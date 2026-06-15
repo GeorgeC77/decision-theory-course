@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Combine, RotateCcw } from 'lucide-react';
 import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '@/components/Layout';
-import Breadcrumb from '@/components/Breadcrumb';
 import FormulaBlock from '@/components/FormulaBlock';
 import CalculationSteps from '@/components/CalculationSteps';
 import type { CalcStep } from '@/components/CalculationSteps';
@@ -399,21 +398,11 @@ export default function UtilityMergingPage() {
   return (
     <Layout>
       <motion.div
-        className="p-4 md:p-6 max-w-[1200px] mx-auto"
+        className=""
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* ── Breadcrumb ── */}
-        <motion.div variants={itemVariants}>
-          <Breadcrumb
-            items={[
-              { label: '首页', path: '/' },
-              { label: '5.2 多维效用并合' },
-            ]}
-          />
-        </motion.div>
-
         {/* ── Section Header ── */}
         <motion.div variants={itemVariants} className="mt-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">

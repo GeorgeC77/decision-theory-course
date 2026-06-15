@@ -1,31 +1,19 @@
-import type { ReactNode } from 'react';
 import Navbar from './Navbar';
-import LeftSidebar from './LeftSidebar';
 import Footer from './Footer';
 
 interface LayoutProps {
-  children: ReactNode;
-  showSidebar?: boolean;
+  children: React.ReactNode;
 }
 
-export default function Layout({ children, showSidebar = true }: LayoutProps) {
+export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-[100dvh] flex flex-col" style={{ background: '#F8F6F2' }}>
-      {/* Top Navbar */}
+    <div className="min-h-[100dvh] flex flex-col bg-[#F8F6F2]">
       <Navbar />
-
-      {/* Main Content Area */}
-      <div className="flex flex-1" style={{ paddingTop: '56px' }}>
-        {/* Left Sidebar - only on pages with sidebar */}
-        {showSidebar && <LeftSidebar />}
-
-        {/* Content */}
-        <main className="flex-1 min-w-0">
+      <main className="pt-14 flex-1">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {children}
-        </main>
-      </div>
-
-      {/* Footer */}
+        </div>
+      </main>
       <Footer />
     </div>
   );

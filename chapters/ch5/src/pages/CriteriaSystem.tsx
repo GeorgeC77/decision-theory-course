@@ -9,7 +9,6 @@ import {
   BookOpen,
 } from 'lucide-react';
 import Layout from '@/components/Layout';
-import Breadcrumb from '@/components/Breadcrumb';
 import { BlockMath } from 'react-katex';
 import KnowledgeCard from '@/components/KnowledgeCard';
 import type { KnowledgeSection } from '@/components/KnowledgeCard';
@@ -182,21 +181,7 @@ export default function CriteriaSystemPage() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-6 max-w-[1200px] mx-auto">
-        {/* ========== Breadcrumb ========== */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Breadcrumb
-            items={[
-              { label: '首页', path: '/' },
-              { label: '5.1 目标准则体系' },
-            ]}
-          />
-        </motion.div>
-
+      <div className="">
         {/* ========== Section Header ========== */}
         <motion.div
           className="mt-6 mb-6 flex flex-col md:flex-row md:justify-between md:items-start gap-4"

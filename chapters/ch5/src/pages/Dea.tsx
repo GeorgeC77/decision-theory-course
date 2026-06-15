@@ -17,7 +17,6 @@ import {
   Minus as IconCRS,
 } from 'lucide-react';
 import Layout from '@/components/Layout';
-import Breadcrumb from '@/components/Breadcrumb';
 import CalculationSteps from '@/components/CalculationSteps';
 import KnowledgeCard from '@/components/KnowledgeCard';
 import { BlockMath, InlineMath } from 'react-katex';
@@ -211,36 +210,6 @@ function calculateEfficiency(
 /* ================================================================
    Section Pills (inline, since it's specific to this page context)
    ================================================================ */
-const sectionPillLinks = [
-  { path: '/criteria-system', label: '5.1 目标准则体系' },
-  { path: '/utility-merging', label: '5.2 多维效用并合' },
-  { path: '/ahp', label: '5.3 层次分析(AHP)' },
-  { path: '/dea', label: '5.4 DEA数据包络分析' },
-];
-
-function SectionPills() {
-  return (
-    <div className="flex flex-wrap gap-2 mb-5">
-      {sectionPillLinks.map((link) => {
-        const isActive = link.path === '/dea';
-        return (
-          <a
-            key={link.path}
-            href={`#${link.path}`}
-            className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 no-underline"
-            style={{
-              background: isActive ? '#1B3A5F' : '#ffffff',
-              color: isActive ? '#ffffff' : '#6B6B6B',
-              border: '1px solid #E0DDD5',
-            }}
-          >
-            {link.label}
-          </a>
-        );
-      })}
-    </div>
-  );
-}
 
 /* ================================================================
    Main Component
@@ -469,24 +438,7 @@ export default function DeaPage() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-6 max-w-[1200px] mx-auto">
-        {/* ====== Section Pills ====== */}
-        <SectionPills />
-
-        {/* ====== Breadcrumb ====== */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Breadcrumb
-            items={[
-              { label: '首页', path: '/' },
-              { label: '5.4 DEA思想简化演示' },
-            ]}
-          />
-        </motion.div>
-
+      <div className="">
         {/* ====== Page Header ====== */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

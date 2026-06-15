@@ -23,7 +23,6 @@ import {
   Cell,
 } from 'recharts';
 import Layout from '@/components/Layout';
-import Breadcrumb from '@/components/Breadcrumb';
 import KnowledgeCard from '@/components/KnowledgeCard';
 
 
@@ -829,14 +828,7 @@ export default function AnpPage() {
     [limitPriorities]
   );
 
-  /* Section pills */
-  const pills = [
-    { label: '5.1', path: '/criteria-system', text: '目标准则体系' },
-    { label: '5.2', path: '/utility-merging', text: '多维效用并合' },
-    { label: '5.3', path: '/ahp', text: 'AHP' },
-    { label: '5.4', path: '/dea', text: 'DEA' },
-    { label: '5.6', path: '/anp', text: 'ANP' },
-  ];
+  
 
   /* Knowledge sections */
   const knowledgeSections = [
@@ -896,30 +888,7 @@ export default function AnpPage() {
 
   return (
     <Layout>
-      <div className="px-4 md:px-6 py-6 max-w-[1200px] mx-auto">
-        {/* Section Pills */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          {pills.map((p) => (
-            <a
-              key={p.label}
-              href={`/#${p.path}`}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 no-underline"
-              style={{
-                background: p.label === '5.6' ? '#1B3A5F' : '#fff',
-                color: p.label === '5.6' ? '#fff' : '#6B6B6B',
-                border: p.label === '5.6' ? '1px solid #1B3A5F' : '1px solid #E0DDD5',
-              }}
-            >
-              {p.label} {p.text}
-            </a>
-          ))}
-        </div>
-
-        {/* Breadcrumb */}
-        <Breadcrumb
-          items={[{ label: '首页', path: '/' }, { label: '5.6 网络分析法(ANP)' }]}
-        />
-
+      <div className="">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

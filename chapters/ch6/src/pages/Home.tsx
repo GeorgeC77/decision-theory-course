@@ -40,7 +40,7 @@ const sections = [
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="space-y-8">
       {/* Hero Section */}
       <section className="bg-[#1B3A5F] rounded-2xl px-6 py-12 lg:px-12 lg:py-16 text-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">

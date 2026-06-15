@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   BarChart,
@@ -13,7 +12,6 @@ import {
 } from 'recharts';
 import {
   BookOpen,
-  ArrowLeft,
   Pencil,
   Lightbulb,
   CheckCircle,
@@ -25,15 +23,6 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Tab data                                                            */
 /* ------------------------------------------------------------------ */
-const tabs = [
-  { label: '4.1', title: '基本概念', path: '/concept', active: false },
-  { label: '4.2', title: '乐观准则', path: '/optimistic', active: true },
-  { label: '4.3', title: '悲观准则', path: '/pessimistic', active: false },
-  { label: '4.4', title: '折中准则', path: '/compromise', active: false },
-  { label: '4.5', title: '后悔值', path: '/regret', active: false },
-  { label: '4.6', title: '等概率', path: '/laplace', active: false },
-  { label: '4.7', title: '案例分析', path: '/case-study', active: false },
-];
 
 /* ------------------------------------------------------------------ */
 /*  Animation variants                                                  */
@@ -162,60 +151,21 @@ export default function Optimistic() {
     <div style={{ backgroundColor: '#F8F6F2' }}>
       {/* ==================== TAB NAVIGATION ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pt-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-5"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Back button */}
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-sm no-underline transition-colors duration-200 mb-3"
-          style={{ color: '#6B6B6B' }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#1B3A5F'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#6B6B6B'; }}
-        >
-          <ArrowLeft size={16} />
-          <span>返回章节首页</span>
-        </Link>
-
-        {/* Tab pills */}
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.path}
-              to={tab.path}
-              className="flex items-center gap-1 px-3 py-1.5 text-[13px] no-underline rounded-full border transition-all duration-200"
-              style={
-                tab.active
-                  ? { backgroundColor: '#1B3A5F', color: '#ffffff', borderColor: '#1B3A5F' }
-                  : { backgroundColor: '#ffffff', color: '#1B3A5F', borderColor: '#E0DDD5' }
-              }
-            >
-              <span className="font-medium">{tab.label}</span>
-              <span>{tab.title}</span>
-            </Link>
-          ))}
-        </div>
       </motion.div>
 
       {/* ==================== PAGE TITLE ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 py-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.15 }}
       >
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs mb-3" style={{ color: '#6B6B6B' }}>
-          <Link to="/" className="no-underline hover:underline" style={{ color: '#6B6B6B' }}>首页</Link>
-          <span>/</span>
-          <Link to="/concept" className="no-underline hover:underline" style={{ color: '#6B6B6B' }}>4.1 基本概念</Link>
-          <span>/</span>
-          <span style={{ color: '#1B3A5F', fontWeight: 500 }}>4.2 乐观准则</span>
-        </div>
-
         {/* Title */}
         <div className="flex items-center justify-between">
           <div>
@@ -267,7 +217,7 @@ export default function Optimistic() {
 
       {/* ==================== KNOWLEDGE CARD ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
@@ -303,7 +253,7 @@ export default function Optimistic() {
 
       {/* ==================== EDITABLE PAYOFF MATRIX ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
@@ -432,7 +382,7 @@ export default function Optimistic() {
 
       {/* ==================== CALCULATION PROCESS ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
@@ -521,7 +471,7 @@ export default function Optimistic() {
 
       {/* ==================== OPTIMAL RESULT CARD ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
@@ -562,7 +512,7 @@ export default function Optimistic() {
 
       {/* ==================== BAR CHART ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"
@@ -652,7 +602,7 @@ export default function Optimistic() {
 
       {/* ==================== KNOWLEDGE CARD ==================== */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 mb-12"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mb-12"
         variants={scrollReveal}
         initial="hidden"
         whileInView="visible"

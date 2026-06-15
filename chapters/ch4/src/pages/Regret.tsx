@@ -1,10 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   RefreshCw,
   RotateCcw,
-  ArrowLeft,
   Lightbulb,
   BookOpen,
   Check,
@@ -48,15 +46,6 @@ const defaultMatrix: MatrixData = {
 const alternatives = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
 const states = ['θ₁（景气）', 'θ₂（不变）', 'θ₃（不景气）'];
 
-const tabs = [
-  { label: '4.1', path: '/concept', title: '基本概念' },
-  { label: '4.2', path: '/optimistic', title: '乐观准则' },
-  { label: '4.3', path: '/pessimistic', title: '悲观准则' },
-  { label: '4.4', path: '/compromise', title: '折中准则' },
-  { label: '4.5', path: '/regret', title: '后悔值' },
-  { label: '4.6', path: '/laplace', title: '等概率' },
-  { label: '4.7', path: '/case-study', title: '案例分析' },
-];
 
 /* ─────────────────────── utility: compute regret ─────────────────────── */
 function computeRegret(matrix: MatrixData): RegretResult {
@@ -234,42 +223,8 @@ export default function Regret() {
 
   return (
     <div className="min-h-[100dvh]" style={{ backgroundColor: '#F8F6F2' }}>
-      {/* ── Tab Navigation ── */}
-      <div className="max-w-[960px] mx-auto px-4 pt-20 pb-6">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-sm mb-4 no-underline transition-colors duration-200 hover:underline"
-          style={{ color: '#2A4A73' }}
-        >
-          <ArrowLeft size={16} />
-          返回章节首页
-        </Link>
-
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((t) => {
-            const isActive = t.path === '/regret';
-            return (
-              <Link
-                key={t.path}
-                to={t.path}
-                className="px-4 py-2 text-sm no-underline transition-all duration-250 flex items-center gap-1.5"
-                style={{
-                  borderRadius: '20px',
-                  border: '1px solid #E0DDD5',
-                  backgroundColor: isActive ? '#1B3A5F' : '#ffffff',
-                  color: isActive ? '#ffffff' : '#1B3A5F',
-                }}
-              >
-                <span>{t.label}</span>
-                <span style={{ opacity: 0.7 }}>{t.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ── Title Section ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -306,7 +261,7 @@ export default function Regret() {
       </div>
 
       {/* ── Original Payoff Matrix ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <Card>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold" style={{ color: '#1B3A5F' }}>
@@ -370,7 +325,7 @@ export default function Regret() {
       </div>
 
       {/* ── Regret Matrix ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <motion.div
           className="bg-white rounded-xl p-6"
           style={{ border: '2px solid #C8963E' }}
@@ -500,7 +455,7 @@ export default function Regret() {
       </div>
 
       {/* ── Calculation Steps ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <Lightbulb size={18} style={{ color: '#C8963E' }} />
@@ -644,7 +599,7 @@ export default function Regret() {
       </div>
 
       {/* ── Optimal Result ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <motion.div
           className="p-6"
           style={{
@@ -691,7 +646,7 @@ export default function Regret() {
       </div>
 
       {/* ── Bar Chart ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-6">
+      <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <Card>
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 size={18} style={{ color: '#C8963E' }} />
@@ -764,7 +719,7 @@ export default function Regret() {
       </div>
 
       {/* ── Knowledge Card ── */}
-      <div className="max-w-[960px] mx-auto px-4 pb-8">
+      <div className="max-w-[1200px] mx-auto px-4 pb-8">
         <motion.div
           className="p-6"
           style={{

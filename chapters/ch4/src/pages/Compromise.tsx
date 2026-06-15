@@ -1,9 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   SlidersHorizontal,
-  ArrowLeft,
   RotateCcw,
   Pencil,
   Lightbulb,
@@ -50,15 +48,6 @@ const ALT_LABELS = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
 const ALT_KEYS = ['A1', 'A2', 'A3'];
 const LINE_COLORS = ['#e74c3c', '#3498db', '#2ecc71'];
 
-const TAB_ITEMS = [
-  { label: '4.1', title: '基本概念', path: '/concept' },
-  { label: '4.2', title: '乐观准则', path: '/optimistic' },
-  { label: '4.3', title: '悲观准则', path: '/pessimistic' },
-  { label: '4.4', title: '折中准则', path: '/compromise' },
-  { label: '4.5', title: '后悔值', path: '/regret' },
-  { label: '4.6', title: '等概率', path: '/laplace' },
-  { label: '4.7', title: '案例分析', path: '/case-study' },
-];
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -122,39 +111,9 @@ export default function Compromise() {
 
   return (
     <div style={{ backgroundColor: '#F8F6F2' }}>
-      {/* ── Tab Navigation ── */}
-      <div className="max-w-[960px] mx-auto px-5 pt-6 pb-2">
-        <div className="flex items-center gap-3 mb-4">
-          <Link to="/" className="flex items-center gap-1.5 text-sm" style={{ color: '#6B6B6B' }}>
-            <ArrowLeft size={16} />
-            <span>返回章节首页</span>
-          </Link>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {TAB_ITEMS.map((tab) => {
-            const isActive = tab.path === '/compromise';
-            return (
-              <Link
-                key={tab.path}
-                to={tab.path}
-                className="px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-250 flex items-center gap-1.5"
-                style={{
-                  backgroundColor: isActive ? '#1B3A5F' : '#ffffff',
-                  color: isActive ? '#ffffff' : '#1B3A5F',
-                  border: '1px solid #E0DDD5',
-                }}
-              >
-                <span>{tab.label}</span>
-                <span className="opacity-70">{tab.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ── Page Title ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 py-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -184,7 +143,7 @@ export default function Compromise() {
 
       {/* ── Editable Payoff Matrix ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -313,7 +272,7 @@ export default function Compromise() {
 
       {/* ── Alpha Slider ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -410,7 +369,7 @@ export default function Compromise() {
 
       {/* ── Calculation Steps ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-6"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
@@ -494,7 +453,7 @@ export default function Compromise() {
 
       {/* ── Optimal Result ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -523,7 +482,7 @@ export default function Compromise() {
 
       {/* ── Line Chart ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-6"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.4, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
@@ -614,7 +573,7 @@ export default function Compromise() {
 
       {/* ── Knowledge Card ── */}
       <motion.div
-        className="max-w-[960px] mx-auto px-5 pb-12"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.45, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}

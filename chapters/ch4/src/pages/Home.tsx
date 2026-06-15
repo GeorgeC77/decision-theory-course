@@ -226,9 +226,9 @@ function ModuleCardComponent({ module }: { module: ModuleCard }) {
 
 export default function Home() {
   return (
-    <div style={{ backgroundColor: '#F8F6F2' }}>
+    <div className="flex flex-col gap-8">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center" style={{ paddingTop: '64px', paddingBottom: '32px' }}>
+      <section className="flex flex-col items-center justify-center text-center py-6">
         <motion.h1
           variants={heroTitleVariants}
           initial="hidden"
@@ -274,33 +274,16 @@ export default function Home() {
       </section>
 
       {/* Module Cards Grid */}
-      <section className="mx-auto px-5" style={{ maxWidth: '1000px', padding: '24px 20px 48px' }}>
+      <section>
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="flex flex-col gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {/* Row 1: 2 cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {modules.slice(0, 2).map((m) => (
-              <ModuleCardComponent key={m.number} module={m} />
-            ))}
-          </div>
-
-          {/* Row 2: 3 cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modules.slice(2, 5).map((m) => (
-              <ModuleCardComponent key={m.number} module={m} />
-            ))}
-          </div>
-
-          {/* Row 3: 2 cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[calc(66.666%-12px)] mx-auto w-full">
-            {modules.slice(5, 7).map((m) => (
-              <ModuleCardComponent key={m.number} module={m} />
-            ))}
-          </div>
+          {modules.map((m) => (
+            <ModuleCardComponent key={m.number} module={m} />
+          ))}
         </motion.div>
       </section>
     </div>

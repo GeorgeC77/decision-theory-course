@@ -1,12 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
   Briefcase,
   BarChart3,
   Lightbulb,
   BookOpen,
-  ArrowLeft,
   Pencil,
   RotateCcw,
   SlidersHorizontal,
@@ -87,15 +85,6 @@ const DEFAULT_MATRIX: Matrix = [
 const SCENARIOS = ['S1(畅销)', 'S2(一般)', 'S3(滞销)'];
 const ALTERNATIVES = ['A1(大批量)', 'A2(中批量)', 'A3(小批量)'];
 
-const TABS = [
-  { label: '4.1', title: '基本概念', path: '/concept' },
-  { label: '4.2', title: '乐观准则', path: '/optimistic' },
-  { label: '4.3', title: '悲观准则', path: '/pessimistic' },
-  { label: '4.4', title: '折中准则', path: '/compromise' },
-  { label: '4.5', title: '后悔值', path: '/regret' },
-  { label: '4.6', title: '等概率', path: '/laplace' },
-  { label: '4.7', title: '案例分析', path: '/case-study' },
-];
 
 /* ------------------------------------------------------------------ */
 /*  Regret matrix calculation                                          */
@@ -261,46 +250,10 @@ export default function CaseStudy() {
   return (
     <div className="min-h-[100dvh]" style={{ backgroundColor: '#F8F6F2' }}>
       {/* ============================ */}
-      {/* Tab Navigation               */}
-      {/* ============================ */}
-      <div className="max-w-[960px] mx-auto px-4 pt-6 pb-2">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-sm mb-4 transition-colors hover:opacity-80"
-          style={{ color: '#1B3A5F' }}
-        >
-          <ArrowLeft size={16} />
-          <span>返回章节首页</span>
-        </Link>
-
-        <div className="flex flex-wrap gap-2">
-          {TABS.map((t) => {
-            const active = t.path === '/case-study';
-            return (
-              <Link
-                key={t.path}
-                to={t.path}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-[13px] font-medium border transition-all duration-250 no-underline flex items-center gap-1.5',
-                  active
-                    ? 'text-white border-[#1B3A5F]'
-                    : 'text-[#1B3A5F] bg-white border-[#E0DDD5] hover:border-[#1B3A5F]',
-                )}
-                style={active ? { backgroundColor: '#1B3A5F' } : undefined}
-              >
-                <span>{t.label}</span>
-                <span style={{ opacity: 0.7 }}>{t.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ============================ */}
       {/* Main Content                 */}
       {/* ============================ */}
       <motion.div
-        className="max-w-[960px] mx-auto px-4 py-6 pb-16 flex flex-col gap-6"
+        className="max-w-[1200px] mx-auto px-4 py-6 pb-16 flex flex-col gap-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
