@@ -3,7 +3,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 
 const sectionNames: Record<string, string> = {
-  '/': '首页',
+  '/': '序贯决策分析',
   '/6-1': '6.1 多阶段决策',
   '/6-2': '6.2 序列决策',
   '/6-3': '6.3 马尔可夫决策',
@@ -15,13 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const currentPath = location.pathname
   const sectionName = sectionNames[currentPath] || '序贯决策分析'
 
-  const breadcrumbItems =
-    currentPath === '/'
-      ? [{ label: '首页', path: '/' }]
-      : [
-          { label: '首页', path: '/' },
-          { label: sectionName, path: currentPath },
-        ]
+  const breadcrumbItems = [{ label: sectionName, path: currentPath }]
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-[#F8F6F2]">
