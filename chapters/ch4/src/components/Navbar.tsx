@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
-import { BookOpen, Menu, X } from 'lucide-react';
+import { BookOpen, Home, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
@@ -32,6 +32,14 @@ export default function Navbar() {
 
         {/* Right: Desktop nav links */}
         <div className="hidden lg:flex items-center gap-1">
+          <a
+            href="/"
+            className="flex items-center gap-1.5 px-3 py-1 text-white text-[13px] no-underline transition-opacity duration-200 rounded-md hover:bg-white/10"
+            title="返回课程目录"
+          >
+            <Home size={14} />
+            目录
+          </a>
           {navLinks.map((link) => {
             const isActive =
               link.path === '/'
@@ -87,6 +95,15 @@ export default function Navbar() {
             className="absolute top-14 left-0 right-0 lg:hidden flex flex-col"
             style={{ backgroundColor: '#1B3A5F' }}
           >
+            <a
+              href="/"
+              className="px-4 py-3 text-white text-[13px] no-underline flex items-center gap-2"
+              style={{ opacity: 0.8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}
+              onClick={() => setMobileOpen(false)}
+            >
+              <Home size={14} />
+              返回课程目录
+            </a>
             {navLinks.map((link) => {
               const isActive =
                 link.path === '/'

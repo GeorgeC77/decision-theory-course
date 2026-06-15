@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Menu, X } from 'lucide-react';
+import { BookOpen, Home, Menu, X } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: '首页' },
-  { path: '/criteria-system', label: '5.1' },
-  { path: '/utility-merging', label: '5.2' },
-  { path: '/ahp', label: '5.3' },
-  { path: '/dea', label: '5.4' },
-  { path: '/fuzzy-eval', label: '5.5' },
-  { path: '/anp', label: '5.6' },
+  { path: '/criteria-system', label: '5.1 目标准则体系' },
+  { path: '/utility-merging', label: '5.2 多维效用并合' },
+  { path: '/ahp', label: '5.3 层次分析(AHP)' },
+  { path: '/dea', label: '5.4 DEA思想简化' },
+  { path: '/fuzzy-eval', label: '5.5 模糊综合评价' },
+  { path: '/anp', label: '5.6 网络分析法(ANP)' },
 ];
 
 export default function Navbar() {
@@ -35,6 +35,14 @@ export default function Navbar() {
 
       {/* Desktop Nav Links */}
       <div className="hidden md:flex items-center gap-1">
+        <a
+          href="/"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 no-underline text-white/80 hover:text-white hover:bg-[#2A4A73]"
+          title="返回课程目录"
+        >
+          <Home size={14} />
+          目录
+        </a>
         {navLinks.map((link) => (
           <Link
             key={link.path}
@@ -88,7 +96,7 @@ export default function Navbar() {
                   background: isActive(link.path) ? '#2A4A73' : 'transparent',
                 }}
               >
-                {link.label === '首页' ? '首页' : `第${link.label}节`}
+                {link.label === '首页' ? '首页' : link.label}
               </Link>
             ))}
           </motion.div>

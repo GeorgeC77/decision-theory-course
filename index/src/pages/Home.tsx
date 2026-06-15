@@ -206,11 +206,23 @@ function ChaptersGrid() {
 
 function Footer() {
   return (
-    <footer className="border-t border-[#E0DDD5] bg-white py-6 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 text-center">
-        <p className="text-sm text-[#6B6B6B]">
-          决策理论与方法 — 交互式学习平台
-        </p>
+    <footer className="bg-[#1B3A5F] text-white mt-auto border-t-4 border-[#C8963E]">
+      <div className="max-w-7xl mx-auto px-4 py-8 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-2 text-[#C8963E] font-semibold text-lg">
+            <span>©</span>
+            <span>2026 GeorgeC77</span>
+          </div>
+          <p className="text-white/90 text-base font-medium">
+            决策理论与方法 · 交互式学习平台
+          </p>
+          <p className="text-white/70 text-sm max-w-2xl">
+            本网站内容仅供教学与学习交流使用。未经授权，禁止用于商业用途或大规模转载。
+          </p>
+          <p className="text-white/50 text-xs mt-1">
+            All Rights Reserved. Licensed for educational use.
+          </p>
+        </div>
       </div>
     </footer>
   )

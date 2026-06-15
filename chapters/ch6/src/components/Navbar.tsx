@@ -1,13 +1,13 @@
 import { Link, useLocation } from 'react-router'
-import { GitBranch, Home, Menu, X } from 'lucide-react'
+import { GitBranch, Home, Menu, X, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { path: '/', label: '首页' },
-  { path: '/6-1', label: '6.1' },
-  { path: '/6-2', label: '6.2' },
-  { path: '/6-3', label: '6.3' },
-  { path: '/6-4', label: '6.4' },
+  { path: '/6-1', label: '6.1 多阶段决策' },
+  { path: '/6-2', label: '6.2 序列决策' },
+  { path: '/6-3', label: '6.3 马尔可夫决策' },
+  { path: '/6-4', label: '6.4 群体决策简介' },
 ]
 
 export default function Navbar() {
@@ -25,6 +25,14 @@ export default function Navbar() {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-1">
+        <a
+          href="/"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 no-underline text-gray-300 hover:text-white hover:bg-[#2A4A73]"
+          title="返回课程目录"
+        >
+          <Home className="w-4 h-4" />
+          目录
+        </a>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
@@ -69,7 +77,7 @@ export default function Navbar() {
                       : 'text-gray-300 hover:text-white hover:bg-[#2A4A73]'
                   }`}
                 >
-                  {item.path === '/' ? <Home className="w-4 h-4" /> : <span className="w-4 h-4 flex items-center justify-center text-xs">{item.label}</span>}
+                  {item.path === '/' ? <ArrowLeft className="w-4 h-4" /> : <span className="w-4 h-4 flex items-center justify-center text-xs">{item.label.split(' ')[0]}</span>}
                   <span>{item.label}</span>
                 </Link>
               )

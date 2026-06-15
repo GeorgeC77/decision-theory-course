@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { BookOpen, Menu, X } from 'lucide-react';
+import { BookOpen, Home, Menu, X } from 'lucide-react';
 
 const navItems = [
   { label: '3.1 期望值准则', tab: 0 },
@@ -65,6 +65,16 @@ export default function Navbar({ activeTab = 0, onNavClick }: NavbarProps) {
 
       {/* Right: Desktop Nav Links */}
       <div className="hidden md:flex items-center gap-1">
+        {/* Back to course catalog */}
+        <a
+          href="/"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 text-white/70 hover:text-white hover:bg-white/10 no-underline mr-1"
+          title="返回课程目录"
+        >
+          <Home className="w-4 h-4" />
+          目录
+        </a>
+
         {/* Home link */}
         <button
           onClick={handleHomeClick}
@@ -115,6 +125,15 @@ export default function Navbar({ activeTab = 0, onNavClick }: NavbarProps) {
       {/* Mobile Menu Dropdown */}
       {mobileOpen && (
         <div className="absolute top-14 left-0 right-0 bg-[#1B3A5F] border-t border-white/10 shadow-lg md:hidden">
+          {/* Back to course catalog */}
+          <a
+            href="/"
+            className="flex items-center gap-2 w-full text-left px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors no-underline"
+          >
+            <Home className="w-4 h-4" />
+            返回课程目录
+          </a>
+
           {/* Home link */}
           <button
             onClick={handleHomeClick}
