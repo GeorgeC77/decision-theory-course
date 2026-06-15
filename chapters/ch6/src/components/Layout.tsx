@@ -1,6 +1,5 @@
 import { useLocation } from 'react-router'
 import Navbar from './Navbar'
-import Sidebar from './Sidebar'
 import Footer from './Footer'
 
 const sectionNames: Record<string, string> = {
@@ -31,9 +30,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="pt-14 flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-
         {/* Content Area */}
         <main className="flex-1 min-w-0 min-h-[calc(100vh-3.5rem)]">
           {/* Breadcrumb */}

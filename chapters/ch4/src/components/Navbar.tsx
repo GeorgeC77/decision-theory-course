@@ -33,7 +33,7 @@ export default function Navbar() {
         {/* Right: Desktop nav links */}
         <div className="hidden lg:flex items-center gap-1">
           <a
-            href="/"
+            href="../"
             className="flex items-center gap-1.5 px-3 py-1 text-white text-[13px] no-underline transition-opacity duration-200 rounded-md hover:bg-white/10"
             title="返回课程目录"
           >
@@ -96,7 +96,7 @@ export default function Navbar() {
             style={{ backgroundColor: '#1B3A5F' }}
           >
             <a
-              href="/"
+              href="../"
               className="px-4 py-3 text-white text-[13px] no-underline flex items-center gap-2"
               style={{ opacity: 0.8, borderBottom: '1px solid rgba(255,255,255,0.1)' }}
               onClick={() => setMobileOpen(false)}

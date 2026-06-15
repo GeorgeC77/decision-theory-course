@@ -26,7 +26,7 @@ export default function Navbar() {
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-1">
         <a
-          href="/"
+          href="../"
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 no-underline text-gray-300 hover:text-white hover:bg-[#2A4A73]"
           title="返回课程目录"
         >
