@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 97%;
+    --foreground: 210 55% 24%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 55% 24%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 55% 24%;
+    --primary: 210 55% 24%;
+    --primary-foreground: 40 20% 97%;
+    --secondary: 40 20% 95%;
+    --secondary-foreground: 210 55% 24%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 40 50% 52%;
+    --accent-foreground: 210 55% 24%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 14% 85%;
+    --input: 38 14% 85%;
+    --ring: 210 55% 24%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 210 55% 24%;
+    --sidebar-primary: 210 55% 24%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 40 20% 95%;
+    --sidebar-accent-foreground: 210 55% 24%;
+    --sidebar-border: 38 14% 85%;
+    --sidebar-ring: 40 50% 52%;
+
+    /* Design System Colors */
+    --Primary: #1B3A5F;
+    --PrimaryLight: #2A4A73;
+    --AccentGold: #C8963E;
+    --AccentGoldLight: #F5EDE0;
+    --SuccessGreen: #4CAF50;
+    --SuccessGreenBG: #E8F5E9;
+    --DangerRed: #F44336;
+    --DangerRedBG: #FDE8E8;
+    --Background: #F8F6F2;
+    --Surface: #FFFFFF;
+    --SurfaceAlt: #F0EDE8;
+    --BorderColor: #E0DDD5;
+    --BorderLight: #EFEBE5;
+    --TextPrimary: #2B2B2B;
+    --TextSecondary: #6B6B6B;
+    --TextMuted: #9E9E9E;
+    --ChartBlue: #1B3A5F;
+    --ChartGold: #C8963E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--Background);
+    color: var(--TextPrimary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .font-mono-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+@layer utilities {
+  .text-Primary { color: var(--Primary); }
+  .text-PrimaryLight { color: var(--PrimaryLight); }
+  .text-AccentGold { color: var(--AccentGold); }
+  .text-AccentGoldLight { color: var(--AccentGoldLight); }
+  .text-SuccessGreen { color: var(--SuccessGreen); }
+  .text-SuccessGreenBG { color: var(--SuccessGreenBG); }
+  .text-DangerRed { color: var(--DangerRed); }
+  .text-DangerRedBG { color: var(--DangerRedBG); }
+  .text-TextPrimary { color: var(--TextPrimary); }
+  .text-TextSecondary { color: var(--TextSecondary); }
+  .text-TextMuted { color: var(--TextMuted); }
+  .text-ChartBlue { color: var(--ChartBlue); }
+  .text-ChartGold { color: var(--ChartGold); }
+
+  .bg-Primary { background-color: var(--Primary); }
+  .bg-PrimaryLight { background-color: var(--PrimaryLight); }
+  .bg-AccentGold { background-color: var(--AccentGold); }
+  .bg-AccentGoldLight { background-color: var(--AccentGoldLight); }
+  .bg-AccentGoldLight { background-color: var(--AccentGoldLight); }
+  .bg-SuccessGreen { background-color: var(--SuccessGreen); }
+  .bg-SuccessGreenBG { background-color: var(--SuccessGreenBG); }
+  .bg-DangerRed { background-color: var(--DangerRed); }
+  .bg-DangerRedBG { background-color: var(--DangerRedBG); }
+  .bg-Background { background-color: var(--Background); }
+  .bg-Surface { background-color: var(--Surface); }
+  .bg-SurfaceAlt { background-color: var(--SurfaceAlt); }
+  .bg-ChartBlue { background-color: var(--ChartBlue); }
+  .bg-ChartGold { background-color: var(--ChartGold); }
+
+  .border-Primary { border-color: var(--Primary); }
+  .border-PrimaryLight { border-color: var(--PrimaryLight); }
+  .border-AccentGold { border-color: var(--AccentGold); }
+  .border-SuccessGreen { border-color: var(--SuccessGreen); }
+  .border-DangerRed { border-color: var(--DangerRed); }
+  .border-Border { border-color: var(--BorderColor); }
+  .border-BorderLight { border-color: var(--BorderLight); }
+
+  .from-Primary { --tw-gradient-from: var(--Primary); }
+  .from-AccentGold { --tw-gradient-from: var(--AccentGold); }
+  .to-PrimaryLight { --tw-gradient-to: var(--PrimaryLight); }
+  .to-AccentGold { --tw-gradient-to: var(--AccentGold); }
+}
+
+/* Shake animation for probability validation error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Gold flash animation for input changes */
+@keyframes goldFlash {
+  0% { color: var(--AccentGold); }
+  100% { color: inherit; }
+}
+
+.animate-gold-flash {
+  animation: goldFlash 0.3s ease-out;
+}
+
+/* Breathing animation for optimal row */
+@keyframes breathe {
+  0%, 100% { background-color: rgba(74, 140, 111, 0.08); }
+  50% { background-color: rgba(74, 140, 111, 0.15); }
+}
+
+.animate-breathe {
+  animation: breathe 2s ease-in-out infinite;
+}

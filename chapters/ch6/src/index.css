@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* KaTeX 样式 */
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 97%;
+    --foreground: 210 55% 24%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 55% 24%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 55% 24%;
+    --primary: 210 55% 24%;
+    --primary-foreground: 40 20% 97%;
+    --secondary: 40 20% 95%;
+    --secondary-foreground: 210 55% 24%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 40 50% 52%;
+    --accent-foreground: 210 55% 24%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 14% 85%;
+    --input: 38 14% 85%;
+    --ring: 210 55% 24%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 210 55% 24%;
+    --sidebar-primary: 210 55% 24%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 40 20% 95%;
+    --sidebar-accent-foreground: 210 55% 24%;
+    --sidebar-border: 38 14% 85%;
+    --sidebar-ring: 40 50% 52%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: #F8F6F2;
+    color: #1B3A5F;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* 全局滚动条样式 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #F8F6F2; }
+::-webkit-scrollbar-thumb { background: #9E9E9E; border-radius: 3px; }
+
+/* 页面过渡动画 */
+.page-enter {
+  animation: pageEnter 0.4s ease-out;
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 决策树样式 */
+.decision-node { fill: #1B3A5F; stroke: #2A4A73; stroke-width: 2; }
+.chance-node { fill: #F8F6F2; stroke: #2A4A73; stroke-width: 2; }
+.tree-edge { stroke: #6B6B6B; stroke-width: 1.5; }
+.optimal-path { stroke: #C8963E !important; stroke-width: 2.5 !important; }

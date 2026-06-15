@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 97%;
+    --foreground: 210 55% 24%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 55% 24%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 55% 24%;
+    --primary: 210 55% 24%;
+    --primary-foreground: 40 20% 97%;
+    --secondary: 40 20% 95%;
+    --secondary-foreground: 210 55% 24%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 40 50% 52%;
+    --accent-foreground: 210 55% 24%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 14% 85%;
+    --input: 38 14% 85%;
+    --ring: 210 55% 24%;
+    --radius: 0.625rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 210 55% 24%;
+    --sidebar-primary: 210 55% 24%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 40 20% 95%;
+    --sidebar-accent-foreground: 210 55% 24%;
+    --sidebar-border: 38 14% 85%;
+    --sidebar-ring: 40 50% 52%;
+
+    --font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", "Source Code Pro", "Consolas", monospace;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #F8F6F2;
+    color: #1B3A5F;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .formula-block {
+    background: #F5EDE0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .card-hover {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border-color: #E0DDD5;
+  }
+}
