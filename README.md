@@ -4,9 +4,7 @@
 
 ## 在线访问
 
-访问地址：https://你的用户名.github.io/你的仓库名/
-
-（请将 `你的用户名` 和 `你的仓库名` 替换为实际的 GitHub 用户名和仓库名）
+访问地址：https://georgec77.github.io/decision-theory-course/
 
 ## 项目结构
 
