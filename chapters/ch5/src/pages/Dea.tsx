@@ -19,7 +19,7 @@ import {
 import Layout from '@/components/Layout';
 import CalculationSteps from '@/components/CalculationSteps';
 import KnowledgeCard from '@/components/KnowledgeCard';
-import { BlockMath, InlineMath } from 'react-katex';
+import { SafeBlockMath as BlockMath, SafeInlineMath as InlineMath } from '@/components/SafeKatex';
 import {
   BarChart,
   Bar,

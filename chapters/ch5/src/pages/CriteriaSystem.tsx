@@ -9,7 +9,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { BlockMath } from 'react-katex';
+import { SafeBlockMath as BlockMath } from '@/components/SafeKatex';
 import KnowledgeCard from '@/components/KnowledgeCard';
 import type { KnowledgeSection } from '@/components/KnowledgeCard';
 

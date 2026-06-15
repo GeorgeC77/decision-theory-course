@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,28 +26,29 @@ import {
   Info,
 } from "lucide-react";
 import katex from "katex";
+import "katex/dist/katex.min.css";
 
 /* ============================================================
    KaTeX Renderer Component
    ============================================================ */
 function TeX({ math, display = false }: { math: string; display?: boolean }) {
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      katex.render(math, ref.current, {
+  const html = useMemo(() => {
+    try {
+      return katex.renderToString(math, {
         throwOnError: false,
         displayMode: display,
         trust: true,
         strict: false,
       });
+    } catch {
+      return math;
     }
   }, [math, display]);
 
   return (
     <span
-      ref={ref}
       className={display ? "block my-2" : "inline"}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
 }

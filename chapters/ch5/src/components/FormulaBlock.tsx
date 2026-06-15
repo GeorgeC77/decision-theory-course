@@ -1,5 +1,4 @@
-import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+import { SafeInlineMath, SafeBlockMath } from '@/components/SafeKatex';
 
 interface FormulaBlockProps {
   formula: string;
@@ -11,9 +10,9 @@ export default function FormulaBlock({ formula, displayMode = true, className = 
   return (
     <div className={`formula-block ${className}`}>
       {displayMode ? (
-        <BlockMath math={formula} />
+        <SafeBlockMath math={formula} />
       ) : (
-        <InlineMath math={formula} />
+        <SafeInlineMath math={formula} />
       )}
     </div>
   );

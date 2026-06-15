@@ -21,6 +21,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import katex from "katex";
+import "katex/dist/katex.min.css";
 
 // ── KaTeX renderer helper ──────────────────────────────────────
 function Katex({ tex, display = false }: { tex: string; display?: boolean }) {

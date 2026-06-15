@@ -25,7 +25,7 @@ import CalculationSteps from '@/components/CalculationSteps';
 import KnowledgeCard from '@/components/KnowledgeCard';
 import OptimalCard from '@/components/OptimalCard';
 import FormulaBlock from '@/components/FormulaBlock';
-import { BlockMath, InlineMath } from 'react-katex';
+import { SafeBlockMath as BlockMath, SafeInlineMath as InlineMath } from '@/components/SafeKatex';
 
 /* ------------------------------------------------------------------ */
 /*  Constants & Types                                                  */

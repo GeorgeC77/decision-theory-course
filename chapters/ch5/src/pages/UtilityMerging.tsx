@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Combine, RotateCcw } from 'lucide-react';
-import { InlineMath, BlockMath } from 'react-katex';
+import { SafeInlineMath as InlineMath, SafeBlockMath as BlockMath } from '@/components/SafeKatex';
 import Layout from '@/components/Layout';
 import FormulaBlock from '@/components/FormulaBlock';
 import CalculationSteps from '@/components/CalculationSteps';
@@ -61,7 +61,7 @@ const RULES: RuleConfig[] = [
     formula: 'W(u_1,u_2) = \\rho_1 u_1 + \\rho_2 u_2  \\quad (\\rho_1+\\rho_2=1)',
     color: '#4CAF50', // green
     desc: '准则间可互相线性补偿，一目标效用减少可由另一目标效用增加补偿。ρ₁,ρ₂为权系数，反映准则重要性。',
-    paramDesc: '\\rho_i \\ge 0，\\sum \\rho_i = 1；u_i \\in [0,1]',
+    paramDesc: '\\rho_i \\ge 0，\\sum \\rho_i = 1；u_i \\in {[0,1]}',
     applicable: '准则间可线性补偿的场景，如居民消费水平（吃+用）',
   },
   {
@@ -71,7 +71,7 @@ const RULES: RuleConfig[] = [
     formula: 'W(u_1,u_2) = u_1^{\\rho_1} \\cdot u_2^{\\rho_2}',
     color: '#a855f7', // purple
     desc: '不可偏废，任一效用为0则并合效用为0。强调"木桶效应"。当\\rho_1=\\rho_2=1时，W=u_1 u_2。',
-    paramDesc: '\\rho_i > 0；u_i \\in [0,1]',
+    paramDesc: '\\rho_i > 0；u_i \\in {[0,1]}',
     applicable: '准则缺一不可的系统（如功能+可靠性）',
   },
   {
@@ -81,7 +81,7 @@ const RULES: RuleConfig[] = [
     formula: '1 + \\gamma W = (1 + \\gamma c_1 u_1)(1 + \\gamma c_2 u_2)',
     color: '#f59e0b', // amber
     desc: '\\gamma为形式因子。\\gamma=0时退化为加法规则；\\gamma<0时体现准则间的可代换性；\\gamma>0时体现互补性。计算结果截断至[0,1]。',
-    paramDesc: '\\gamma \\ge -1；c_i \\ge 0，\\sum c_i = 1；u_i \\in [0,1]',
+    paramDesc: '\\gamma \\ge -1；c_i \\ge 0，\\sum c_i = 1；u_i \\in {[0,1]}',
     applicable: '准则间关系复杂，不能确定选用哪种基本规则时',
   },
 ];
@@ -515,9 +515,9 @@ export default function UtilityMergingPage() {
           <div className="text-sm leading-relaxed mb-4" style={{ color: '#6B6B6B' }}>
             <p className="mb-3">
               设决策问题有 <InlineMath math="s" /> 个评价准则{' '}
-              <InlineMath math="G_1, G_2, ..., G_s" />，<InlineMath math="m" /> 个可行方案{' '}
+              <InlineMath math="G_1, G_2, \\ldots, G_s" />，<InlineMath math="m" /> 个可行方案{' '}
               <InlineMath math="A_1, A_2, ..., A_m" />。每个方案在各准则下的效用值为{' '}
-              <InlineMath math="u_i(A_k) \in [0, 1]" />，简记为 <InlineMath math="u_{ki}" />。
+              <InlineMath math="u_i(A_k) \in {[0, 1]}" />，简记为 <InlineMath math="u_{ki}" />。
             </p>
             <p>
               多维效用并合就是根据一定的规则将这 <InlineMath math="s" />{' '}
@@ -528,7 +528,7 @@ export default function UtilityMergingPage() {
           {/* General model formula */}
           <div className="formula-block">
             <BlockMath math="W = \mathcal{M}(u_1, u_2, \ldots, u_n)" />
-            <p className="text-sm mt-1" style={{ color: '#6B6B6B' }}>s.t. <InlineMath math="u_i \in [0,1]" /></p>
+            <p className="text-sm mt-1" style={{ color: '#6B6B6B' }}>s.t. <InlineMath math="u_i \in {[0,1]}" /></p>
           </div>
 
           {/* 5 rule mini-cards */}

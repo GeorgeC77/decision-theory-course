@@ -1,39 +1,109 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>确定型决策分析交互式学习平台</title>
+    <title>确定型决策分析 - 交互教学平台</title>
     <script type="module" crossorigin src="./assets/index-Byub_yxM.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-Bn306i-z.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    <a
-      href="../"
-      style="
+    <style>
+      /* Unify chapter 2 navbar/footer with the rest of the site */
+      .kimi-unified-nav {
         position: fixed;
         top: 0;
-        left: 180px;
+        left: 0;
+        right: 0;
         z-index: 9999;
+        height: 56px;
+        background-color: #1B3A5F;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      .kimi-unified-nav-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 16px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .kimi-unified-nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .kimi-unified-nav-link {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        height: 56px;
+        height: 32px;
         padding: 0 12px;
-        background-color: transparent;
+        border-radius: 6px;
         color: rgba(255, 255, 255, 0.7);
         font-size: 13px;
         font-weight: 500;
         text-decoration: none;
-        border-radius: 6px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      "
-      onmouseover="this.style.color='#ffffff'; this.style.backgroundColor='rgba(255,255,255,0.1)';"
-      onmouseout="this.style.color='rgba(255,255,255,0.7)'; this.style.backgroundColor='transparent';"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      目录
-    </a>
+        transition: background-color 0.15s, color 0.15s;
+      }
+      .kimi-unified-nav-link:hover {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .kimi-unified-footer {
+        background-color: #ffffff;
+        border-top: 1px solid #E0DDD5;
+        padding: 20px 16px;
+      }
+      .kimi-unified-footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+        color: #6B6B6B;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function () {
+        function unify() {
+          const nav = document.querySelector('nav');
+          if (nav) {
+            nav.className = 'kimi-unified-nav';
+            nav.innerHTML =
+              '<div class="kimi-unified-nav-inner">' +
+                '<a href="./" class="kimi-unified-nav-brand">' +
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>' +
+                  '<span>决策理论与方法</span>' +
+                '</a>' +
+                '<a href="../" class="kimi-unified-nav-link" title="返回课程目录">' +
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
+                  '目录' +
+                '</a>' +
+              '</div>';
+          }
+          const footer = document.querySelector('footer');
+          if (footer) {
+            footer.className = 'kimi-unified-footer';
+            footer.innerHTML =
+              '<div class="kimi-unified-footer-inner">' +
+                '决策理论与方法 · 第二章 确定型决策分析 · 交互教学平台' +
+              '</div>';
+          }
+        }
+        if (document.readyState === 'complete') {
+          setTimeout(unify, 500);
+        } else {
+          window.addEventListener('load', function () {
+            setTimeout(unify, 500);
+          });
+        }
+      })();
+    </script>
   </body>
 </html>

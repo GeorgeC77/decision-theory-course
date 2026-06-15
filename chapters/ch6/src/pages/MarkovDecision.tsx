@@ -435,7 +435,7 @@ export default function MarkovDecision() {
             <KaTeX tex="\\pi = \\pi P" display />
             <KaTeX tex="\\sum_{i} \\pi_i = 1" display />
             <p className="text-xs text-slate-500 mt-2">
-              其中 <KaTeX tex="\\pi = [\\pi_1, \\pi_2, \\dots, \\pi_n]" /> 为稳态概率向量，P 为状态转移矩阵。
+              其中 <KaTeX tex="\\pi = {[\\pi_1, \\pi_2, \\dots, \\pi_n]}" /> 为稳态概率向量，P 为状态转移矩阵。
             </p>
           </div>
 
