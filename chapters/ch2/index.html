@@ -24,6 +24,11 @@
           return color === ACTIVE_GOLD || color === ACTIVE_GOLD_RGBA;
         }
 
+        const bookOpenSvg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>';
+        const homeIconSvg =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+
         function setHover(link) {
           link.onmouseenter = function () {
             this.style.color = '#ffffff';
@@ -33,6 +38,19 @@
             this.style.color = 'rgba(255,255,255,0.7)';
             this.style.backgroundColor = 'transparent';
           };
+        }
+
+        function makeBaseLink(href, html) {
+          const a = document.createElement('a');
+          a.href = href;
+          a.setAttribute('data-kimi', 'true');
+          a.innerHTML = html;
+          a.style.cssText =
+            'position:relative;display:inline-flex;align-items:center;height:32px;padding:0 12px;' +
+            'border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;' +
+            'color:rgba(255,255,255,0.7);transition:background-color 0.15s,color 0.15s;';
+          setHover(a);
+          return a;
         }
 
         function styleNavbar() {
@@ -52,32 +70,21 @@
 
           const flexWrap = inner.querySelector('div');
           if (flexWrap) {
-            flexWrap.style.height = '56px'; // unified h-14 with other chapters
+            flexWrap.style.height = '56px'; // unified h-14
             flexWrap.style.display = 'flex';
             flexWrap.style.alignItems = 'center';
             flexWrap.style.justifyContent = 'space-between';
           }
 
-          // Brand link: first <a>
+          // Replace brand entirely: BookOpen icon + "决策理论与方法", links to course home
           const brandLink = nav.querySelector('a');
           if (brandLink) {
             brandLink.href = '../';
             brandLink.title = '返回课程目录';
-            brandLink.style.color = '#ffffff';
-            brandLink.style.textDecoration = 'none';
-            brandLink.style.fontSize = '14px';
-            brandLink.style.fontWeight = '600';
-            brandLink.style.display = 'inline-flex';
-            brandLink.style.alignItems = 'center';
-            brandLink.style.gap = '8px';
-            const svg = brandLink.querySelector('svg');
-            if (svg) {
-              svg.style.color = '#ffffff';
-              svg.style.width = '20px';
-              svg.style.height = '20px';
-            }
-            const text = brandLink.querySelector('span');
-            if (text) text.textContent = '决策理论与方法';
+            brandLink.innerHTML = bookOpenSvg + '<span style="margin-left:8px">决策理论与方法</span>';
+            brandLink.style.cssText =
+              'display:inline-flex;align-items:center;color:#ffffff;text-decoration:none;' +
+              'font-size:14px;font-weight:600;';
           }
 
           // Links container: second div inside the flex wrapper
@@ -87,30 +94,15 @@
             linksContainer.style.alignItems = 'center';
             linksContainer.style.gap = '4px';
 
-            const homeIconSvg =
-              '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-
-            function makeLink(href, text, withIcon) {
-              const a = document.createElement('a');
-              a.href = href;
-              a.setAttribute('data-kimi', 'true');
-              a.innerHTML = (withIcon ? homeIconSvg + '<span style="margin-left:6px">' + text + '</span>' : '<span>' + text + '</span>');
-              a.style.cssText =
-                'position:relative;display:inline-flex;align-items:center;height:32px;padding:0 12px;' +
-                'border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;' +
-                'color:rgba(255,255,255,0.7);transition:background-color 0.15s,color 0.15s;';
-              setHover(a);
-              return a;
-            }
-
-            const catalogLink = makeLink('../', '目录', true);
-            const homeLink = makeLink('./', '首页', false);
+            // Prepend "目录" back link only (original nav already has 首页 + section links)
+            const catalogLink = makeBaseLink(
+              '../',
+              homeIconSvg + '<span style="margin-left:6px">目录</span>'
+            );
             linksContainer.insertBefore(catalogLink, linksContainer.firstChild);
-            linksContainer.insertBefore(homeLink, linksContainer.firstChild.nextSibling);
 
-            // Style section links: gold active -> white + underline
+            // Style all nav links: gold active -> white + underline
             Array.from(linksContainer.querySelectorAll('a')).forEach((link) => {
-              // Brand is outside this container; all <a>s here are nav links
               const isCustom = link.hasAttribute('data-kimi');
               const computedColor = getComputedStyle(link).color;
               const isActive = isGold(computedColor);

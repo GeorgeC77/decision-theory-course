@@ -239,40 +239,40 @@ export default function MultiStageDecision() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* 特点 1 */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white border border-[#E0DDD5] rounded-xl p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500 text-white flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[#F8F6F2] text-[#1B3A5F] flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-blue-900">时间先后性</h3>
+              <h3 className="font-bold text-[#1B3A5F]">时间先后性</h3>
             </div>
-            <p className="text-sm text-blue-800 leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
               决策者需要做出时间上有先后之别的多次决策，各阶段决策构成一个序列。
             </p>
           </div>
 
           {/* 特点 2 */}
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white border border-[#E0DDD5] rounded-xl p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[#F8F6F2] text-[#1B3A5F] flex items-center justify-center">
                 <Link2 className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-amber-900">前序影响后续</h3>
+              <h3 className="font-bold text-[#1B3A5F]">前序影响后续</h3>
             </div>
-            <p className="text-sm text-amber-800 leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
               前一次决策的选择将直接影响到后一次决策，后一次决策的状态取决于前一次决策的结果。
             </p>
           </div>
 
           {/* 特点 3 */}
-          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white border border-[#E0DDD5] rounded-xl p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-[#F8F6F2] text-[#1B3A5F] flex items-center justify-center">
                 <Target className="w-5 h-5" />
               </div>
-              <h3 className="font-bold text-emerald-900">关注总结果</h3>
+              <h3 className="font-bold text-[#1B3A5F]">关注总结果</h3>
             </div>
-            <p className="text-sm text-emerald-800 leading-relaxed">
+            <p className="text-sm text-[#6B6B6B] leading-relaxed">
               决策者关心的是多次决策的总结果，而不是各次决策的即时后果。
             </p>
           </div>

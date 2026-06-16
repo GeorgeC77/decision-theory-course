@@ -59,12 +59,12 @@ function TeX({ math, display = false }: { math: string; display?: boolean }) {
 function OverviewSection() {
   return (
     <Card className="shadow-md border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+      <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-500 rounded-lg">
-            <Users className="w-5 h-5 text-white" />
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <Users className="w-5 h-5 text-[#1B3A5F]" />
           </div>
-          <CardTitle className="text-xl text-slate-800">群体决策问题</CardTitle>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">群体决策问题</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
@@ -252,12 +252,12 @@ function BordaCountSection() {
 
   return (
     <Card className="shadow-md border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+      <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-emerald-500 rounded-lg">
-            <Vote className="w-5 h-5 text-white" />
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <Vote className="w-5 h-5 text-[#1B3A5F]" />
           </div>
-          <CardTitle className="text-xl text-slate-800">
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
             投票规则与波德规则
           </CardTitle>
         </div>
@@ -586,12 +586,12 @@ function ParadoxDemo() {
 function WeightedMethodSection() {
   return (
     <Card className="shadow-md border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100">
+      <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-500 rounded-lg">
-            <BarChart3 className="w-5 h-5 text-white" />
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <BarChart3 className="w-5 h-5 text-[#1B3A5F]" />
           </div>
-          <CardTitle className="text-xl text-slate-800">综合加权法</CardTitle>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">综合加权法</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
@@ -1032,12 +1032,12 @@ function WeightedExample() {
 function SummarySection() {
   return (
     <Card className="shadow-md border-slate-200">
-      <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100">
+      <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-orange-500 rounded-lg">
-            <CheckCircle2 className="w-5 h-5 text-white" />
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <CheckCircle2 className="w-5 h-5 text-[#1B3A5F]" />
           </div>
-          <CardTitle className="text-xl text-slate-800">知识点总结</CardTitle>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">知识点总结</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="pt-6">
