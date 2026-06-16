@@ -745,9 +745,9 @@ export default function MarkovDecision() {
             </div>
 
             {/* Conclusion */}
-            <Alert className="bg-indigo-50 border-indigo-200">
-              <ArrowRight className="h-4 w-4 text-indigo-600" />
-              <AlertDescription className="text-indigo-800">
+            <Alert className="bg-amber-50 border-amber-200">
+              <ArrowRight className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800">
                 <strong>结论：</strong>不采取广告策略的三年总利润期望为 {noAdTotal.toFixed(2)} 万元，
                 采取广告策略为 {adTotal.toFixed(2)} 万元。
                 <span className="font-bold">

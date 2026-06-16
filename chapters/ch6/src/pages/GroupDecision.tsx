@@ -106,20 +106,20 @@ function OverviewSection() {
         {/* 群体与个人决策对比 */}
         <div>
           <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
-            <Scale className="w-4 h-4 text-indigo-500" />
+            <Scale className="w-4 h-4 text-[#1B3A5F]" />
             群体决策 vs 个人决策
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-indigo-50">
-                  <th className="border border-indigo-200 px-4 py-2 text-left text-indigo-800 rounded-tl-lg">
+                <tr className="bg-slate-100">
+                  <th className="border border-slate-200 px-4 py-2 text-left text-slate-800 rounded-tl-lg">
                     比较维度
                   </th>
-                  <th className="border border-indigo-200 px-4 py-2 text-left text-indigo-800">
+                  <th className="border border-slate-200 px-4 py-2 text-left text-slate-800">
                     群体决策
                   </th>
-                  <th className="border border-indigo-200 px-4 py-2 text-left text-indigo-800 rounded-tr-lg">
+                  <th className="border border-slate-200 px-4 py-2 text-left text-slate-800 rounded-tr-lg">
                     个人决策
                   </th>
                 </tr>
@@ -637,8 +637,8 @@ function WeightedMethodSection() {
         </div>
 
         {/* 公式展示 */}
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <h3 className="font-semibold text-purple-800 mb-3">核心公式</h3>
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h3 className="font-semibold text-slate-800 mb-3">核心公式</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormulaCard
               title="算术加权平均分"
@@ -690,8 +690,8 @@ function FormulaCard({
   desc: string;
 }) {
   return (
-    <div className="bg-white rounded-lg border border-purple-100 p-3">
-      <h4 className="text-sm font-medium text-purple-700 mb-1">{title}</h4>
+    <div className="bg-white rounded-lg border border-slate-200 p-3">
+      <h4 className="text-sm font-medium text-slate-700 mb-1">{title}</h4>
       <div className="text-sm overflow-x-auto">
         <TeX math={formula} display />
       </div>
@@ -772,12 +772,12 @@ function WeightedExample() {
 
   return (
     <div className="border border-slate-200 rounded-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-purple-500 to-violet-600 text-white px-4 py-3">
+      <div className="bg-[#1B3A5F] text-white px-4 py-3">
         <h3 className="font-semibold flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4" />
           示例计算（5个方案，2个专家，2个目标）
         </h3>
-        <p className="text-xs text-purple-100 mt-1">
+        <p className="text-xs text-white/70 mt-1">
           <TeX math="W=(0.5, 0.5)^T" />，<TeX math="\lambda_1=\lambda_2=0.5" />
         </p>
       </div>

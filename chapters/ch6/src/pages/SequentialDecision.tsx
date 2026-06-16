@@ -1058,7 +1058,7 @@ function ContinuousDecisionModule() {
         {/* Backward induction solution */}
         <div>
           <h4 className="font-medium text-slate-800 mb-3 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-blue-600" />
+            <Layers className="w-4 h-4 text-[#1B3A5F]" />
             逆序归纳法求解过程
           </h4>
 
@@ -1068,7 +1068,7 @@ function ContinuousDecisionModule() {
                 key={step.year}
                 className={`border rounded-lg cursor-pointer transition-all ${
                   activeYear === step.year
-                    ? "border-blue-300 bg-blue-50 shadow-sm"
+                    ? "border-[#1B3A5F]/30 bg-[#F8F6F2] shadow-sm"
                     : "border-slate-200 hover:border-slate-300 bg-white"
                 }`}
                 onClick={() =>
