@@ -51,20 +51,22 @@ function OverviewModule() {
   return (
     <Card className="border-slate-200 shadow-sm">
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <GitBranch className="w-5 h-5 text-blue-600" />
-          <CardTitle className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <GitBranch className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
             序列决策问题
           </CardTitle>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-            <Info className="w-4 h-4" />
+        <div className="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-4">
+          <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+            <Info className="w-4 h-4 text-amber-600" />
             定义
           </h4>
-          <p className="text-sm text-blue-800 leading-relaxed">
+          <p className="text-sm text-amber-800 leading-relaxed">
             序列决策（Sequential Decision）是指在决策过程中，
             <strong>初始决策之后会产生新的情况</strong>
             ，需要根据新情况进行后续决策，形成
@@ -185,9 +187,11 @@ function DecisionTreeSVG() {
   return (
     <Card className="border-slate-200 shadow-sm">
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <GitBranch className="w-5 h-5 text-blue-600" />
-          <CardTitle className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <GitBranch className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
             决策树构建方法
           </CardTitle>
         </div>
@@ -961,9 +965,11 @@ function ContinuousDecisionModule() {
   return (
     <Card className="border-slate-200 shadow-sm">
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-blue-600" />
-          <CardTitle className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <TrendingUp className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
             例6-2 连续情形决策分析
           </CardTitle>
         </div>
@@ -1144,9 +1150,11 @@ function SummaryModule() {
   return (
     <Card className="border-slate-200 shadow-sm">
       <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-blue-600" />
-          <CardTitle className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <BookOpen className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
             知识点总结
           </CardTitle>
         </div>

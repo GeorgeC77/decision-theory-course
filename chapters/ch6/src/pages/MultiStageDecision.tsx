@@ -226,10 +226,14 @@ export default function MultiStageDecision() {
   const ModuleOverview = () => (
     <Card className="shadow-sm border-slate-200">
       <CardHeader className="pb-3">
-        <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <GitFork className="w-5 h-5 text-slate-600" />
-          多阶段决策问题
-        </CardTitle>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <GitFork className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
+            多阶段决策问题
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-slate-700 leading-relaxed">
@@ -285,10 +289,14 @@ export default function MultiStageDecision() {
   const ModuleMethod = () => (
     <Card className="shadow-sm border-slate-200">
       <CardHeader className="pb-3">
-        <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <GitFork className="w-5 h-5 text-slate-600" />
-          决策树与逆序归纳法
-        </CardTitle>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <GitFork className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
+            决策树与逆序归纳法
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 决策树构成 */}
@@ -396,10 +404,14 @@ export default function MultiStageDecision() {
   const ModuleExample = () => (
     <Card className="shadow-sm border-slate-200">
       <CardHeader className="pb-3">
-        <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-slate-600" />
-          例6-1 某公司产销新产品的收益矩阵
-        </CardTitle>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#F8F6F2] rounded-lg">
+            <TrendingUp className="w-5 h-5 text-[#1B3A5F]" />
+          </div>
+          <CardTitle className="text-xl font-bold text-[#1B3A5F]">
+            例6-1 某公司产销新产品的收益矩阵
+          </CardTitle>
+        </div>
         <p className="text-sm text-slate-500">
           某公司考虑是否花费4000元从某科研机构购买某项技术，然后产销新产品。如果不买技术，可获利8000元。
         </p>

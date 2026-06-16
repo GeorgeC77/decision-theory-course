@@ -380,11 +380,13 @@ export default function MarkovDecision() {
       {/* ════════════════════════════════════════════
           Module 1: 马尔可夫决策概述
       ════════════════════════════════════════════ */}
-      <Card className="border-indigo-100 shadow-sm">
+      <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-indigo-600" />
-            <CardTitle className="text-lg">马尔可夫决策问题</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F8F6F2] rounded-lg">
+              <BookOpen className="h-5 w-5 text-[#1B3A5F]" />
+            </div>
+            <CardTitle className="text-xl font-bold text-[#1B3A5F]">马尔可夫决策问题</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -421,11 +423,13 @@ export default function MarkovDecision() {
       {/* ════════════════════════════════════════════
           Module 2: 状态转移矩阵与稳态概率
       ════════════════════════════════════════════ */}
-      <Card className="border-emerald-100 shadow-sm">
+      <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-emerald-600" />
-            <CardTitle className="text-lg">状态转移矩阵与稳态概率</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F8F6F2] rounded-lg">
+              <Calculator className="h-5 w-5 text-[#1B3A5F]" />
+            </div>
+            <CardTitle className="text-xl font-bold text-[#1B3A5F]">状态转移矩阵与稳态概率</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -552,11 +556,13 @@ export default function MarkovDecision() {
       {/* ════════════════════════════════════════════
           Module 3: 应用举例
       ════════════════════════════════════════════ */}
-      <Card className="border-violet-100 shadow-sm">
+      <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-violet-600" />
-            <CardTitle className="text-lg">例6-7 畅销与滞销状态转移决策</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F8F6F2] rounded-lg">
+              <BarChart3 className="h-5 w-5 text-[#1B3A5F]" />
+            </div>
+            <CardTitle className="text-xl font-bold text-[#1B3A5F]">例6-7 畅销与滞销状态转移决策</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -757,11 +763,13 @@ export default function MarkovDecision() {
       {/* ════════════════════════════════════════════
           Module 4: 知识点总结（折叠面板）
       ════════════════════════════════════════════ */}
-      <Card className="border-amber-100 shadow-sm">
+      <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-amber-600" />
-            <CardTitle className="text-lg">知识点总结</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#F8F6F2] rounded-lg">
+              <BookOpen className="h-5 w-5 text-[#1B3A5F]" />
+            </div>
+            <CardTitle className="text-xl font-bold text-[#1B3A5F]">知识点总结</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
