@@ -37,6 +37,15 @@ export default function Navbar() {
             <Home className="w-4 h-4" />
             目录
           </a>
+          <Link
+            to="/"
+            className={`relative px-3 py-1.5 text-[13px] rounded-md transition-colors duration-150 no-underline ${
+              isActive('/') ? 'text-white font-medium' : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            首页
+            {isActive('/') && <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-white rounded-full" />}
+          </Link>
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -76,6 +85,15 @@ export default function Navbar() {
               <Home className="w-4 h-4" />
               返回课程目录
             </a>
+            <Link
+              to="/"
+              onClick={() => setMobileOpen(false)}
+              className={`block px-4 py-3 text-sm rounded-md transition-colors no-underline ${
+                isActive('/') ? 'text-white font-medium bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              首页
+            </Link>
             {navItems.map((item) => (
               <Link
                 key={item.path}

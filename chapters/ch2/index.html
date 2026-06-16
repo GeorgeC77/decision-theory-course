@@ -17,6 +17,24 @@
     <div id="root"></div>
     <script>
       (function () {
+        const ACTIVE_GOLD = 'rgb(200, 150, 62)';
+        const ACTIVE_GOLD_RGBA = 'rgba(200, 150, 62, 1)';
+
+        function isGold(color) {
+          return color === ACTIVE_GOLD || color === ACTIVE_GOLD_RGBA;
+        }
+
+        function setHover(link) {
+          link.onmouseenter = function () {
+            this.style.color = '#ffffff';
+            this.style.backgroundColor = 'rgba(255,255,255,0.1)';
+          };
+          link.onmouseleave = function () {
+            this.style.color = 'rgba(255,255,255,0.7)';
+            this.style.backgroundColor = 'transparent';
+          };
+        }
+
         function styleNavbar() {
           const nav = document.querySelector('nav');
           if (!nav) return false;
@@ -34,7 +52,7 @@
 
           const flexWrap = inner.querySelector('div');
           if (flexWrap) {
-            flexWrap.style.height = '64px'; // keep original h-16 to match existing content padding
+            flexWrap.style.height = '56px'; // unified h-14 with other chapters
             flexWrap.style.display = 'flex';
             flexWrap.style.alignItems = 'center';
             flexWrap.style.justifyContent = 'space-between';
@@ -69,35 +87,40 @@
             linksContainer.style.alignItems = 'center';
             linksContainer.style.gap = '4px';
 
-            // Prepend "目录" back link
-            const catalogLink = document.createElement('a');
-            catalogLink.href = '../';
-            catalogLink.className = 'kimi-ch2-nav-link';
-            catalogLink.innerHTML =
-              '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' +
-              '<span>目录</span>';
-            catalogLink.style.cssText =
-              'display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;' +
-              'color:rgba(255,255,255,0.7);font-size:13px;font-weight:500;text-decoration:none;' +
-              'transition:background-color 0.15s,color 0.15s;';
-            catalogLink.onmouseenter = function () {
-              this.style.color = '#ffffff';
-              this.style.backgroundColor = 'rgba(255,255,255,0.1)';
-            };
-            catalogLink.onmouseleave = function () {
-              this.style.color = 'rgba(255,255,255,0.7)';
-              this.style.backgroundColor = 'transparent';
-            };
+            const homeIconSvg =
+              '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+
+            function makeLink(href, text, withIcon) {
+              const a = document.createElement('a');
+              a.href = href;
+              a.setAttribute('data-kimi', 'true');
+              a.innerHTML = (withIcon ? homeIconSvg + '<span style="margin-left:6px">' + text + '</span>' : '<span>' + text + '</span>');
+              a.style.cssText =
+                'position:relative;display:inline-flex;align-items:center;height:32px;padding:0 12px;' +
+                'border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;' +
+                'color:rgba(255,255,255,0.7);transition:background-color 0.15s,color 0.15s;';
+              setHover(a);
+              return a;
+            }
+
+            const catalogLink = makeLink('../', '目录', true);
+            const homeLink = makeLink('./', '首页', false);
             linksContainer.insertBefore(catalogLink, linksContainer.firstChild);
+            linksContainer.insertBefore(homeLink, linksContainer.firstChild.nextSibling);
 
             // Style section links: gold active -> white + underline
             Array.from(linksContainer.querySelectorAll('a')).forEach((link) => {
-              if (link === catalogLink) return;
+              // Brand is outside this container; all <a>s here are nav links
+              const isCustom = link.hasAttribute('data-kimi');
+              const computedColor = getComputedStyle(link).color;
+              const isActive = isGold(computedColor);
+
+              // Reset base style
               link.style.cssText =
                 'position:relative;display:inline-flex;align-items:center;height:32px;padding:0 12px;' +
                 'border-radius:6px;font-size:13px;font-weight:500;text-decoration:none;' +
                 'transition:background-color 0.15s,color 0.15s;';
-              const isActive = link.style.color === 'rgb(200, 150, 62)' || getComputedStyle(link).color === 'rgb(200, 150, 62)';
+
               if (isActive) {
                 link.style.color = '#ffffff';
                 link.style.fontWeight = '500';
@@ -107,16 +130,15 @@
                 link.appendChild(underline);
               } else {
                 link.style.color = 'rgba(255,255,255,0.7)';
-                link.onmouseenter = function () {
-                  this.style.color = '#ffffff';
-                  this.style.backgroundColor = 'rgba(255,255,255,0.1)';
-                };
-                link.onmouseleave = function () {
-                  this.style.color = 'rgba(255,255,255,0.7)';
-                  this.style.backgroundColor = 'transparent';
-                };
+                setHover(link);
               }
             });
+          }
+
+          // Adjust main content padding to match h-14 navbar
+          const pt16 = document.querySelector('[class*="pt-16"]');
+          if (pt16) {
+            pt16.style.paddingTop = '56px';
           }
 
           return true;
@@ -137,7 +159,6 @@
           if (styleNavbar()) {
             styleFooter();
           } else {
-            // React hasn't rendered the nav yet; wait a bit
             setTimeout(run, 50);
           }
         }
