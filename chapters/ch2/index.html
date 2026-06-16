@@ -76,15 +76,19 @@
             flexWrap.style.justifyContent = 'space-between';
           }
 
-          // Replace brand entirely: BookOpen icon + "决策理论与方法", links to course home
+          // Replace the React-Router brand link with a plain <a> so it actually navigates
+          // to the course home page and can't be overridden by React's click handler.
           const brandLink = nav.querySelector('a');
-          if (brandLink) {
-            brandLink.href = '../';
-            brandLink.title = '返回课程目录';
-            brandLink.innerHTML = bookOpenSvg + '<span style="margin-left:8px">决策理论与方法</span>';
-            brandLink.style.cssText =
+          if (brandLink && brandLink.parentNode) {
+            const newBrand = document.createElement('a');
+            newBrand.href = '../';
+            newBrand.title = '返回课程目录';
+            newBrand.setAttribute('data-kimi-brand', 'true');
+            newBrand.innerHTML = bookOpenSvg + '<span style="margin-left:8px">决策理论与方法</span>';
+            newBrand.style.cssText =
               'display:inline-flex;align-items:center;color:#ffffff;text-decoration:none;' +
               'font-size:14px;font-weight:600;';
+            brandLink.parentNode.replaceChild(newBrand, brandLink);
           }
 
           // Links container: second div inside the flex wrapper
