@@ -66,8 +66,8 @@ function normalizeValue(
   return type === 'benefit' ? normalized : 1 - normalized;
 }
 
-function computeUtility(row: TableRow, criteria: CriterionType[]): number {
-  const allValues = defaultTableData.map((r) => [
+function computeUtility(row: TableRow, criteria: CriterionType[], data: TableRow[]): number {
+  const allValues = data.map((r) => [
     r.returnRate,
     r.npv,
     r.carbon,
@@ -132,7 +132,7 @@ export default function CriteriaSystemPage() {
   }, []);
 
   /* -- computed utilities -- */
-  const utilities = tableData.map((row) => computeUtility(row, criteria));
+  const utilities = tableData.map((row) => computeUtility(row, criteria, tableData));
   const maxUtility = Math.max(...utilities);
   const bestIndex = utilities.indexOf(maxUtility);
 

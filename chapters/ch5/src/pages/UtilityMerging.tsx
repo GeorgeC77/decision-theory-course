@@ -40,8 +40,8 @@ const RULES: RuleConfig[] = [
     shortLabel: '距离规则',
     formula: 'W(u_1,u_2) = 1 - \\sqrt{\\frac{1}{2}[(1-u_1)^2 + (1-u_2)^2]}',
     color: '#6366f1', // indigo
-    desc: '并合效用与距离理想点(1,1)的欧氏距离成反比。当任一效用达到最大值1时，距离减小，W增大。适用于成本效益分析等场景。',
-    paramDesc: '无参数，仅依赖u_1和u_2',
+    desc: '二维演示：并合效用与距离理想点(1,1)的欧氏距离成反比。本页面表格与等高线仅展示前两个准则的并合效果。',
+    paramDesc: '无参数，二维演示仅依赖u_1和u_2',
     applicable: '成本效益分析等需要衡量与理想点距离的场景',
   },
   {
@@ -257,7 +257,7 @@ export default function UtilityMergingPage() {
     if (activeRule === 'distance') {
       steps.push({
         title: 'Step 1: 确认距离规则公式',
-        formula: 'W = 1 − √{(1/2)[(1−u₁)² + (1−u₂)²]}，理想点为(1,1)',
+        formula: 'W = 1 − √{(1/2)[(1−u₁)² + (1−u₂)²]}（二维演示，仅使用前两个准则），理想点为(1,1)',
         highlight: true,
       });
       results.forEach((r, idx) => {
@@ -462,7 +462,7 @@ export default function UtilityMergingPage() {
           {/* Parameter sliders */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
             {activeRule === 'distance' && (
-              <p className="text-sm" style={{ color: '#6B6B6B' }}>距离规则无参数，直接由u₁和u₂决定</p>
+              <p className="text-sm" style={{ color: '#6B6B6B' }}>距离规则无参数，二维演示直接由u₁和u₂决定</p>
             )}
             {activeRule === 'substitution' && (
               <p className="text-sm" style={{ color: '#6B6B6B' }}>代换规则无参数，直接由u₁和u₂决定</p>
@@ -481,7 +481,7 @@ export default function UtilityMergingPage() {
             )}
             {activeRule === 'mixed' && (
               <>
-                <Slider3D label="γ (交互参数)" value={surfGamma} onChange={setSurfGamma} min={-2} max={5} step={0.1} />
+                <Slider3D label="γ (交互参数)" value={surfGamma} onChange={setSurfGamma} min={-1} max={5} step={0.1} />
                 <Slider3D label="c₁ (权重)" value={surfC1} onChange={setSurfC1} min={0} max={1} step={0.05} />
                 <Slider3D label="c₂ (权重)" value={surfC2} onChange={setSurfC2} min={0} max={1} step={0.05} />
               </>
@@ -962,11 +962,11 @@ export default function UtilityMergingPage() {
               {
                 subtitle: '五种并合规则对比',
                 content: [
-                  '【距离规则】W = 1 − √{(1/2)[(1−u₁)²+(1−u₂)²]} — 与理想点(1,1)的欧氏距离成反比。适用：成本效益分析等需要衡量与理想点距离的场景',
+                  '【距离规则】W = 1 − √{(1/2)[(1−u₁)²+(1−u₂)²]} — 二维演示，与理想点(1,1)的欧氏距离成反比。适用：成本效益分析等需要衡量与理想点距离的场景',
                   '【代换规则】W = 1−Π(1−uᵢ) — "一好遮百丑"，任一效用取1则W=1。适用：效用间可完全替代的场景',
                   '【加法规则】W = Σρᵢuᵢ — 可互相线性补偿，加权求和。适用：准则间可线性补偿的场景（如居民消费水平）',
                   '【乘法规则】W = Πuᵢ^ρᵢ — 不可偏废，任一效用为0则W=0。适用：准则缺一不可的系统（木桶效应）',
-                  '【混合规则】1+γW = Π(1+γcᵢuᵢ) — γ=−1时代换，γ=0时加法，γ→∞近似乘法。适用：准则间关系复杂的场景',
+                  '【混合规则】1+γW = Π(1+γcᵢuᵢ) — γ=−1时代换，γ=0时加法，γ>0时体现互补性（结果截断至[0,1]）。适用：准则间关系复杂的场景',
                 ],
               },
               {

@@ -64,7 +64,7 @@ function computeW(
     }
     case 'additive': {
       // Use c1 as rho1, c2 as rho2 for weights
-      return c1 * u1 + c2 * u2;
+      return Math.max(0, Math.min(1, c1 * u1 + c2 * u2));
     }
     case 'multiplicative': {
       return Math.pow(Math.max(u1, 0.0001), rho1) * Math.pow(Math.max(u2, 0.0001), rho2);

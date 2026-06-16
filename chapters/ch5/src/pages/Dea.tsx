@@ -395,29 +395,28 @@ export default function DeaPage() {
       content: [
         '适用于评价具有相同类型的多投入、多产出的决策单元（如企业、部门、项目等）的相对效率',
         '无需预设生产函数形式，避免主观赋权',
-        'DMU数量建议 ≥ 2×投入数×产出数',
+        'DMU数量建议 ≥ 2×(投入数 + 产出数)',
       ],
     },
     {
-      subtitle: 'C²R模型',
+      subtitle: '本演示的简化效率代理',
       content: [
-        'min θ',
-        's.t. Σλⱼ·xᵢⱼ ≤ θ·xᵢⱼ₀,  i = 1,...,m（投入约束）',
-        'Σλⱼ·yᵣⱼ ≥ yᵣⱼ₀,    r = 1,...,s（产出约束）',
-        'λⱼ ≥ 0,  j = 1,...,n',
+        '效率代理值 = (某 DMU 产出综合) / (某 DMU 投入综合)',
+        '再以效率最高的 DMU 为基准做归一化，得到相对效率值 θ ∈ [0,1]',
+        '注意：这不是严格的 C²R 线性规划模型，仅用于理解“相对效率”思想',
       ],
     },
     {
-      subtitle: 'DEA有效性判定',
+      subtitle: '相对有效性判定',
       content: [
-        'θ* = 1 且 s⁺ = s⁻ = 0 → DEA有效（技术和规模均有效）',
-        'θ* = 1 但 s⁺ ≠ 0 或 s⁻ ≠ 0 → 弱DEA有效',
-        'θ* < 1 → 非DEA有效',
+        'θ ≈ 1 → 相对有效（本演示中 θ ≥ 0.98 视为有效）',
+        'θ < 1 → 相对非有效，可参照有效单元改进',
       ],
     },
     {
-      subtitle: '规模收益判定',
+      subtitle: '规模收益判定（注：本演示未实现）',
       content: [
+        '严格 DEA 中通过 λ 权重之和判断规模收益状态：',
         'Σλ* = 1, θ* = 1 → 规模收益不变 (CRS)',
         'Σλ* < 1, θ* = 1 → 规模收益递增 (IRS)',
         'Σλ* > 1, θ* = 1 → 规模收益递减 (DRS)',
@@ -466,7 +465,7 @@ export default function DeaPage() {
               投入产出效率比值分析 — 演示DEA相对效率思想（注：非严格DEA线性规划模型）
             </p>
             <div className="flex flex-wrap gap-2 mt-3">
-              {['DEA', '效率评价', 'C²R模型', '规模收益'].map((tag) => (
+              {['DEA', '效率评价', '简化演示', '投入产出比'].map((tag) => (
                 <span
                   key={tag}
                   className="px-2.5 py-1 rounded-md text-xs font-medium"
@@ -500,7 +499,7 @@ export default function DeaPage() {
             📖 DEA方法概述（简化演示版）
           </h2>
           <p className="text-sm leading-relaxed mb-3" style={{ color: '#6B6B6B' }}>
-            数据包络分析（Data Envelopment Analysis, DEA）是1978年由Charnes、Cooper和Rhodes提出的非参数化效率评价方法，称为C²R模型。严格DEA需通过线性规划求解，输出效率值θ、权重λ、松弛变量s⁺和s⁻，并判断强有效/弱有效/非有效。
+            数据包络分析（Data Envelopment Analysis, DEA）是1978年由Charnes、Cooper和Rhodes提出的非参数化效率评价方法，经典的C²R模型需通过线性规划求解。本演示为降低理解门槛，采用“产出综合/投入综合”的比值作为相对效率的近似代理，并非严格的DEA线性规划结果。
           </p>
           <div className="rounded-lg p-3 mb-4" style={{ background: '#fffbeb', border: '1px solid #fcd34d' }}>
             <p className="text-xs font-medium" style={{ color: '#b45309' }}>
@@ -551,7 +550,7 @@ export default function DeaPage() {
           </div>
         </motion.div>
 
-        {/* ====== Section 3: C²R Model ====== */}
+        {/* ====== Section 3: Simplified Efficiency Proxy ====== */}
         <motion.div
           custom={1}
           variants={fadeUp}
@@ -561,10 +560,10 @@ export default function DeaPage() {
           style={{ border: '1px solid #E0DDD5' }}
         >
           <h2 className="text-lg font-semibold mb-3" style={{ color: '#2A4A73' }}>
-            📐 C²R模型
+            📐 简化效率比值模型
           </h2>
           <p className="text-sm leading-relaxed mb-4" style={{ color: '#6B6B6B' }}>
-            C²R模型是最基本的DEA模型，假设规模收益不变（CRS）。评价第 j₀ 个决策单元的效率时，通过以下线性规划求解：
+            本演示使用简化比值代理来近似DEA的相对效率思想。先计算每个DMU的产出综合与投入综合之比，再以最高比值为基准归一化到[0,1]。严格DEA需对每个DMU求解线性规划。
           </p>
 
           <div className="formula-block">
@@ -827,7 +826,7 @@ export default function DeaPage() {
                 ⚖️ DEA效率值计算
               </h2>
               <p className="text-[13px] mt-1" style={{ color: '#6B6B6B' }}>
-                基于C²R模型计算各决策单元的相对效率值
+                基于简化投入产出比值代理计算各决策单元的相对效率值
               </p>
             </div>
             <span
@@ -840,7 +839,7 @@ export default function DeaPage() {
           </div>
 
           <p className="text-sm mb-4" style={{ color: '#6B6B6B' }}>
-            采用投入导向的C²R模型，对每个DMU求解线性规划，得到效率值θ。θ越接近1表示效率越高。
+            采用简化效率比值代理：θ = (某DMU产出综合/投入综合) ÷ (所有DMU中最大产出投入比)。θ越接近1表示相对效率越高。
           </p>
 
           {/* Efficiency Results Table */}
@@ -1090,7 +1089,7 @@ export default function DeaPage() {
           {/* Explanation */}
           <div className="mb-4 p-3 rounded-lg" style={{ background: '#F8F6F2' }}>
             <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>
-              在C²R模型下，根据效率值θ*和λ权重之和判断规模收益状态：
+              在严格DEA的C²R模型下，根据效率值θ*和λ权重之和判断规模收益状态（本演示仅作示意）：
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -1289,7 +1288,7 @@ export default function DeaPage() {
           <KnowledgeCard
             title="DEA数据包络分析"
             sections={knowledgeSections}
-            tags={['DEA', '效率评价', 'C²R模型', '线性规划', '规模收益']}
+            tags={['DEA', '效率评价', '简化演示', '投入产出比']}
           />
         </motion.div>
 

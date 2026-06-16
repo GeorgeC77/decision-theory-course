@@ -267,11 +267,11 @@ function BordaCountSection() {
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
           <h3 className="font-semibold text-slate-800 mb-2 flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-slate-600" />
-            简单多数规则
+            相对多数规则（Plurality）
           </h3>
           <p className="text-sm text-slate-600 leading-relaxed">
-            每位投票人投一票给最偏好的方案，得票最多的方案获胜。
-            简单直接，但可能存在<span className="font-semibold text-red-600">循环悖论</span>（Condorcet
+            每位投票人投一票给最偏好的方案，得票最多（不必超过半数）的方案获胜。
+            这是简单多数的一种常见形式，简单直接，但可能存在<span className="font-semibold text-red-600">循环悖论</span>（Condorcet
             Paradox）：即使每个投票人的偏好都是理性的，群体偏好也可能出现 A&gt;B&gt;C&gt;A 的循环。
           </p>
         </div>
@@ -668,7 +668,7 @@ function WeightedMethodSection() {
             <FormulaCard
               title="协调系数"
               formula="W = \frac{12}{m^2(n^3-n)} \sum_{j=1}^{n} d_j^2"
-              desc="检验专家意见一致性程度"
+              desc="m：专家人数；n：方案数；d_j：第 j 个方案的等级和。检验专家意见一致性程度"
             />
           </div>
         </div>

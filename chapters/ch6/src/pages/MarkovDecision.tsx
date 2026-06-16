@@ -139,7 +139,7 @@ function solveSteadyState(P: number[][]): number[] | null {
 
   // Validate: all non-negative and sum to ~1
   const sum = x.reduce((a, b) => a + b, 0);
-  if (Math.abs(sum - 1) > 0.1 || x.some((v) => v < -0.01)) return null;
+  if (Math.abs(sum - 1) > 1e-6 || x.some((v) => v < -1e-6)) return null;
 
   // Normalize
   return x.map((v) => (sum > 0 ? v / sum : 0));
@@ -671,7 +671,7 @@ export default function MarkovDecision() {
                 <Badge variant="secondary" className="mb-2">
                   策略B：采取广告策略
                 </Badge>
-                <MatrixLatex matrix={adMatrix} name="\\omega" />
+                <MatrixLatex matrix={adMatrix} name="P_A" />
               </div>
             </div>
 
@@ -688,8 +688,8 @@ export default function MarkovDecision() {
                   <MatrixLatex matrix={noAdP3} name="P^3" />
                 </TabsContent>
                 <TabsContent value="ad" className="space-y-2">
-                  <MatrixLatex matrix={adW2} name="\\omega^2" />
-                  <MatrixLatex matrix={adW3} name="\\omega^3" />
+                  <MatrixLatex matrix={adW2} name="P_A^2" />
+                  <MatrixLatex matrix={adW3} name="P_A^3" />
                 </TabsContent>
               </Tabs>
             </div>

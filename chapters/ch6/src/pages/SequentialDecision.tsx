@@ -943,21 +943,21 @@ function ContinuousDecisionModule() {
       year: 3,
       title: "第三年",
       desc: "考虑第三年及以后的累计收益",
-      result: "f_3(s_3) = \\max\\{8000s_3, 7800s_3\\} = 8000s_3",
-      choice: "方案1（x₃ = s₃）",
+      result: "f_3(s_3) = \\max\\{8500s_3, 9600s_3\\} = 9600s_3",
+      choice: "方案2（y₃ = s₃）",
     },
     {
       year: 2,
       title: "第二年",
       desc: "两年累计收益最大化",
-      result: "f_2(s_2) = \\max\\{11800s_2, 12000s_2\\} = 12000s_2",
+      result: "f_2(s_2) = \\max\\{20400s_2, 20520s_2\\} = 20520s_2",
       choice: "方案2（y₂ = s₂）",
     },
     {
       year: 1,
       title: "第一年",
       desc: "四年累计总收益最大化",
-      result: "f_1(s_1) = \\max\\{23720s_1, 23600s_1\\} = 23720s_1",
+      result: "f_1(s_1) = \\max\\{38780s_1, 36624s_1\\} = 38780s_1",
       choice: "方案1（x₁ = s₁ = 10万）",
     },
   ];
@@ -1130,11 +1130,13 @@ function ContinuousDecisionModule() {
             <strong>方案1</strong>
             ，之后每年产生的利润全部投入
             <strong>方案2</strong>
-            。此策略可在四年内获得最大累计产量。
+            。此策略四年累计最大收益为
+            <strong>387,800</strong>
+            元。
           </p>
           <div className="mt-3 p-2 bg-white/60 rounded-md">
             <p className="text-xs text-amber-700 font-medium">
-              关键思路：方案1利润率高（ reinvestment能力强），方案2产量高（单位资金产出多）。先积累资本再转产高量方案。
+              关键思路：方案1利润率高（再投资能力强），方案2单位资金产出高。先通过方案1快速积累资本，再转投方案2获取高产出的总收益最大。
             </p>
           </div>
         </div>

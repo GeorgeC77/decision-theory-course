@@ -139,7 +139,7 @@ function normalizeSupermatrix(matrix: number[][]): number[][] {
         }
         if (colSum > 0) {
           for (let i = rows[0]; i <= rows[1]; i++) {
-            newMatrix[i][j] = r4(newMatrix[i][j] / colSum);
+            newMatrix[i][j] = newMatrix[i][j] / colSum;
           }
         }
       }
@@ -151,7 +151,7 @@ function normalizeSupermatrix(matrix: number[][]): number[][] {
 function normalizeVector(vec: number[]): number[] {
   const sum = vec.reduce((a, b) => a + b, 0);
   if (sum === 0) return vec.map(() => 0);
-  return vec.map((v) => r4(v / sum));
+  return vec.map((v) => v / sum);
 }
 
 /* ------------------------------------------------------------------ */
@@ -853,7 +853,7 @@ export default function AnpPage() {
       subtitle: '超矩阵',
       content: [
         '未加权超矩阵 W = [Wᵢⱼ]，每个 Wᵢⱼ 是局部权重矩阵',
-        '加权超矩阵 W̃ = [wᵢⱼ · aⱼ]，其中 aⱼ 是集群权重',
+        '加权超矩阵 W̃ = [aᵢ · wᵢⱼ]，其中 aᵢ 是行集群（被影响集群）权重',
         '极限超矩阵 W* = limₖ→∞ W̃ᵏ，给出最终稳定优先级',
       ],
     },
@@ -1148,10 +1148,10 @@ export default function AnpPage() {
           <div className="mt-4">
             <div className="formula-block">
               <span className="text-sm" style={{ color: '#2A4A73' }}>
-                <span style={{ fontStyle: 'italic' }}>W̃</span><sub>ij</sub> = W<sub>ij</sub> · a<sub>j</sub>
+                <span style={{ fontStyle: 'italic' }}>W̃</span><sub>ij</sub> = a<sub>i</sub> · W<sub>ij</sub>
               </span>
               <p className="text-sm mt-1" style={{ color: '#6B6B6B' }}>
-                其中 a<sub>j</sub> 为集群 j 的归一化权重
+                其中 a<sub>i</sub> 为行集群 i（被影响集群）的归一化权重
               </p>
             </div>
           </div>
@@ -1417,7 +1417,7 @@ export default function AnpPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-sm" style={{ color: '#2A4A73' }}>Step 2:</span>
               <span className="text-sm" style={{ color: '#2A4A73' }}>
-                <span style={{ fontStyle: 'italic' }}>W̃</span> = [a<sub>j</sub>W<sub>ij</sub>] → W<sup>*</sup> = lim<sub>k→∞</sub><span style={{ fontStyle: 'italic' }}>W̃</span><sup>k</sup>
+                <span style={{ fontStyle: 'italic' }}>W̃</span> = [a<sub>i</sub>W<sub>ij</sub>] → W<sup>*</sup> = lim<sub>k→∞</sub><span style={{ fontStyle: 'italic' }}>W̃</span><sup>k</sup>
               </span>
             </div>
           </div>

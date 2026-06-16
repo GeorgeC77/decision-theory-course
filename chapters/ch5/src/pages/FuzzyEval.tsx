@@ -1102,19 +1102,19 @@ export default function FuzzyEvalPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
               className="rounded-lg p-4"
-              style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6' }}
+              style={{ background: '#fffbeb', borderLeft: '4px solid #f59e0b' }}
             >
-              <h4 className="text-sm font-semibold mb-2" style={{ color: '#2563eb' }}>
+              <h4 className="text-sm font-semibold mb-2" style={{ color: '#b45309' }}>
                 加权平均原则
               </h4>
               <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>
-                Score = Σ(j · bⱼ) / Σbⱼ
+                Score = Σ(j · bⱼ) / Σbⱼ，其中 j = 0,1,2,3 分别对应 优秀、良好、一般、较差
               </p>
               <div className="text-lg font-bold" style={{ color: '#1B3A5F' }}>
                 {r3(weightedScore)}
               </div>
               <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
-                对应等级偏向：{weightedScore < maxBIndex + 0.5 ? grades[Math.floor(weightedScore)] || grades[0] : grades[Math.ceil(weightedScore)] || grades[grades.length - 1]}
+                对应等级偏向：{grades[Math.min(grades.length - 1, Math.max(0, Math.round(weightedScore)))]}
               </p>
             </motion.div>
           </div>

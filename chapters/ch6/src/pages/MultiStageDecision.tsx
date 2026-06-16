@@ -193,8 +193,30 @@ export default function MultiStageDecision() {
       }
     }
 
-    return { pH, posterior, evPosterior };
-  }, [showPosterior, likelihood, priorProbs, payoffData]);
+    // Posterior decision: can still choose not to buy the technology (8000 yuan)
+    const posteriorDecisions = evPosterior.map((evs) => {
+      const maxBatchEv = Math.max(...evs);
+      const buyValue = maxBatchEv - 4000;
+      const noBuyValue = 8000;
+      const chooseBuy = buyValue >= noBuyValue;
+      return {
+        maxBatchEv,
+        buyValue,
+        noBuyValue,
+        chooseBuy,
+        posteriorValue: Math.max(buyValue, noBuyValue) - 600,
+      };
+    });
+
+    const expectedPosteriorValue = posteriorDecisions.reduce(
+      (sum, d, k) => sum + pH[k] * d.posteriorValue,
+      0
+    );
+    const priorBestValue = maxEv - 4000;
+    const evsi = expectedPosteriorValue - priorBestValue;
+
+    return { pH, posterior, evPosterior, posteriorDecisions, evsi, expectedPosteriorValue };
+  }, [showPosterior, likelihood, priorProbs, payoffData, maxEv]);
 
   // ── Handlers ─────────────────────────────────────────────────
   const updatePayoff = useCallback(
@@ -760,8 +782,8 @@ export default function MultiStageDecision() {
                 </h4>
                 <div className="space-y-3">
                   {posteriorResults.evPosterior.map((evs, k) => {
-                    const maxPosteriorEv = Math.max(...evs);
-                    const bestIdx = evs.indexOf(maxPosteriorEv);
+                    const decision = posteriorResults.posteriorDecisions[k];
+                    const bestIdx = evs.indexOf(decision.maxBatchEv);
                     return (
                       <div
                         key={k}
@@ -783,17 +805,26 @@ export default function MultiStageDecision() {
                             >
                               <Katex tex={`a_${a + 1}:`} />
                               <br />
-                              {(ev - 4000 - 600).toLocaleString("zh-CN", {
+                              {(ev - 4000).toLocaleString("zh-CN", {
                                 maximumFractionDigits: 0,
                               })}{" "}
                               元
                               {a === bestIdx && (
                                 <span className="text-xs block mt-0.5 text-emerald-600">
-                                  最优
+                                  最优批量
                                 </span>
                               )}
                             </div>
                           ))}
+                        </div>
+                        <div className="mt-2 text-sm text-slate-700">
+                          试销后决策：
+                          <strong className={decision.chooseBuy ? "text-emerald-700" : "text-amber-700"}>
+                            {decision.chooseBuy ? "购买技术" : "不购买技术"}
+                          </strong>
+                          <span className="text-slate-500 ml-1">
+                            （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {decision.posteriorValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
+                          </span>
                         </div>
                       </div>
                     );
@@ -825,7 +856,15 @@ export default function MultiStageDecision() {
                           })}{" "}
                           元
                         </strong>
-                        。在试销信息价值分析中，若试销的期望收益增量不超过试销费用600元，则不进行试销。
+                        。考虑试销后的期望净收益为{" "}
+                        <strong>
+                          {posteriorResults.expectedPosteriorValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元
+                        </strong>
+                        ，信息价值 EVSI ≈{" "}
+                        <strong>{posteriorResults.evsi.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>
+                        ，小于试销费用 600 元。因此最终最优策略为：
+                        <strong className="text-emerald-700">不做试销，直接购买技术并采用{bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产"}</strong>
+                        。
                       </p>
                     </div>
                   </div>
