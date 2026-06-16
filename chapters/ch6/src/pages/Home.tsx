@@ -42,16 +42,14 @@ export default function Home() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <section className="bg-white border border-[#E0DDD5] rounded-2xl px-6 py-12 lg:px-12 lg:py-16 text-center relative overflow-hidden">
-        <div className="relative z-10">
-          <h1 className="text-3xl lg:text-4xl font-bold text-[#1B3A5F] mb-3">
-            序贯决策分析
-          </h1>
-          <p className="text-base lg:text-lg text-[#6B6B6B] mb-4">
-            决策理论与方法 · 第6章
-          </p>
-          <div className="w-16 h-1 bg-[#C8963E] mx-auto rounded-full" />
-        </div>
+      <section className="text-center py-12 lg:py-16">
+        <h1 className="text-3xl lg:text-4xl font-bold text-[#1B3A5F] mb-3">
+          序贯决策分析
+        </h1>
+        <p className="text-base lg:text-lg text-[#6B6B6B] mb-4">
+          决策理论与方法 · 第6章
+        </p>
+        <div className="w-16 h-1 bg-[#C8963E] mx-auto rounded-full" />
       </section>
 
       {/* Cards Grid */}
