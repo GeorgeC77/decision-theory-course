@@ -40,10 +40,10 @@ export default function Navbar({ activeTab = 0, onNavClick }: NavbarProps) {
     <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-[#1B3A5F]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
         {/* Logo */}
-        <button onClick={handleHomeClick} className="flex items-center gap-2 cursor-pointer">
+        <a href="../" className="flex items-center gap-2 no-underline" title="返回课程目录">
           <BookOpen className="w-5 h-5 text-white" />
           <span className="text-sm font-semibold text-white">决策理论与方法</span>
-        </button>
+        </a>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-1">

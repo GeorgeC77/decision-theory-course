@@ -208,18 +208,17 @@ function Footer() {
   return (
     <footer className="bg-[#1B3A5F] text-white mt-auto border-t-4 border-[#C8963E]">
       <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2 text-[#C8963E] font-semibold text-lg">
-            <span>©</span>
-            <span>2026 GeorgeC77</span>
-          </div>
+        <div className="flex flex-col items-center gap-4">
           <p className="text-white/90 text-base font-medium">
             决策理论与方法 · 交互式学习平台
           </p>
-          <p className="text-white/70 text-sm max-w-2xl">
-            本网站内容仅供教学与学习交流使用。未经授权，禁止用于商业用途或大规模转载。
-          </p>
-          <p className="text-white/50 text-xs mt-1">
+          <div className="inline-flex items-start gap-3 bg-amber-100 text-amber-900 rounded-lg px-5 py-3 text-sm font-medium max-w-2xl text-left shadow-sm">
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <span>
+              本网站内容仅供教学与学习交流使用。未经授权，禁止用于商业用途或大规模转载。
+            </span>
+          </div>
+          <p className="text-white/60 text-xs">
             All Rights Reserved. Licensed for educational use.
           </p>
         </div>

@@ -43,6 +43,8 @@
           // Brand link: first <a>
           const brandLink = nav.querySelector('a');
           if (brandLink) {
+            brandLink.href = '../';
+            brandLink.title = '返回课程目录';
             brandLink.style.color = '#ffffff';
             brandLink.style.textDecoration = 'none';
             brandLink.style.fontSize = '14px';
