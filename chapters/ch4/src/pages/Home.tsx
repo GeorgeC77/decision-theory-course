@@ -74,7 +74,7 @@ const modules: ModuleCard[] = [
     number: '4.7',
     icon: Briefcase,
     title: '案例分析',
-    description: '综合运用以上六种准则进行实际决策分析，对比不同准则的决策结果',
+    description: '综合运用以上五种准则进行实际决策分析，对比不同准则的决策结果',
     tags: ['综合', '对比分析', '实践'],
     link: '/case-study',
   },
