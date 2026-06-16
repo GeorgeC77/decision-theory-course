@@ -215,6 +215,11 @@ export default function BayesianDecision() {
           </div>
         </div>
 
+        {/* Full probability denominator */}
+        <p className="text-sm text-[#6B6B6B] mt-4">
+          其中全概率 P(A) = Σᵢ P(A|Hᵢ)·P(Hᵢ)，保证后验概率归一化。
+        </p>
+
         {/* Four labeled cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
           <div className="bg-white/60 rounded-lg p-3 text-sm">

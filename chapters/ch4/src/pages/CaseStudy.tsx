@@ -289,10 +289,10 @@ export default function CaseStudy() {
             某企业计划推出新产品，面临三种市场状态（畅销 S1、一般 S2、滞销 S3），考虑三种生产方案（大批量生产 A1、中批量生产 A2、小批量生产 A3）。由于市场变化莫测，无法估计各市场状态出现的概率。
           </p>
           <p className="text-sm leading-relaxed mt-3" style={{ color: '#1B3A5F', lineHeight: 1.8 }}>
-            各方案在不同市场状态下的预期收益（万元）如下表所示，决策者需要根据六种不同的决策准则来选择最优方案。
+            各方案在不同市场状态下的预期收益（万元）如下表所示，决策者需要根据五种不同的决策准则来选择最优方案。
           </p>
           <div className="flex flex-wrap gap-2 mt-4">
-            {['不确定型决策', '概率未知', '六种准则对比'].map((tag) => (
+            {['不确定型决策', '概率未知', '五种准则对比'].map((tag) => (
               <span
                 key={tag}
                 className="px-3 py-1 rounded-full text-xs font-medium"
@@ -487,7 +487,7 @@ export default function CaseStudy() {
           <div className="flex items-center gap-2 mb-1">
             <BarChart3 size={18} style={{ color: '#1B3A5F' }} />
             <h2 className="text-lg font-semibold" style={{ color: '#1B3A5F' }}>
-              六种决策准则综合对比
+              五种决策准则综合对比
             </h2>
           </div>
           <p className="text-xs mb-4" style={{ color: '#6B6B6B' }}>
@@ -622,9 +622,9 @@ export default function CaseStudy() {
                 const maxCount = sorted[0][1];
                 const top = sorted.filter(([, c]) => Math.abs(c - maxCount) < 1e-9).map(([name]) => name);
                 if (top.length === 1) {
-                  return `综合多数准则结果，${top[0]} 是综合最优选择。`;
+                  return `综合多数准则结果，${top[0]} 获得最多准则推荐。`;
                 }
-                return `综合多数准则结果，${top.join('、')} 并列综合最优。`;
+                return `综合多数准则结果，${top.join('、')} 并列获得最多准则推荐。`;
               })()}
             </p>
           </div>
@@ -726,7 +726,7 @@ export default function CaseStudy() {
                   className="w-full px-3 py-2 rounded-lg text-xs font-medium text-center"
                   style={{ backgroundColor: '#e8f4fd', border: '1.5px solid #c5dff5', color: '#1B3A5F' }}
                 >
-                  信息程度
+                  风险态度
                 </div>
               </div>
               <div className="flex flex-col items-center gap-1">
@@ -773,9 +773,9 @@ export default function CaseStudy() {
                   className="px-3 py-2 rounded-lg text-xs font-medium text-center"
                   style={{ backgroundColor: '#e8f4fd', borderLeft: '3px solid #3498db', color: '#1B3A5F' }}
                 >
-                  完全不知
+                  风险态度：
                   <br />
-                  概率
+                  悲观 / 保守
                 </div>
                 <div className="flex justify-center">
                   <ChevronDown size={16} style={{ color: '#C8963E' }} />
@@ -863,7 +863,7 @@ export default function CaseStudy() {
           <div className="flex items-center gap-2 mb-4">
             <BookOpen size={18} style={{ color: '#1B3A5F' }} />
             <h2 className="text-lg font-semibold" style={{ color: '#1B3A5F' }}>
-              六种准则速查表
+              五种准则速查表
             </h2>
           </div>
           <div className="overflow-x-auto">

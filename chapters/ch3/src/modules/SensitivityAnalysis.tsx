@@ -69,6 +69,28 @@ export default function SensitivityAnalysis() {
     return { scheme: '两者相同', ev: eA, color: 'text-[#4CAF50]', bg: 'bg-[#4CAF50]/15', border: 'border-[#4CAF50]/30' };
   }, [eA, eB]);
 
+  /* ── dynamic decision rule around p* ── */
+  const decisionRule = useMemo(() => {
+    if (pStar === null) {
+      const evAt0A = a2;
+      const evAt0B = b2;
+      const evAt1A = a1;
+      const evAt1B = b1;
+      const leftBetter = evAt0A > evAt0B ? 'A' : evAt0B > evAt0A ? 'B' : '相同';
+      const rightBetter = evAt1A > evAt1B ? 'A' : evAt1B > evAt1A ? 'B' : '相同';
+      return { leftBetter, rightBetter, pStar: null };
+    }
+    const pLeft = Math.max(0, pStar - 0.01);
+    const pRight = Math.min(1, pStar + 0.01);
+    const evLeftA = pLeft * a1 + (1 - pLeft) * a2;
+    const evLeftB = pLeft * b1 + (1 - pLeft) * b2;
+    const evRightA = pRight * a1 + (1 - pRight) * a2;
+    const evRightB = pRight * b1 + (1 - pRight) * b2;
+    const leftBetter = evLeftA > evLeftB ? 'A' : evLeftB > evLeftA ? 'B' : '相同';
+    const rightBetter = evRightA > evRightB ? 'A' : evRightB > evRightA ? 'B' : '相同';
+    return { leftBetter, rightBetter, pStar };
+  }, [pStar, a1, a2, b1, b2]);
+
   /* ── chart data ── */
   const chartData = useMemo(() => {
     const points: { p: number; eA: number; eB: number }[] = [];
@@ -510,15 +532,19 @@ export default function SensitivityAnalysis() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
           <div className="bg-white rounded-lg border border-[#E0DDD5] p-3 text-center">
             <p className="text-sm text-[#6B6B6B]">
-              P(好) {'<'} <span className="font-bold text-[#C8963E]">{pStar !== null ? (pStar * 100).toFixed(2) : '—'}%</span>
+              P(好) {'<'} <span className="font-bold text-[#C8963E]">{decisionRule.pStar !== null ? (decisionRule.pStar * 100).toFixed(2) : '—'}%</span>
             </p>
-            <p className="text-sm font-bold text-[#1B3A5F] mt-1">选 方案A</p>
+            <p className="text-sm font-bold mt-1" style={{ color: decisionRule.leftBetter === 'A' ? '#1B3A5F' : decisionRule.leftBetter === 'B' ? '#C8963E' : '#4CAF50' }}>
+              选 方案{decisionRule.leftBetter === '相同' ? '均可' : decisionRule.leftBetter}
+            </p>
           </div>
           <div className="bg-white rounded-lg border border-[#E0DDD5] p-3 text-center">
             <p className="text-sm text-[#6B6B6B]">
-              P(好) {'>'} <span className="font-bold text-[#C8963E]">{pStar !== null ? (pStar * 100).toFixed(2) : '—'}%</span>
+              P(好) {'>'} <span className="font-bold text-[#C8963E]">{decisionRule.pStar !== null ? (decisionRule.pStar * 100).toFixed(2) : '—'}%</span>
             </p>
-            <p className="text-sm font-bold text-[#C8963E] mt-1">选 方案B</p>
+            <p className="text-sm font-bold mt-1" style={{ color: decisionRule.rightBetter === 'A' ? '#1B3A5F' : decisionRule.rightBetter === 'B' ? '#C8963E' : '#4CAF50' }}>
+              选 方案{decisionRule.rightBetter === '相同' ? '均可' : decisionRule.rightBetter}
+            </p>
           </div>
         </div>
 

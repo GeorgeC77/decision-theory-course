@@ -12,14 +12,11 @@ import {
   Medal,
   CheckCircle,
   AlertTriangle,
-  TrendingUp as IconIRS,
-  TrendingDown as IconDRS,
-  Minus as IconCRS,
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import CalculationSteps from '@/components/CalculationSteps';
 import KnowledgeCard from '@/components/KnowledgeCard';
-import { SafeBlockMath as BlockMath, SafeInlineMath as InlineMath } from '@/components/SafeKatex';
+import { SafeBlockMath as BlockMath } from '@/components/SafeKatex';
 import {
   BarChart,
   Bar,
@@ -29,9 +26,6 @@ import {
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
-  ScatterChart,
-  Scatter,
-  ZAxis,
   Cell,
 } from 'recharts';
 
@@ -50,12 +44,8 @@ interface EfficiencyResult {
   theta: number;
   rank: number;
   effective: boolean;
-  lambdaWeights: string;
-  refDMUs: string;
   inputScores: number[];
   outputScores: number[];
-  lambdaSum: number;
-  scaleReturns: 'IRS' | 'DRS' | 'CRS' | null;
   inputRedundancy: number[];
 }
 
@@ -140,52 +130,12 @@ function calculateEfficiency(
     rankMap.set(item.idx, rank + 1);
   });
 
-  // Find DEA-effective DMUs (theta >= 0.98)
-  const effectiveIndices = dmus
-    .map((_, idx) => idx)
-    .filter((idx) => thetas[idx] >= 0.98);
-
   return dmus.map((dmu, idx) => {
     const theta = thetas[idx];
     const effective = theta >= 0.98;
     const rank = rankMap.get(idx) ?? 0;
 
-    // Lambda weights: if effective, self = 1; else blend of top performers
-    let lambdaWeights = '';
-    let refDMUs = '';
-
-    if (effective) {
-      lambdaWeights = `λ${idx + 1}=1.0`;
-      refDMUs = '—';
-    } else {
-      // Use top 2 effective DMUs as reference
-      const refs = effectiveIndices.slice(0, 2);
-      if (refs.length >= 2) {
-        lambdaWeights = `λ${refs[0] + 1}=0.6, λ${refs[1] + 1}=0.4`;
-        refDMUs = `${dmus[refs[0]].name}, ${dmus[refs[1]].name}`;
-      } else if (refs.length === 1) {
-        lambdaWeights = `λ${refs[0] + 1}=1.0`;
-        refDMUs = dmus[refs[0]].name;
-      } else {
-        lambdaWeights = `λ${indexed[0].idx + 1}=0.5, λ${indexed[1].idx + 1}=0.5`;
-        refDMUs = `${dmus[indexed[0].idx].name}, ${dmus[indexed[1].idx].name}`;
-      }
-    }
-
-    // Lambda sum for scale returns
-    const lambdaSum = effective
-      ? 0.8 + Math.random() * 0.4 // CRS ~1.0, IRS <1, DRS >1
-      : 1.0;
-
-    // Scale returns classification
-    let scaleReturns: 'IRS' | 'DRS' | 'CRS' | null = null;
-    if (effective) {
-      if (lambdaSum < 0.95) scaleReturns = 'IRS';
-      else if (lambdaSum > 1.05) scaleReturns = 'DRS';
-      else scaleReturns = 'CRS';
-    }
-
-    // Input redundancy for non-effective DMUs
+    // Input redundancy for non-effective DMUs (illustrative only)
     const inputRedundancy = dmu.inputs.map((inp) =>
       effective ? 0 : Math.round((1 - theta) * inp * 10) / 10
     );
@@ -196,12 +146,8 @@ function calculateEfficiency(
       theta: Math.round(theta * 1000) / 1000,
       rank,
       effective,
-      lambdaWeights,
-      refDMUs,
       inputScores: dmu.inputs,
       outputScores: dmu.outputs,
-      lambdaSum: Math.round(lambdaSum * 100) / 100,
-      scaleReturns,
       inputRedundancy,
     };
   });
@@ -251,22 +197,6 @@ export default function DeaPage() {
       })),
     [results]
   );
-
-  // Scatter data for scale returns
-  const scatterData = useMemo(() => {
-    return results
-      .filter((r) => r.effective)
-      .map((r) => {
-        const totalInput = r.inputScores.reduce((a, b) => a + b, 0);
-        return {
-          x: totalInput,
-          y: r.theta,
-          name: r.name,
-          scaleReturns: r.scaleReturns,
-          z: r.scaleReturns === 'CRS' ? 120 : 100,
-        };
-      });
-  }, [results]);
 
   /* ---- Input handlers ---- */
   const handleInputChange = useCallback(
@@ -377,11 +307,11 @@ export default function DeaPage() {
           optimal: selectedResult.effective,
         },
         {
-          title: `Step 4: 判定DEA有效性`,
-          formula: `θ* = ${selectedResult.theta.toFixed(3)} ${selectedResult.effective ? '= 1' : '< 1'}`,
+          title: `Step 4: 判定相对有效性`,
+          formula: `θ* = ${selectedResult.theta.toFixed(3)} ${selectedResult.effective ? '≈ 1' : '< 1'}`,
           result: selectedResult.effective
-            ? `${selectedResult.name} 是DEA有效的（位于有效前沿面上）`
-            : `${selectedResult.name} 非DEA有效，需要改进`,
+            ? `${selectedResult.name} 在简化比值代理下相对有效（比值接近最高）`
+            : `${selectedResult.name} 在简化比值代理下相对非有效，可参照有效单元改进`,
           highlight: true,
           optimal: selectedResult.effective,
         },
@@ -411,15 +341,6 @@ export default function DeaPage() {
       content: [
         'θ ≈ 1 → 相对有效（本演示中 θ ≥ 0.98 视为有效）',
         'θ < 1 → 相对非有效，可参照有效单元改进',
-      ],
-    },
-    {
-      subtitle: '规模收益判定（注：本演示未实现）',
-      content: [
-        '严格 DEA 中通过 λ 权重之和判断规模收益状态：',
-        'Σλ* = 1, θ* = 1 → 规模收益不变 (CRS)',
-        'Σλ* < 1, θ* = 1 → 规模收益递增 (IRS)',
-        'Σλ* > 1, θ* = 1 → 规模收益递减 (DRS)',
       ],
     },
     {
@@ -567,18 +488,14 @@ export default function DeaPage() {
           </p>
 
           <div className="formula-block">
-            <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>min <InlineMath math="\theta" />，s.t.</p>
-            <BlockMath math="\sum_{j=1}^{n} \lambda_j x_{ij} \le \theta x_{ij_0}, \quad i=1,...,m \\ \sum_{j=1}^{n} \lambda_j y_{rj} \ge y_{rj_0}, \quad r=1,...,s \\ \lambda_j \ge 0" />
+            <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>简化效率代理（非严格 DEA）</p>
+            <BlockMath math="\text{原始效率}_j = \frac{\sum_{r=1}^{s} y_{rj}}{\sum_{i=1}^{m} x_{ij}}" />
+            <BlockMath math="\theta_j = \frac{\text{原始效率}_j}{\max_k\{\text{原始效率}_k\}} \in [0,1]" />
           </div>
 
           <p className="text-sm leading-relaxed mt-4 mb-4" style={{ color: '#6B6B6B' }}>
-            上述投入导向模型的对偶形式（multiplier form）为：
+            严格 DEA 的 C²R 模型需对每个 DMU 求解线性规划，本演示未实现该过程，仅用于理解“相对效率”思想。
           </p>
-
-          <div className="formula-block">
-            <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>max <InlineMath math="\sum_{r=1}^{s} u_r y_{rj_0}" />，s.t.</p>
-            <BlockMath math="\sum_{r=1}^{s} u_r y_{rj} - \sum_{i=1}^{m} v_i x_{ij} \le 0, \quad j=1,...,n \\ \sum_{i=1}^{m} v_i x_{ij_0} = 1 \\ u_r \ge 0, \quad v_i \ge 0" />
-          </div>
 
           {/* DEA Validity Cards */}
           <h3 className="text-sm font-semibold mt-5 mb-3" style={{ color: '#2A4A73' }}>
@@ -851,8 +768,7 @@ export default function DeaPage() {
                   <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">效率值 θ</th>
                   <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">排名</th>
                   <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">有效性</th>
-                  <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">λ权重</th>
-                  <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">参考DMU</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -890,7 +806,7 @@ export default function DeaPage() {
                           style={{ background: '#E8F5E9', color: '#4CAF50' }}
                         >
                           <CheckCircle size={12} />
-                          DEA有效
+                          相对有效
                         </span>
                       ) : (
                         <span
@@ -898,18 +814,9 @@ export default function DeaPage() {
                           style={{ background: '#f1f5f9', color: '#6B6B6B' }}
                         >
                           <AlertTriangle size={12} />
-                          非有效
+                          相对非有效
                         </span>
                       )}
-                    </td>
-                    <td
-                      className="px-4 py-2.5 font-mono text-xs"
-                      style={{ color: '#6B6B6B' }}
-                    >
-                      {r.lambdaWeights}
-                    </td>
-                    <td className="px-4 py-2.5 text-xs" style={{ color: '#6B6B6B' }}>
-                      {r.refDMUs}
                     </td>
                   </motion.tr>
                 ))}
@@ -1070,217 +977,9 @@ export default function DeaPage() {
           </motion.div>
         </motion.div>
 
-        {/* ====== Section 7: Scale Returns Analysis ====== */}
+        {/* ====== Section 7: Knowledge Card ====== */}
         <motion.div
           custom={5}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="bg-white rounded-xl p-6 mb-6"
-          style={{ border: '1px solid #E0DDD5' }}
-        >
-          <h2 className="text-lg font-semibold mb-1" style={{ color: '#2A4A73' }}>
-            📊 生产活动规模收益判定
-          </h2>
-          <p className="text-[13px] mb-4" style={{ color: '#6B6B6B' }}>
-            通过效率值和λ之和判断各DMU的规模收益状态
-          </p>
-
-          {/* Explanation */}
-          <div className="mb-4 p-3 rounded-lg" style={{ background: '#F8F6F2' }}>
-            <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>
-              在严格DEA的C²R模型下，根据效率值θ*和λ权重之和判断规模收益状态（本演示仅作示意）：
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ background: '#E0DDD5' }}>
-                    <th className="px-3 py-2 text-left font-medium" style={{ color: '#2A4A73' }}>
-                      条件
-                    </th>
-                    <th className="px-3 py-2 text-left font-medium" style={{ color: '#2A4A73' }}>
-                      规模收益状态
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { condition: 'Σλ* = 1 且 θ* = 1', status: '规模收益不变 (CRS)' },
-                    { condition: 'Σλ* < 1 且 θ* = 1', status: '规模收益递增 (IRS)' },
-                    { condition: 'Σλ* > 1 且 θ* = 1', status: '规模收益递减 (DRS)' },
-                  ].map((row, i) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? '#ffffff' : '#F8F6F2' }}>
-                      <td className="px-3 py-2 font-mono text-xs" style={{ color: '#6B6B6B' }}>
-                        {row.condition}
-                      </td>
-                      <td className="px-3 py-2" style={{ color: '#2A4A73' }}>
-                        {row.status}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Scale Returns Table */}
-          <div className="overflow-x-auto mb-5">
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ background: '#2A4A73' }}>
-                  <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">DMU</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">θ</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">Σλ</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">规模收益状态</th>
-                  <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">建议</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((r, idx) => (
-                  <motion.tr
-                    key={idx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: idx * 0.06 }}
-                    style={{
-                      background: idx % 2 === 0 ? '#ffffff' : '#F8F6F2',
-                    }}
-                  >
-                    <td className="px-4 py-2.5 font-medium" style={{ color: '#2A4A73' }}>
-                      {r.name}
-                    </td>
-                    <td className="px-4 py-2.5 text-center font-mono" style={{ color: '#2A4A73' }}>
-                      {r.theta.toFixed(3)}
-                    </td>
-                    <td className="px-4 py-2.5 text-center font-mono" style={{ color: '#2A4A73' }}>
-                      {r.effective ? r.lambdaSum.toFixed(1) : '—'}
-                    </td>
-                    <td className="px-4 py-2.5 text-center">
-                      {r.scaleReturns === 'IRS' && (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#E8F5E9', color: '#16a34a', border: '1px solid #bbf7d0' }}
-                        >
-                          <IconIRS size={12} />
-                          📈 递增
-                        </span>
-                      )}
-                      {r.scaleReturns === 'DRS' && (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#FDE8E8', color: '#dc2626', border: '1px solid #fecaca' }}
-                        >
-                          <IconDRS size={12} />
-                          📉 递减
-                        </span>
-                      )}
-                      {r.scaleReturns === 'CRS' && (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd' }}
-                        >
-                          <IconCRS size={12} />
-                          ➡️ 不变
-                        </span>
-                      )}
-                      {!r.scaleReturns && (
-                        <span className="text-xs" style={{ color: '#9E9E9E' }}>
-                          —
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5 text-xs" style={{ color: '#6B6B6B' }}>
-                      {r.scaleReturns === 'IRS' && '可适当扩大规模'}
-                      {r.scaleReturns === 'DRS' && '应适当缩减规模'}
-                      {r.scaleReturns === 'CRS' && '规模适中，保持现状'}
-                      {!r.scaleReturns && '先改善技术效率'}
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Scatter Chart */}
-          {scatterData.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold mb-3" style={{ color: '#2A4A73' }}>
-                规模收益散点图（有效DMU）
-              </h3>
-              <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
-                  <ScatterChart margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E0DDD5" />
-                    <XAxis
-                      type="number"
-                      dataKey="x"
-                      name="投入规模"
-                      tick={{ fill: '#6B6B6B', fontSize: 12 }}
-                      label={{ value: '投入规模', position: 'insideBottom', offset: -5, fill: '#6B6B6B', fontSize: 12 }}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="y"
-                      name="效率值"
-                      domain={[0.9, 1.05]}
-                      tick={{ fill: '#6B6B6B', fontSize: 12 }}
-                      label={{ value: '效率值 θ', angle: -90, position: 'insideLeft', fill: '#6B6B6B', fontSize: 12 }}
-                    />
-                    <ZAxis type="number" dataKey="z" range={[60, 200]} />
-                    <Tooltip
-                      contentStyle={{
-                        background: '#ffffff',
-                        border: '1px solid #E0DDD5',
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                      }}
-                      formatter={(_: number, __: string, props: { payload?: { name?: string; scaleReturns?: string } }) => {
-                        const p = props?.payload;
-                        return [`${p?.name ?? ''} / ${p?.scaleReturns ?? ''}`, 'DMU'];
-                      }}
-                    />
-                    <ReferenceLine y={1} stroke="#4CAF50" strokeDasharray="5 5" />
-                    <Scatter data={scatterData}>
-                      {scatterData.map((entry, index) => (
-                        <Cell
-                          key={index}
-                          fill={
-                            entry.scaleReturns === 'IRS'
-                              ? '#4CAF50'
-                              : entry.scaleReturns === 'DRS'
-                              ? '#ef4444'
-                              : '#3b82f6'
-                          }
-                        />
-                      ))}
-                    </Scatter>
-                  </ScatterChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-4 mt-3">
-                {[
-                  { label: '递增 (IRS)', color: '#4CAF50' },
-                  { label: '递减 (DRS)', color: '#ef4444' },
-                  { label: '不变 (CRS)', color: '#3b82f6' },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5">
-                    <span
-                      className="w-3 h-3 rounded-full"
-                      style={{ background: item.color }}
-                    />
-                    <span className="text-xs" style={{ color: '#6B6B6B' }}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </motion.div>
-
-        {/* ====== Section 8: Knowledge Card ====== */}
-        <motion.div
-          custom={6}
           variants={fadeUp}
           initial="hidden"
           animate="visible"

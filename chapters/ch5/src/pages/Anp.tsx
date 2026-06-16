@@ -772,19 +772,20 @@ export default function AnpPage() {
   /* Computed: limit priorities */
   const limitPriorities = useMemo(() => {
     const limitMat = poweredMatrices[poweredMatrices.length - 1];
-    // Average each column (all columns should converge to same values)
-    const avgCol: number[] = [];
-    for (let j = 0; j < 6; j++) {
+    // Standard ANP practice: extract the limiting priorities by averaging each row
+    // of the limit supermatrix, then normalize.
+    const avgRow: number[] = [];
+    for (let i = 0; i < 6; i++) {
       let sum = 0;
-      for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 6; j++) {
         sum += limitMat[i][j];
       }
-      avgCol.push(sum / 6);
+      avgRow.push(sum / 6);
     }
     // Normalize
-    const total = avgCol.reduce((a, b) => a + b, 0);
-    if (total === 0) return avgCol.map(() => r4(1 / 6));
-    return avgCol.map((v) => r4(v / total));
+    const total = avgRow.reduce((a, b) => a + b, 0);
+    if (total === 0) return avgRow.map(() => r4(1 / 6));
+    return avgRow.map((v) => r4(v / total));
   }, [poweredMatrices]);
 
   /* Toggle dependency */
@@ -861,7 +862,7 @@ export default function AnpPage() {
       subtitle: '极限计算',
       content: [
         '通过幂迭代计算 W̃ᵏ 直至收敛',
-        '收敛后每一列相同，即为极限优先向量',
+        '收敛后极限超矩阵各行趋于一致，按行平均提取极限优先向量',
         '优先向量归一化后得到各元素的最终权重',
       ],
     },

@@ -768,7 +768,7 @@ export default function UtilityMergingPage() {
                     {gamma.toFixed(1)}
                   </span>
                   <span className="text-xs" style={{ color: '#9E9E9E' }}>
-                    γ=0退化为代换规则，γ&gt;0强调互补，γ&lt;0强调替代
+                    γ=0退化为加法规则；γ&gt;0强调互补性；γ&lt;0强调可替代性
                   </span>
                 </div>
               )}

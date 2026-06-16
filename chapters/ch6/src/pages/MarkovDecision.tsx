@@ -378,7 +378,7 @@ export default function MarkovDecision() {
   return (
     <>
       {/* ════════════════════════════════════════════
-          Module 1: 马尔可夫决策概述
+          Module 1: 马尔可夫链决策分析概述
       ════════════════════════════════════════════ */}
       <Card className="border-slate-200 shadow-sm">
         <CardHeader className="pb-3">
@@ -386,7 +386,7 @@ export default function MarkovDecision() {
             <div className="p-2 bg-[#F8F6F2] rounded-lg">
               <BookOpen className="h-5 w-5 text-[#1B3A5F]" />
             </div>
-            <CardTitle className="text-xl font-bold text-[#1B3A5F]">马尔可夫决策问题</CardTitle>
+            <CardTitle className="text-xl font-bold text-[#1B3A5F]">马尔可夫链决策分析</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

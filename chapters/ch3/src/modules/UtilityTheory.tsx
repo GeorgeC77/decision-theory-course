@@ -221,9 +221,10 @@ export default function UtilityTheory() {
     setB2(DEFAULT_B2);
   }, []);
 
-  const numInput = (setter: (v: number) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const numInput = (setter: (v: number) => void, min = -Infinity, max = Infinity) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = parseFloat(e.target.value);
-    setter(isNaN(v) ? 0 : v);
+    if (isNaN(v)) return setter(0);
+    setter(Math.max(min, Math.min(max, v)));
   };
 
   const currentRisk = RISK_OPTIONS.find((r) => r.key === riskType)!;
@@ -473,7 +474,10 @@ export default function UtilityTheory() {
         className="bg-white rounded-xl border border-[#E0DDD5] shadow-sm p-5"
       >
         <h3 className="text-[17px] font-semibold text-[#2B2B2B] mb-1">决策矩阵</h3>
-        <p className="text-[13px] text-[#6B6B6B] mb-4">输入各方案在不同状态下的收益值及状态概率</p>
+        <p className="text-[13px] text-[#6B6B6B] mb-1">输入各方案在不同状态下的收益值及状态概率</p>
+        <p className="text-[12px] text-[#C8963E] mb-4">
+          提示：当前效用函数定义域为 0–100，收益值已限制在该范围内。
+        </p>
 
         {/* Probability inputs */}
         <div className="grid grid-cols-2 gap-3 mb-4">
@@ -514,7 +518,9 @@ export default function UtilityTheory() {
               <input
                 type="number"
                 value={a1}
-                onChange={numInput(setA1)}
+                onChange={numInput(setA1, 0, 100)}
+                min={0}
+                max={100}
                 className="w-full h-9 px-3 border border-[#E0DDD5] rounded-lg text-center text-sm font-medium focus:border-[#2A4A73] focus:ring-2 focus:ring-[#1B3A5F]/20 outline-none transition-all"
               />
             </div>
@@ -523,7 +529,9 @@ export default function UtilityTheory() {
               <input
                 type="number"
                 value={a2}
-                onChange={numInput(setA2)}
+                onChange={numInput(setA2, 0, 100)}
+                min={0}
+                max={100}
                 className="w-full h-9 px-3 border border-[#E0DDD5] rounded-lg text-center text-sm font-medium focus:border-[#2A4A73] focus:ring-2 focus:ring-[#1B3A5F]/20 outline-none transition-all"
               />
             </div>
@@ -539,7 +547,9 @@ export default function UtilityTheory() {
               <input
                 type="number"
                 value={b1}
-                onChange={numInput(setB1)}
+                onChange={numInput(setB1, 0, 100)}
+                min={0}
+                max={100}
                 className="w-full h-9 px-3 border border-[#E0DDD5] rounded-lg text-center text-sm font-medium focus:border-[#2A4A73] focus:ring-2 focus:ring-[#1B3A5F]/20 outline-none transition-all"
               />
             </div>
@@ -548,7 +558,9 @@ export default function UtilityTheory() {
               <input
                 type="number"
                 value={b2}
-                onChange={numInput(setB2)}
+                onChange={numInput(setB2, 0, 100)}
+                min={0}
+                max={100}
                 className="w-full h-9 px-3 border border-[#E0DDD5] rounded-lg text-center text-sm font-medium focus:border-[#2A4A73] focus:ring-2 focus:ring-[#1B3A5F]/20 outline-none transition-all"
               />
             </div>

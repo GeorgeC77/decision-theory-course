@@ -194,6 +194,7 @@ export default function MultiStageDecision() {
     }
 
     // Posterior decision: can still choose not to buy the technology (8000 yuan)
+    const testCost = 600;
     const posteriorDecisions = evPosterior.map((evs) => {
       const maxBatchEv = Math.max(...evs);
       const buyValue = maxBatchEv - 4000;
@@ -204,18 +205,31 @@ export default function MultiStageDecision() {
         buyValue,
         noBuyValue,
         chooseBuy,
-        posteriorValue: Math.max(buyValue, noBuyValue) - 600,
+        posteriorValueGross: Math.max(buyValue, noBuyValue),
       };
     });
 
-    const expectedPosteriorValue = posteriorDecisions.reduce(
-      (sum, d, k) => sum + pH[k] * d.posteriorValue,
+    const expectedPosteriorValueGross = posteriorDecisions.reduce(
+      (sum, d, k) => sum + pH[k] * d.posteriorValueGross,
       0
     );
     const priorBestValue = maxEv - 4000;
-    const evsi = expectedPosteriorValue - priorBestValue;
+    const evsiGross = expectedPosteriorValueGross - priorBestValue;
+    const netEVSI = evsiGross - testCost;
+    const expectedPosteriorValueNet = expectedPosteriorValueGross - testCost;
 
-    return { pH, posterior, evPosterior, posteriorDecisions, evsi, expectedPosteriorValue };
+    return {
+      pH,
+      posterior,
+      evPosterior,
+      posteriorDecisions,
+      priorBestValue,
+      expectedPosteriorValueGross,
+      expectedPosteriorValueNet,
+      evsiGross,
+      netEVSI,
+      testCost,
+    };
   }, [showPosterior, likelihood, priorProbs, payoffData, maxEv]);
 
   // ── Handlers ─────────────────────────────────────────────────
@@ -823,7 +837,7 @@ export default function MultiStageDecision() {
                             {decision.chooseBuy ? "购买技术" : "不购买技术"}
                           </strong>
                           <span className="text-slate-500 ml-1">
-                            （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {decision.posteriorValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
+                            （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {(decision.posteriorValueGross - 600).toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
                           </span>
                         </div>
                       </div>
@@ -856,14 +870,28 @@ export default function MultiStageDecision() {
                           })}{" "}
                           元
                         </strong>
-                        。考虑试销后的期望净收益为{" "}
-                        <strong>
-                          {posteriorResults.expectedPosteriorValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元
+                        。
+                        <br />
+                        不试销最优收益 ={" "}
+                        <strong>{posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                        试销后 gross 期望收益 ={" "}
+                        <strong>{posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                        <br />
+                        EVSI(gross) = {posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} ={" "}
+                        <strong>{posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                        试销成本 = {posteriorResults.testCost.toLocaleString("zh-CN")} 元；
+                        <br />
+                        EVSI(net) = {posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.testCost.toLocaleString("zh-CN")} ={" "}
+                        <strong className={posteriorResults.netEVSI > 0 ? "text-emerald-700" : "text-rose-600"}>
+                          {posteriorResults.netEVSI.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元
+                        </strong>。
+                        <br />
+                        决策规则：EVSI(net) {posteriorResults.netEVSI > 0 ? ">" : "≤"} 0，{posteriorResults.netEVSI > 0 ? "建议试销" : "不建议试销"}。
+                        因此最终最优策略为：
+                        <strong className="text-emerald-700">
+                          {posteriorResults.netEVSI > 0 ? "做试销" : "不做试销，直接购买技术并采用"}
+                          {posteriorResults.netEVSI <= 0 ? (bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产") : ""}
                         </strong>
-                        ，信息价值 EVSI ≈{" "}
-                        <strong>{posteriorResults.evsi.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>
-                        ，小于试销费用 600 元。因此最终最优策略为：
-                        <strong className="text-emerald-700">不做试销，直接购买技术并采用{bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产"}</strong>
                         。
                       </p>
                     </div>

@@ -98,7 +98,7 @@ const r4 = (v: number) => Math.round(v * 10000) / 10000;
 /*  AHP Math Utilities                                                 */
 /* ------------------------------------------------------------------ */
 
-/** Compute weights using the 和积法 (sum-product / approximate eigenvector) */
+/** Compute weights using the 和积法 — an approximation of the principal eigenvector */
 function computeWeights(matrix: number[][]): number[] {
   const n = matrix.length;
   // Step 1: column sums
@@ -758,7 +758,7 @@ export default function AhpPage() {
   const ahpSteps = [
     { num: '①', text: '建立递阶层次结构(目标层→准则层→方案层)' },
     { num: '②', text: '构建两两比较判断矩阵(1-9标度法)' },
-    { num: '③', text: '计算权重向量(特征向量法)' },
+    { num: '③', text: '计算权重向量(和积法近似最大特征向量)' },
     { num: '④', text: '一致性检验(CI、RI、CR)' },
     { num: '⑤', text: '层次总排序与决策' },
   ];
@@ -940,7 +940,7 @@ export default function AhpPage() {
             </h2>
           </div>
           <p className="text-[13px] mb-4" style={{ color: '#6B6B6B' }}>
-            使用特征向量法(和积法)计算各准则的相对权重
+            使用和积法近似计算最大特征向量对应的权重
           </p>
 
           <CalculationSteps title="权重计算过程" steps={weightCalcSteps} />
