@@ -42,22 +42,12 @@ export default function Home() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <section className="bg-[#1B3A5F] rounded-2xl px-6 py-12 lg:px-12 lg:py-16 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+      <section className="bg-white border border-[#E0DDD5] rounded-2xl px-6 py-12 lg:px-12 lg:py-16 text-center relative overflow-hidden">
         <div className="relative z-10">
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
+          <h1 className="text-3xl lg:text-4xl font-bold text-[#1B3A5F] mb-3">
             序贯决策分析
           </h1>
-          <p className="text-base lg:text-lg text-gray-400 mb-4">
+          <p className="text-base lg:text-lg text-[#6B6B6B] mb-4">
             决策理论与方法 · 第6章
           </p>
           <div className="w-16 h-1 bg-[#C8963E] mx-auto rounded-full" />
