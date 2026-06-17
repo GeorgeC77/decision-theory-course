@@ -556,8 +556,8 @@ export default function AhpPage() {
     [criteriaWeights, altWeightsPerCriterion]
   );
 
-  /* Consistency for each alternative matrix (computed but displayed per-tab) */
-  useMemo(
+  /* Consistency for each alternative matrix */
+  const altConsistencies = useMemo(
     () =>
       altMatrices.map((m, i) => computeConsistency(m, altWeightsPerCriterion[i])),
     [altMatrices, altWeightsPerCriterion]
@@ -748,7 +748,7 @@ export default function AhpPage() {
         '判断矩阵的构建需要领域专家参与',
         '准则数不宜过多(建议不超过9个)，否则一致性难以保证',
         '1-9标度法是一种近似方法，存在一定主观性',
-        '当CR≥0.10时，需要找出矛盾最大的元素进行调整',
+        '当CR≥0.10时，需要找出逻辑矛盾较突出的元素进行调整',
         '层次总排序也需要进行一致性检验',
       ],
     },
@@ -1182,6 +1182,43 @@ export default function AhpPage() {
               shortLabels={ALT_SHORT}
             />
           </motion.div>
+
+          {/* Alternative-level consistency result */}
+          <div
+            className="mt-4 rounded-lg p-4"
+            style={{ background: '#F8F6F2', border: '1px solid #E0DDD5' }}
+          >
+            <h4 className="text-sm font-semibold mb-2" style={{ color: '#2A4A73' }}>
+              {CRITERIA_SHORT[activeAltTab]} 方案层一致性检验
+            </h4>
+            {(() => {
+              const c = altConsistencies[activeAltTab];
+              if (!c || !c.crValid) {
+                return (
+                  <p className="text-xs" style={{ color: '#6B6B6B' }}>
+                    n ≤ 2 时 RI = 0，CR 无定义，方案层判断矩阵天然一致。
+                  </p>
+                );
+              }
+              const passed = c.cr < 0.1;
+              return (
+                <div className="flex flex-wrap items-center gap-2 text-sm">
+                  <span style={{ color: '#6B6B6B' }}>
+                    λ_max = {r3(c.lambdaMax)}，CI = {r4(c.ci)}，RI = {c.ri}，CR = {r4(c.cr)}
+                  </span>
+                  <span
+                    className="px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={{
+                      background: passed ? '#E8F5E9' : '#FDE8E8',
+                      color: passed ? '#4CAF50' : '#dc2626',
+                    }}
+                  >
+                    {passed ? '通过一致性检验' : '未通过一致性检验'}
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
 
           {/* Combined weights table */}
           <div className="mt-6 overflow-x-auto">

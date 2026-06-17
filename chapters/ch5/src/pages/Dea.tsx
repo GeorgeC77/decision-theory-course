@@ -135,7 +135,7 @@ function calculateEfficiency(
     const effective = theta >= 0.98;
     const rank = rankMap.get(idx) ?? 0;
 
-    // Input redundancy for non-effective DMUs (illustrative only)
+    // Illustrative input improvement room for non-effective DMUs
     const inputRedundancy = dmu.inputs.map((inp) =>
       effective ? 0 : Math.round((1 - theta) * inp * 10) / 10
     );
@@ -348,8 +348,8 @@ export default function DeaPage() {
       content: [
         '无需预先设定权重，避免主观性',
         '无需指定生产函数的具体形式',
-        '同时评价技术效率和规模效率',
-        '可给出非有效DMU的改进方向',
+        '本演示仅给出简化的相对效率代理值，不涉及严格DEA的效率分解',
+        '可示意非有效DMU的投入改进空间（非严格DEA投影结果）',
         '评价的是相对效率而非绝对效率',
         'DEA对异常值敏感，结果对指标选择较为敏感',
       ],
@@ -438,13 +438,13 @@ export default function DeaPage() {
               },
               {
                 icon: Boxes,
-                title: '生产可能集（示意）',
-                desc: '所有投入产出组合构成的集合，严格DEA在此集合的前沿面上寻找最优参照',
+                title: '生产可能集概念（示意）',
+                desc: '所有投入产出组合构成的集合；严格DEA在此集合上寻找最优参照，本演示仅做概念示意',
               },
               {
                 icon: TrendingUp,
-                title: '相对效率前沿示意',
-                desc: '以最高投入产出比为基准，近似展示相对效率最高的DMU，非严格包络面',
+                title: '相对效率参照（示意）',
+                desc: '以最高投入产出比为基准，近似展示相对效率最高的DMU；非严格包络面/前沿示意',
               },
             ].map((card, i) => (
               <motion.div

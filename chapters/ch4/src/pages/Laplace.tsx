@@ -49,14 +49,14 @@ const defaultMatrix: MatrixData = {
 };
 
 const alternatives = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
-const states = ['θ₁（景气）', 'θ₂（不变）', 'θ₃（不景气）'];
+const states = ['θ₁（好）', 'θ₂（中）', 'θ₃（差）'];
 
 
 /* ─────────────────────── utility: compute expected values ─────────────────────── */
 function computeLaplace(matrix: MatrixData): LaplaceResult {
   const { values, probs } = matrix;
   const probSum = probs.reduce((a, b) => a + b, 0);
-  const probValid = Math.abs(probSum - 1) < 0.0001;
+  const probValid = Math.abs(probSum - 1) < 0.0001 && probs.every((p) => p >= 0);
 
   // Expected value for each alternative
   const expectedValues = values.map((row) =>
@@ -324,7 +324,7 @@ export default function Laplace() {
                 }}
               >
                 <AlertTriangle size={16} />
-                概率之和必须等于 1，才能进行期望收益计算。
+                各概率须非负且概率之和必须等于 1，才能进行期望收益计算。
               </div>
             )}
           </div>
@@ -340,7 +340,7 @@ export default function Laplace() {
               }}
             >
               <AlertTriangle size={16} />
-              概率之和为 {result.probSum.toFixed(4)}，必须等于 1.0 才能正确计算期望收益
+              各概率须非负且概率之和为 {result.probSum.toFixed(4)}，必须等于 1.0 才能正确计算期望收益
             </div>
           )}
 
@@ -748,7 +748,7 @@ export default function Laplace() {
               }}
             >
               <AlertTriangle size={16} />
-              概率之和必须等于 1，才能显示期望收益对比图。
+              各概率须非负且概率之和必须等于 1，才能显示期望收益对比图。
             </div>
           )}
         </Card>

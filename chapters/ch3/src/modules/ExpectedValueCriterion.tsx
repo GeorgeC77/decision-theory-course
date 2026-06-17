@@ -48,8 +48,8 @@ export default function ExpectedValueCriterion() {
   }, [probs]);
 
   const probValid = useMemo(() => {
-    return Math.abs(probSum - 1) < 0.001;
-  }, [probSum]);
+    return Math.abs(probSum - 1) < 0.001 && probs.every((p) => p >= 0);
+  }, [probSum, probs]);
 
   const expectedValues = useMemo(() => {
     return payoffs.map((row) =>
@@ -278,9 +278,11 @@ export default function ExpectedValueCriterion() {
             (probValid ? 'text-[#4CAF50]' : 'text-[#F44336] animate-shake')
           }
         >
-          概率验证：ΣP = {probSum.toFixed(2)}
+          概率验证：ΣP = {probSum.toFixed(2)}，Pᵢ ≥ 0
           {!probValid && (
-            <span className="ml-2 text-xs">（概率之和必须等于 1.00）</span>
+            <span className="ml-2 text-xs">
+              （各概率须非负且概率之和必须等于 1.00）
+            </span>
           )}
         </div>
       </motion.div>

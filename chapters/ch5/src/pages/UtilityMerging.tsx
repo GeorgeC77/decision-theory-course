@@ -80,7 +80,7 @@ const RULES: RuleConfig[] = [
     shortLabel: '混合规则',
     formula: '1 + \\gamma W = (1 + \\gamma c_1 u_1)(1 + \\gamma c_2 u_2)',
     color: '#f59e0b', // amber
-    desc: '\\gamma为形式因子。\\gamma=0时退化为加法规则；\\gamma<0时体现准则间的可代换性；\\gamma>0时体现互补性。计算结果截断至[0,1]。',
+    desc: '\\gamma为形式因子。\\gamma=0时退化为加法规则；\\gamma<0时体现准则间的可代换性；\\gamma>0时体现互补性。若原始计算值超出[0,1]，说明当前参数不满足模型假设，请检查输入。',
     paramDesc: '\\gamma \\ge -1；c_i \\ge 0，\\sum c_i = 1；u_i \\in {[0,1]}',
     applicable: '准则间关系复杂，不能确定选用哪种基本规则时',
   },
@@ -166,46 +166,54 @@ export default function UtilityMergingPage() {
   const results = useMemo(() => {
     return alternatives.map((alt) => {
       const u = [alt.g1, alt.g2, alt.g3, alt.g4];
-      let W = 0;
+      let rawW = 0;
       switch (activeRule) {
         case 'distance': {
           // Use u1 and u2 for 2D visualization, but for table use first two
-          W = 1 - Math.sqrt(0.5 * ((1 - u[0]) ** 2 + (1 - u[1]) ** 2));
+          rawW = 1 - Math.sqrt(0.5 * ((1 - u[0]) ** 2 + (1 - u[1]) ** 2));
           break;
         }
         case 'substitution': {
-          W = 1 - u.reduce((prod, ui) => prod * (1 - ui), 1);
+          rawW = 1 - u.reduce((prod, ui) => prod * (1 - ui), 1);
           break;
         }
         case 'additive': {
-          W = u.reduce((sum, ui, i) => sum + effectiveWeights[i] * ui, 0);
+          rawW = u.reduce((sum, ui, i) => sum + effectiveWeights[i] * ui, 0);
           break;
         }
         case 'multiplicative': {
-          W = u.reduce((prod, ui, i) => prod * Math.pow(ui, effectiveRhos[i]), 1);
+          rawW = u.reduce((prod, ui, i) => prod * Math.pow(ui, effectiveRhos[i]), 1);
           break;
         }
         case 'mixed': {
           if (Math.abs(gamma) < 0.0001) {
-            W = u.reduce((sum, ui, i) => sum + effectiveMixedWeights[i] * ui, 0);
+            rawW = u.reduce((sum, ui, i) => sum + effectiveMixedWeights[i] * ui, 0);
           } else {
             const prod = u.reduce(
               (p, ui, i) => p * (1 + gamma * effectiveMixedWeights[i] * ui),
               1
             );
-            W = (prod - 1) / gamma;
+            rawW = (prod - 1) / gamma;
           }
           break;
         }
       }
-      return { name: alt.name, W: Math.round(Math.max(0, Math.min(1, W)) * 1000) / 1000, utilities: u };
+      // Show raw value; do not silently clamp. Use clamped value only for
+      // visualization range checks and fallback ranking.
+      const clampedW = Math.round(Math.max(0, Math.min(1, rawW)) * 1000) / 1000;
+      return { name: alt.name, W: rawW, clampedW, utilities: u };
     });
   }, [alternatives, activeRule, effectiveWeights, effectiveRhos, gamma, effectiveMixedWeights]);
+
+  const hasOutOfBounds = useMemo(
+    () => results.some((r) => r.W < -1e-9 || r.W > 1 + 1e-9),
+    [results]
+  );
 
   const optimalIndex = useMemo(() => {
     let best = 0;
     results.forEach((r, i) => {
-      if (r.W > results[best].W) best = i;
+      if (r.clampedW > results[best].clampedW) best = i;
     });
     return best;
   }, [results]);
@@ -257,7 +265,7 @@ export default function UtilityMergingPage() {
       G2社会效益: alt.g2,
       G3环境效益: alt.g3,
       G4技术可行性: alt.g4,
-      综合效用: results[idx].W,
+      综合效用: results[idx].clampedW,
     }));
   }, [alternatives, results]);
 
@@ -414,8 +422,13 @@ export default function UtilityMergingPage() {
       multiplicative: '乘法规则',
       mixed: '混合规则',
     };
-    return `在${ruleNames[activeRule]}下，方案${optimalAlt.name}的综合效用最高（W = ${r.W.toFixed(3)}）。该方案在各准则上表现均衡，${CRITERIA.map((c, i) => `${c}(${optimalAlt[CRITERIA_KEYS[i] as 'g1' | 'g2' | 'g3' | 'g4'].toFixed(2)})`).join('、')}。`;
-  }, [activeRule, optimalIndex, results, optimalAlt]);
+    const rawWDisplay = r.W.toFixed(3);
+    const clampedDisplay = r.clampedW.toFixed(3);
+    const extra = hasOutOfBounds
+      ? `注意：当前并合效用的原始计算值 W = ${rawWDisplay} 已超出 [0,1] 区间（截断后 ${clampedDisplay}），请检查输入效用值或规则参数是否满足模型假设。`
+      : `原始计算值 W = ${rawWDisplay}。`;
+    return `在${ruleNames[activeRule]}下，方案${optimalAlt.name}的综合效用最高（W = ${rawWDisplay}）。该方案在各准则上表现均衡，${CRITERIA.map((c, i) => `${c}(${optimalAlt[CRITERIA_KEYS[i] as 'g1' | 'g2' | 'g3' | 'g4'].toFixed(2)})`).join('、')}。${extra}`;
+  }, [activeRule, optimalIndex, results, optimalAlt, hasOutOfBounds]);
 
   /* ────────────── render ────────────── */
 
@@ -895,9 +908,20 @@ export default function UtilityMergingPage() {
                       ))}
                       <td
                         className="px-4 py-2.5 text-center font-semibold font-mono"
-                        style={{ color: isOptimal ? '#4CAF50' : '#2A4A73' }}
+                        style={{
+                          color: isOptimal
+                            ? '#4CAF50'
+                            : results[rowIdx].W < -1e-9 || results[rowIdx].W > 1 + 1e-9
+                              ? '#ef4444'
+                              : '#2A4A73',
+                        }}
                       >
                         {results[rowIdx].W.toFixed(3)}
+                        {(results[rowIdx].W < -1e-9 || results[rowIdx].W > 1 + 1e-9) && (
+                          <span className="ml-1 text-xs" title="原始计算值已超出 [0,1]，请检查输入或参数">
+                            ⚠
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-2.5 text-center">
                         {isOptimal ? (
@@ -977,6 +1001,14 @@ export default function UtilityMergingPage() {
 
         {/* ── Section 7: Optimal Card ── */}
         <motion.div variants={itemVariants} className="mb-6">
+          {hasOutOfBounds && (
+            <div
+              className="mb-4 rounded-lg p-3 text-sm font-medium"
+              style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}
+            >
+              ⚠️ 警告：部分方案的并合效用原始计算值已超出 [0,1] 区间。多维效用并合模型通常要求 W∈[0,1]，越界说明当前输入效用值或规则参数可能不满足模型假设，结果仅供演示参考，请检查数据。
+            </div>
+          )}
           <OptimalCard
             name={`方案${results[optimalIndex].name}`}
             value={`综合效用 W = ${results[optimalIndex].W.toFixed(3)} (${ruleConfig.shortLabel})`}

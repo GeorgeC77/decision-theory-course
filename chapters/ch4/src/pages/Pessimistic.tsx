@@ -36,7 +36,7 @@ const DEFAULT_DATA: MatrixRow[] = [
   { name: 'A₃', values: [200, 200, 150] },
 ];
 
-const STATE_LABELS = ['S₁(景气)', 'S₂(不变)', 'S₃(不景气)'];
+const STATE_LABELS = ['S₁(好)', 'S₂(中)', 'S₃(差)'];
 const ALT_LABELS = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
 
 

@@ -44,7 +44,7 @@ const defaultMatrix: MatrixData = {
 };
 
 const alternatives = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
-const states = ['θ₁（景气）', 'θ₂（不变）', 'θ₃（不景气）'];
+const states = ['θ₁（好）', 'θ₂（中）', 'θ₃（差）'];
 
 
 /* ─────────────────────── utility: compute regret ─────────────────────── */

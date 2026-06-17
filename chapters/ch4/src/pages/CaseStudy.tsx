@@ -615,16 +615,12 @@ export default function CaseStudy() {
                   </div>
                 ))}
             </div>
-            <p className="text-xs font-semibold mt-3" style={{ color: '#1B3A5F' }}>
+            <p className="text-xs mt-3" style={{ color: '#1B3A5F' }}>
               {(() => {
                 const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
                 if (sorted.length === 0) return '请编辑收益矩阵以查看推荐结果。';
-                const maxCount = sorted[0][1];
-                const top = sorted.filter(([, c]) => Math.abs(c - maxCount) < 1e-9).map(([name]) => name);
-                if (top.length === 1) {
-                  return `综合多数准则结果，${top[0]} 获得最多准则推荐。`;
-                }
-                return `综合多数准则结果，${top.join('、')} 并列获得最多准则推荐。`;
+                const details = sorted.map(([name, c]) => `${name}(${c})`).join('、');
+                return `各准则推荐方案统计：${details}。不同准则反映不同决策偏好，最终选择应结合决策情境与风险偏好综合判断，不宜简单按准则数量“多数决”。`;
               })()}
             </p>
           </div>
@@ -1000,7 +996,7 @@ export default function CaseStudy() {
                   </li>
                   <li className="flex items-start gap-1.5">
                     <Check size={13} className="mt-1 flex-shrink-0" style={{ color: '#27ae60' }} />
-                    <span>若多数准则指向同一方案，决策信心更高</span>
+                    <span>若多种准则指向同一方案，可作为参考依据之一</span>
                   </li>
                   <li className="flex items-start gap-1.5">
                     <Check size={13} className="mt-1 flex-shrink-0" style={{ color: '#27ae60' }} />

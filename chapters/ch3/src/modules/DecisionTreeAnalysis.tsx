@@ -229,6 +229,13 @@ export default function DecisionTreeAnalysis() {
               strokeDasharray={isOptimal1 ? undefined : '5,3'}
               filter={isOptimal1 ? 'url(#optimalGlow)' : undefined}
             />
+            {/* Prune mark for scheme 1 */}
+            {!isOptimal1 && (
+              <g transform="translate(100, 125)">
+                <line x1={0} y1={0} x2={10} y2={10} stroke="#F44336" strokeWidth={2} />
+                <line x1={10} y1={0} x2={0} y2={10} stroke="#F44336" strokeWidth={2} />
+              </g>
+            )}
             {/* Scheme 1 label */}
             <text x={55} y={125} className="text-xs font-semibold fill-[#2B2B2B]">
               {scheme1.name}
@@ -247,7 +254,7 @@ export default function DecisionTreeAnalysis() {
             {/* EV label for scheme 1 */}
             <rect x={125} y={55} width={100} height={24} rx={6} fill={isOptimal1 ? '#E8F5E9' : '#FDE8E8'} stroke={isOptimal1 ? '#4CAF50' : '#F44336'} strokeWidth={1} />
             <text x={175} y={71} textAnchor="middle" className={`text-xs font-bold ${isOptimal1 ? 'fill-[#4CAF50]' : 'fill-[#F44336]'}`}>
-              EV = {ev1.toFixed(0)}万 {isOptimal1 ? '★' : ''}
+              EV = {ev1.toFixed(0)}万{isOptimal1 ? ' ★' : ''}
             </text>
 
             {/* Branch: 好 (scheme 1) */}
@@ -305,7 +312,7 @@ export default function DecisionTreeAnalysis() {
             {/* EV label for scheme 2 */}
             <rect x={125} y={261} width={100} height={24} rx={6} fill={isOptimal2 ? '#E8F5E9' : '#FDE8E8'} stroke={isOptimal2 ? '#4CAF50' : '#F44336'} strokeWidth={1} />
             <text x={175} y={277} textAnchor="middle" className={`text-xs font-bold ${isOptimal2 ? 'fill-[#4CAF50]' : 'fill-[#F44336]'}`}>
-              EV = {ev2.toFixed(0)}万 {isOptimal2 ? '★' : '[剪枝]'}
+              EV = {ev2.toFixed(0)}万{isOptimal2 ? ' ★' : ''}
             </text>
 
             {/* Branch: 好 (scheme 2) */}

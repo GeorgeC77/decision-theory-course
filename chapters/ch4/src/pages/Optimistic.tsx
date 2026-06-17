@@ -55,7 +55,7 @@ const defaultMatrix = [
 ];
 
 const altLabels = ['积极(A₁)', '稳健(A₂)', '保守(A₃)'];
-const stateLabels = ['S₁(景气)', 'S₂(不变)', 'S₃(不景气)'];
+const stateLabels = ['S₁(好)', 'S₂(中)', 'S₃(差)'];
 const altShortLabels = ['A₁', 'A₂', 'A₃'];
 
 /* ------------------------------------------------------------------ */
