@@ -59,7 +59,7 @@ interface EfficiencyOutput {
 /* ================================================================
    Default Data
    ================================================================ */
-const DEFAULT_DMU_NAMES = ['DMU₁', 'DMU₂', 'DMU₃', 'DMU₄', 'DMU₅'];
+const DEFAULT_UNIT_NAMES = ['单元₁', '单元₂', '单元₃', '单元₄', '单元₅'];
 const DEFAULT_INPUT_LABELS = ['资金投入X₁(万元)', '人力投入X₂(人)'];
 const DEFAULT_OUTPUT_LABELS = ['产值Y₁(万元)', '利润Y₂(万元)'];
 
@@ -143,7 +143,7 @@ function calculateEfficiency(
         inputRedundancy: dmu.inputs.map(() => 0),
         validInput: withMeta[idx].validInput,
       })),
-      error: '当前数据无法归一化：所有有效 DMU 的投入产出比非正或不存在。请检查投入数据是否大于 0。',
+      error: '当前数据无法归一化：没有有效评价单元的投入产出比。请检查投入数据是否大于 0。',
       invalidInputNames,
     };
   }
@@ -201,7 +201,7 @@ export default function DeaPage() {
   const [dmuCount, setDmuCount] = useState(5);
   const [inputCount, setInputCount] = useState(2);
   const [outputCount, setOutputCount] = useState(2);
-  const [dmuNames, setDmuNames] = useState<string[]>(DEFAULT_DMU_NAMES);
+  const [dmuNames, setDmuNames] = useState<string[]>(DEFAULT_UNIT_NAMES);
   const [inputLabels, setInputLabels] = useState<string[]>(DEFAULT_INPUT_LABELS);
   const [outputLabels, setOutputLabels] = useState<string[]>(DEFAULT_OUTPUT_LABELS);
   const [inputs, setInputs] = useState<number[][]>(DEFAULT_INPUTS.map((r) => [...r]));
@@ -271,7 +271,7 @@ export default function DeaPage() {
     setDmuNames((prev) => {
       const next = [...prev];
       while (next.length < newCount) {
-        next.push(`DMU${next.length + 1}`);
+        next.push(`单元${next.length + 1}`);
       }
       return next;
     });
@@ -296,7 +296,7 @@ export default function DeaPage() {
     setDmuCount(5);
     setInputCount(2);
     setOutputCount(2);
-    setDmuNames([...DEFAULT_DMU_NAMES]);
+    setDmuNames([...DEFAULT_UNIT_NAMES]);
     setInputLabels([...DEFAULT_INPUT_LABELS]);
     setOutputLabels([...DEFAULT_OUTPUT_LABELS]);
     setInputs(DEFAULT_INPUTS.map((r) => [...r]));
@@ -327,16 +327,25 @@ export default function DeaPage() {
     : null;
   const selectedOutSum = selectedMeta?.outputs.reduce((a, b) => a + b, 0) ?? 0;
   const selectedInSum = selectedMeta?.inputs.reduce((a, b) => a + b, 0) ?? 0;
-  const selectedRawEfficiency = selectedInSum > 0 ? selectedOutSum / selectedInSum : NaN;
-  const selectedMaxRaw = Math.max(
-    ...dmuData
+  const selectedRawEfficiency =
+    Number.isFinite(selectedInSum) &&
+    Number.isFinite(selectedOutSum) &&
+    selectedInSum > 0
+      ? selectedOutSum / selectedInSum
+      : NaN;
+  const selectedMaxRaw = useMemo(() => {
+    const ratios = dmuData
       .map((d) => ({
         inSum: d.inputs.reduce((a, b) => a + b, 0),
         outSum: d.outputs.reduce((a, b) => a + b, 0),
       }))
-      .filter((d) => d.inSum > 0)
+      .filter(
+        (d) => Number.isFinite(d.inSum) && Number.isFinite(d.outSum) && d.inSum > 0
+      )
       .map((d) => d.outSum / d.inSum)
-  );
+      .filter((r) => Number.isFinite(r));
+    return ratios.length > 0 ? Math.max(...ratios) : NaN;
+  }, [dmuData]);
 
   const calcSteps = selectedResult
     ? [
@@ -363,9 +372,12 @@ export default function DeaPage() {
         {
           title: `Step 4: 计算相对效率代理值 θ`,
           formula: `θ = 当前效率代理值 / 最高效率代理值`,
-          result: Number.isFinite(selectedMaxRaw) && selectedMaxRaw > 0
-            ? `θ = ${selectedRawEfficiency.toFixed(3)} / ${selectedMaxRaw.toFixed(3)} = ${selectedResult.theta.toFixed(3)}`
-            : '当前数据无法归一化',
+          result:
+            Number.isFinite(selectedRawEfficiency) &&
+            Number.isFinite(selectedMaxRaw) &&
+            selectedMaxRaw > 0
+              ? `θ = ${selectedRawEfficiency.toFixed(3)} / ${selectedMaxRaw.toFixed(3)} = ${selectedResult.theta.toFixed(3)}`
+              : '当前数据无法归一化',
           highlight: true,
           optimal: selectedResult.effective,
         },
@@ -386,17 +398,17 @@ export default function DeaPage() {
     {
       subtitle: '适用条件',
       content: [
-        '适用于评价具有相同类型的多投入、多产出的决策单元（如企业、部门、项目等）的相对效率',
-        '无需预设生产函数形式，避免主观赋权',
-        'DMU数量建议 ≥ 2×(投入数 + 产出数)',
+        '适用于评价具有相同类型的多投入、多产出的评价单元（如企业、部门、项目等）的相对效率',
+        '严格 DEA 通过线性规划内生选择权重；但本页面为简化演示，采用投入和产出等权加总，因此仍隐含等权假设。该结果仅用于教学示意，不能替代正式 DEA 分析。',
+        '评价单元数量建议 ≥ 2×(投入数 + 产出数)',
       ],
     },
     {
       subtitle: '本演示的简化效率代理',
       content: [
-        '效率代理值 = (某 DMU 产出综合) / (某 DMU 投入综合)',
-        '再以效率最高的 DMU 为基准做归一化，得到相对效率值 θ ∈ [0,1]',
-        '注意：这不是严格的 C²R 线性规划模型，仅用于理解“相对效率”思想',
+        '效率代理值 = (某评价单元产出总和) / (某评价单元投入总和)',
+        '再以效率最高的评价单元为基准做归一化，得到相对效率代理值 θ ∈ [0,1]',
+        '注意：这不是严格的数据包络分析（DEA）线性规划模型，仅用于理解“相对效率”思想',
       ],
     },
     {
@@ -409,12 +421,12 @@ export default function DeaPage() {
     {
       subtitle: '特点与注意事项',
       content: [
-        '无需预先设定权重，避免主观性',
+        '本页面为简化演示，投入和产出采用等权加总，结果仅用于教学示意，不能替代正式 DEA 分析',
         '无需指定生产函数的具体形式',
-        '本演示仅给出简化的相对效率代理值，不涉及严格DEA的效率分解',
-        '可示意代理值较低DMU的投入改进空间（非严格DEA投影结果）',
+        '本演示仅给出简化的相对效率代理值，不涉及严格数据包络分析的效率分解',
+        '可示意代理值较低单元的投入改进空间（非严格模型投影结果）',
         '评价的是相对效率而非绝对效率',
-        'DEA对异常值敏感，结果对指标选择较为敏感',
+        '评价结果对指标选择和异常值较为敏感',
       ],
     },
   ];
@@ -446,7 +458,7 @@ export default function DeaPage() {
               DEA思想简化演示
             </h1>
             <p className="text-sm mt-1" style={{ color: '#6B6B6B' }}>
-              投入产出效率比值分析 — 演示DEA相对效率思想（注：非严格DEA线性规划模型）
+              投入产出效率比值分析 — 演示 DEA 相对效率思想（注：非严格 DEA 线性规划模型）
             </p>
             <div className="flex flex-wrap gap-2 mt-3">
               {['DEA', '效率评价', '简化演示', '投入产出比'].map((tag) => (
@@ -496,7 +508,7 @@ export default function DeaPage() {
             {[
               {
                 icon: Building2,
-                title: '决策单元(DMU)',
+                title: '评价单元',
                 desc: '被评价的对象，如企业、部门、项目等，具有相同的投入和产出指标',
               },
               {
@@ -507,7 +519,7 @@ export default function DeaPage() {
               {
                 icon: TrendingUp,
                 title: '相对效率参照（示意）',
-                desc: '以最高投入产出比为基准，近似展示相对效率最高的DMU；非严格包络面/前沿示意',
+                desc: '以最高投入产出比为基准，近似展示相对效率最高的单元；非严格包络面/前沿示意',
               },
             ].map((card, i) => (
               <motion.div
@@ -552,7 +564,7 @@ export default function DeaPage() {
             </p>
           </div>
           <p className="text-sm leading-relaxed mb-4" style={{ color: '#6B6B6B' }}>
-            本演示使用简化比值代理来近似DEA的相对效率思想。先计算每个DMU的产出综合与投入综合之比，再以最高比值为基准归一化到[0,1]。严格DEA需对每个DMU求解线性规划。
+            本演示使用简化比值代理来近似 DEA 的相对效率思想。先计算每个评价单元的产出综合与投入综合之比，再以最高比值为基准归一化到[0,1]。严格 DEA 需对每个评价单元求解线性规划。
           </p>
 
           <div className="formula-block">
@@ -562,7 +574,7 @@ export default function DeaPage() {
           </div>
 
           <p className="text-sm leading-relaxed mt-4 mb-4" style={{ color: '#6B6B6B' }}>
-            严格 DEA 的 C²R 模型需对每个 DMU 求解线性规划，本演示未实现该过程，仅用于理解“相对效率”思想。
+            严格 DEA 的 C²R 模型需对每个评价单元求解线性规划，本演示未实现该过程，仅用于理解“相对效率”思想。
           </p>
 
           {/* DEA Validity Cards */}
@@ -634,7 +646,7 @@ export default function DeaPage() {
                 📊 投入产出数据
               </h2>
               <p className="text-[13px] mt-1" style={{ color: '#6B6B6B' }}>
-                输入各决策单元的投入和产出数据，系统将自动计算简化效率代理值
+                输入各评价单元的投入和产出数据，系统将自动计算简化效率代理值
               </p>
             </div>
             <span
@@ -649,7 +661,7 @@ export default function DeaPage() {
           <div className="flex flex-wrap items-center gap-4 mb-4 p-3 rounded-lg" style={{ background: '#F8F6F2' }}>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium" style={{ color: '#6B6B6B' }}>
-                决策单元数:
+                评价单元数:
               </span>
               <div className="flex items-center gap-1">
                 <button
@@ -685,7 +697,7 @@ export default function DeaPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: '#2A4A73' }}>
-                    <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">DMU</th>
+                    <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">评价单元</th>
                     {inputLabels.slice(0, inputCount).map((label, i) => (
                       <th key={i} className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">
                         {label}
@@ -744,7 +756,7 @@ export default function DeaPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: '#2A4A73' }}>
-                    <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">DMU</th>
+                    <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">评价单元</th>
                     {outputLabels.slice(0, outputCount).map((label, i) => (
                       <th key={i} className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">
                         {label}
@@ -811,7 +823,7 @@ export default function DeaPage() {
                 ⚖️ 简化效率代理值计算
               </h2>
               <p className="text-[13px] mt-1" style={{ color: '#6B6B6B' }}>
-                基于简化投入产出比值代理计算各决策单元的相对效率值
+                基于简化投入产出比值代理计算各评价单元的相对效率值
               </p>
             </div>
             <span
@@ -824,7 +836,7 @@ export default function DeaPage() {
           </div>
 
           <p className="text-sm mb-4" style={{ color: '#6B6B6B' }}>
-            采用简化效率比值代理：θ = (某DMU产出综合/投入综合) ÷ (所有DMU中最大产出投入比)。θ越接近1表示相对效率越高。
+            采用简化效率比值代理：θ = (某评价单元产出综合/投入综合) ÷ (所有评价单元中最大产出投入比)。θ越接近1表示相对效率越高。
           </p>
 
           {(efficiencyError || invalidInputNames.length > 0) && (
@@ -835,86 +847,89 @@ export default function DeaPage() {
               {efficiencyError && <div>{efficiencyError}</div>}
               {invalidInputNames.length > 0 && (
                 <div>
-                  以下 DMU 的投入总和必须大于 0：{invalidInputNames.join('、')}。
+                  以下评价单元的投入总和必须大于 0：{invalidInputNames.join('、')}。
                 </div>
               )}
             </div>
           )}
 
-          {/* Efficiency Results Table */}
-          <div className="overflow-x-auto mb-5">
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ background: '#2A4A73' }}>
-                  <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">DMU</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">效率值 θ</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">排名</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">代理值层级</th>
+          {!efficiencyError && (
+            <>
+              {/* Efficiency Results Table */}
+              <div className="overflow-x-auto mb-5">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr style={{ background: '#2A4A73' }}>
+                      <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">评价单元</th>
+                      <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">相对效率代理值 θ</th>
+                      <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">排名</th>
+                      <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">代理值层级</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.map((r, idx) => (
+                      <motion.tr
+                        key={idx}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: idx * 0.06 }}
+                        style={{
+                          background: idx % 2 === 0 ? '#ffffff' : '#F8F6F2',
+                          borderLeft: r.effective ? '3px solid #4CAF50' : '3px solid transparent',
+                        }}
+                        className={r.effective ? 'bg-green-50' : ''}
+                      >
+                        <td className="px-4 py-2.5 font-medium" style={{ color: '#2A4A73' }}>
+                          {r.name}
+                        </td>
+                        <td
+                          className="px-4 py-2.5 text-center font-mono font-semibold"
+                          style={{ color: r.effective ? '#4CAF50' : '#2A4A73' }}
+                        >
+                          {r.validInput ? r.theta.toFixed(3) : '—'}
+                        </td>
+                        <td className="px-4 py-2.5 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            {rankIcon(r.rank)}
+                            <span style={{ color: '#2A4A73' }}>{r.rank}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2.5 text-center">
+                          {!r.validInput ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                              style={{ background: '#FDE8E8', color: '#dc2626' }}
+                            >
+                              <AlertTriangle size={12} />
+                              投入无效
+                            </span>
+                          ) : r.effective ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                              style={{ background: '#E8F5E9', color: '#4CAF50' }}
+                            >
+                              <CheckCircle size={12} />
+                              代理值最高/接近最高
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                              style={{ background: '#f1f5f9', color: '#6B6B6B' }}
+                            >
+                              <AlertTriangle size={12} />
+                              代理值较低
+                            </span>
+                          )}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
 
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((r, idx) => (
-                  <motion.tr
-                    key={idx}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: idx * 0.06 }}
-                    style={{
-                      background: idx % 2 === 0 ? '#ffffff' : '#F8F6F2',
-                      borderLeft: r.effective ? '3px solid #4CAF50' : '3px solid transparent',
-                    }}
-                    className={r.effective ? 'bg-green-50' : ''}
-                  >
-                    <td className="px-4 py-2.5 font-medium" style={{ color: '#2A4A73' }}>
-                      {r.name}
-                    </td>
-                    <td
-                      className="px-4 py-2.5 text-center font-mono font-semibold"
-                      style={{ color: r.effective ? '#4CAF50' : '#2A4A73' }}
-                    >
-                      {r.theta.toFixed(3)}
-                    </td>
-                    <td className="px-4 py-2.5 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        {rankIcon(r.rank)}
-                        <span style={{ color: '#2A4A73' }}>{r.rank}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-2.5 text-center">
-                      {!r.validInput ? (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#FDE8E8', color: '#dc2626' }}
-                        >
-                          <AlertTriangle size={12} />
-                          投入无效
-                        </span>
-                      ) : r.effective ? (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#E8F5E9', color: '#4CAF50' }}
-                        >
-                          <CheckCircle size={12} />
-                          代理值最高/接近最高
-                        </span>
-                      ) : (
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                          style={{ background: '#f1f5f9', color: '#6B6B6B' }}
-                        >
-                          <AlertTriangle size={12} />
-                          代理值较低
-                        </span>
-                      )}
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* DMU selector for calculation steps */}
+          {/* Unit selector for calculation steps */}
           <div className="flex items-center gap-3 mb-4">
             <span className="text-sm font-medium" style={{ color: '#6B6B6B' }}>
               查看计算过程:
@@ -986,85 +1001,96 @@ export default function DeaPage() {
           style={{ border: '1px solid #E0DDD5' }}
         >
           <h2 className="text-lg font-semibold mb-1" style={{ color: '#2A4A73' }}>
-            📈 各决策单元简化效率代理值对比
+            📈 各评价单元简化效率代理值对比
           </h2>
           <p className="text-[13px] mb-5" style={{ color: '#6B6B6B' }}>
-            θ≈1 的决策单元在简化代理下相对效率最高
+            θ≈1 的评价单元在简化代理下相对效率最高
           </p>
 
-          <div style={{ width: '100%', height: 350 }}>
-            <ResponsiveContainer>
-              <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E0DDD5" />
-                <XAxis dataKey="name" tick={{ fill: '#6B6B6B', fontSize: 13 }} />
-                <YAxis
-                  domain={[0, 1.1]}
-                  tick={{ fill: '#6B6B6B', fontSize: 12 }}
-                  tickFormatter={(v: number) => v.toFixed(1)}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: '#ffffff',
-                    border: '1px solid #E0DDD5',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                  }}
-                  formatter={(value: number) => [`θ = ${value.toFixed(3)}`, '效率值']}
-                />
-                <ReferenceLine
-                  y={1}
-                  stroke="#4CAF50"
-                  strokeDasharray="5 5"
-                  label={{
-                    value: '相对效率参考线 θ=1',
-                    position: 'right',
-                    fill: '#4CAF50',
-                    fontSize: 12,
-                  }}
-                />
-                <Bar dataKey="theta" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={index}
-                      fill={entry.effective ? '#4CAF50' : '#9E9E9E'}
+          {efficiencyError ? (
+            <div
+              className="rounded-lg p-4 text-sm font-medium"
+              style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}
+            >
+              当前数据无法归一化，暂不显示效率代理值对比图。请检查投入数据是否大于 0，并确保至少存在一个有效评价单元。
+            </div>
+          ) : (
+            <>
+              <div style={{ width: '100%', height: 350 }}>
+                <ResponsiveContainer>
+                  <BarChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E0DDD5" />
+                    <XAxis dataKey="name" tick={{ fill: '#6B6B6B', fontSize: 13 }} />
+                    <YAxis
+                      domain={[0, 1.1]}
+                      tick={{ fill: '#6B6B6B', fontSize: 12 }}
+                      tickFormatter={(v: number) => v.toFixed(1)}
                     />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+                    <Tooltip
+                      contentStyle={{
+                        background: '#ffffff',
+                        border: '1px solid #E0DDD5',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                      }}
+                      formatter={(value: number) => [`θ = ${value.toFixed(3)}`, '相对效率代理值']}
+                    />
+                    <ReferenceLine
+                      y={1}
+                      stroke="#4CAF50"
+                      strokeDasharray="5 5"
+                      label={{
+                        value: '相对效率参考线 θ=1',
+                        position: 'right',
+                        fill: '#4CAF50',
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar dataKey="theta" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={index}
+                          fill={entry.effective ? '#4CAF50' : '#9E9E9E'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
 
-          {/* Statistics */}
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-wrap justify-center gap-4 mt-5"
-          >
-            {[
-              { label: '代理值最高/接近最高DMU', value: `${effectiveCount}/${results.length}`, color: '#4CAF50' },
-              { label: '平均效率', value: avgEfficiency.toFixed(3), color: '#3b82f6' },
-              {
-                label: '最低效率',
-                value: minResult ? `${minResult.theta.toFixed(3)} (${minResult.name})` : '—',
-                color: '#ef4444',
-              },
-            ].map((stat) => (
+              {/* Statistics */}
               <motion.div
-                key={stat.label}
-                variants={fadeUp}
-                className="text-center px-5 py-3 rounded-lg"
-                style={{ background: '#F8F6F2' }}
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-wrap justify-center gap-4 mt-5"
               >
-                <div className="text-lg font-semibold" style={{ color: stat.color }}>
-                  {stat.value}
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: '#6B6B6B' }}>
-                  {stat.label}
-                </div>
+                {[
+                  { label: '代理值最高/接近最高单元', value: `${effectiveCount}/${results.length}`, color: '#4CAF50' },
+                  { label: '平均效率', value: avgEfficiency.toFixed(3), color: '#3b82f6' },
+                  {
+                    label: '最低效率',
+                    value: minResult ? `${minResult.theta.toFixed(3)} (${minResult.name})` : '—',
+                    color: '#ef4444',
+                  },
+                ].map((stat) => (
+                  <motion.div
+                    key={stat.label}
+                    variants={fadeUp}
+                    className="text-center px-5 py-3 rounded-lg"
+                    style={{ background: '#F8F6F2' }}
+                  >
+                    <div className="text-lg font-semibold" style={{ color: stat.color }}>
+                      {stat.value}
+                    </div>
+                    <div className="text-xs mt-0.5" style={{ color: '#6B6B6B' }}>
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+            </>
+          )}
         </motion.div>
 
         {/* ====== Section 7: Knowledge Card ====== */}

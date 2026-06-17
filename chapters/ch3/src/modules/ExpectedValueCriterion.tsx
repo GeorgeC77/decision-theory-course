@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   TrendingUp,
@@ -146,6 +146,8 @@ export default function ExpectedValueCriterion() {
     text: string;
   } | null>(null);
 
+  const chartWrapperRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="space-y-6 mt-6">
       {/* ── Section Header ── */}
@@ -256,10 +258,10 @@ export default function ExpectedValueCriterion() {
                         (isOptimal ? 'text-[#4CAF50]' : 'text-[#2B2B2B]')
                       }
                     >
-                      {expectedValues[i].toFixed(2)}
+                      {probValid ? expectedValues[i].toFixed(2) : '—'}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {isOptimal && (
+                      {probValid && isOptimal && (
                         <span className="inline-flex items-center gap-1 bg-[#E8F5E9] text-[#4CAF50] border border-[#4CAF50]/30 rounded-full px-2 py-0.5 text-xs font-semibold">
                           <Award className="w-3 h-3" />
                           最优
@@ -329,20 +331,16 @@ export default function ExpectedValueCriterion() {
             </div>
           ) : (
             <div className="rounded-lg p-4 text-sm text-[#dc2626] bg-[#FDE8E8]">
-              当前概率不满足合法性要求（须非负且和为 1），EVPI 数值仅供中间预览，不能作为决策结论。
+              概率输入无效，暂不显示完整情报价值相关数值与决策结论。请先修正概率，使各概率非负且和为 1。
             </div>
           )}
 
           {/* Economic meaning */}
-          {probValid ? (
+          {probValid && (
             <div className="mt-4 bg-[#C8963E]/5 rounded-lg p-4 text-sm leading-relaxed">
               获得完整情报后，期望收益最多可增加{' '}
               <span className="font-bold text-[#C8963E]">{evpi.toFixed(2)}</span>{' '}
-              个单位。若情报成本低于此值，则获取情报是值得的。
-            </div>
-          ) : (
-            <div className="mt-4 bg-[#FDE8E8] rounded-lg p-4 text-sm leading-relaxed text-[#dc2626]">
-              概率输入无效，无法给出 EVPI 决策结论。请先修正概率，使各概率非负且和为 1。
+              个单位。若情报成本低于此值，则搜集该信息在经济上合理。
             </div>
           )}
         </motion.div>
@@ -413,7 +411,7 @@ export default function ExpectedValueCriterion() {
             </div>
           ) : (
             <div className="rounded-lg p-4 text-sm text-[#dc2626] bg-[#FDE8E8]">
-              概率输入无效，无法显示完整情报下的状态最优方案。请先修正概率。
+              概率无效，无法计算完整情报期望收益。请先修正概率。
             </div>
           )}
         </motion.div>
@@ -432,12 +430,12 @@ export default function ExpectedValueCriterion() {
           <h3 className="text-[17px] font-semibold text-[#2B2B2B]">各方案期望值对比</h3>
         </div>
         <p className="text-[13px] text-[#6B6B6B] mb-4">
-          {probValid ? '绿色柱子为最优方案，蓝色为其他方案' : '概率无效时仅显示预览，不出具正式结论'}
+          {probValid ? '绿色柱子为最优方案，蓝色为其他方案' : '概率无效，待修正后可查看图表结论'}
         </p>
 
         {/* SVG Bar Chart */}
         {probValid ? (
-        <div className="w-full" style={{ height: 240, position: 'relative' }}>
+        <div ref={chartWrapperRef} className="w-full" style={{ height: 240, position: 'relative' }}>
           <svg
             viewBox="0 0 400 200"
             className="w-full h-full"
@@ -497,9 +495,10 @@ export default function ExpectedValueCriterion() {
                     }}
                     onMouseEnter={(e) => {
                       const rect = (e.target as SVGRectElement).getBoundingClientRect();
+                      const wrapperRect = chartWrapperRef.current?.getBoundingClientRect();
                       setTooltip({
-                        x: rect.left + rect.width / 2,
-                        y: rect.top - 10,
+                        x: rect.left + rect.width / 2 - (wrapperRect?.left ?? 0),
+                        y: rect.top - 10 - (wrapperRect?.top ?? 0),
                         text: `${d.name}: E = ${d.value.toFixed(2)}`,
                       });
                     }}
@@ -560,7 +559,7 @@ export default function ExpectedValueCriterion() {
           className="w-full flex items-center justify-center rounded-lg text-sm font-medium"
           style={{ height: 240, background: '#FDE8E8', color: '#dc2626' }}
         >
-          请先修正概率输入（须非负且和为 1），再查看图表结论
+          请先修正概率输入。
         </div>
       )}
       </motion.div>

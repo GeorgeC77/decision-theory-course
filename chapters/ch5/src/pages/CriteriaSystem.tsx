@@ -348,10 +348,10 @@ export default function CriteriaSystemPage() {
             <img
               src={
                 structureType === 'single'
-                  ? '/tree-single-level.jpg'
+                  ? './tree-single-level.jpg'
                   : structureType === 'sequential'
-                  ? '/tree-sequential.jpg'
-                  : '/tree-non-sequential.jpg'
+                  ? './tree-sequential.jpg'
+                  : './tree-non-sequential.jpg'
               }
               alt={
                 structureType === 'single'

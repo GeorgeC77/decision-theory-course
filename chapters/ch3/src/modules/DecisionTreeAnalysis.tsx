@@ -368,11 +368,11 @@ export default function DecisionTreeAnalysis() {
         <div className="text-center mt-3 pt-3 border-t border-[#EFEBE5]">
           {optimalIdxs.length === 1 ? (
             <span className="text-sm font-bold text-[#4CAF50]">
-              ★ 最优方案（EV = {maxEV.toFixed(0)}万）= {schemes[optimalIdxs[0]].name}
+              最优方案：{schemes[optimalIdxs[0]].name}，EV = {maxEV.toFixed(0)}万
             </span>
           ) : (
             <span className="text-sm font-bold text-[#4CAF50]">
-              ★ 并列最优方案为 {optimalIdxs.map((i) => schemes[i].name).join('、')}（EV = {maxEV.toFixed(0)}万）
+              并列最优方案：{optimalIdxs.map((i) => schemes[i].name).join(' 和 ')}，EV = {maxEV.toFixed(0)}万
             </span>
           )}
         </div>
@@ -462,11 +462,11 @@ export default function DecisionTreeAnalysis() {
               <div className="border-t border-[#E0DDD5] pt-2 mt-2">
                 {optimalIdxs.length === 1 ? (
                   <span className="text-lg font-bold text-[#4CAF50]">
-                    最优决策：{schemes[optimalIdxs[0]].name}（EV = {maxEV.toFixed(0)}万）
+                    最优方案：{schemes[optimalIdxs[0]].name}，EV = {maxEV.toFixed(0)}万
                   </span>
                 ) : (
                   <span className="text-lg font-bold text-[#4CAF50]">
-                    并列最优决策：{optimalIdxs.map((i) => schemes[i].name).join('、')}（EV = {maxEV.toFixed(0)}万）
+                    并列最优方案：{optimalIdxs.map((i) => schemes[i].name).join(' 和 ')}，EV = {maxEV.toFixed(0)}万
                   </span>
                 )}
               </div>
@@ -724,7 +724,7 @@ export default function DecisionTreeAnalysis() {
                       对每个<strong>决策节点</strong>选择 EV 最大的方案
                     </li>
                     <li>
-                      在次优方案上标记"剪枝"（×），保留最优路径
+                      在明显较差的方案上标记"剪枝"（×），保留最优路径；若多个方案并列最优则均保留
                     </li>
                   </ol>
                 </div>
