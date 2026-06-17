@@ -190,12 +190,12 @@ export default function CaseStudy() {
     [results],
   );
 
-  // Best-scheme tally (supports ties)
+  // Best-scheme tally (each criterion counts 1 for every tied best scheme)
   const tally = useMemo(() => {
     const counts: Record<string, number> = {};
     results.forEach((r) => {
       r.best.forEach((alt) => {
-        counts[alt] = (counts[alt] || 0) + 1 / r.best.length;
+        counts[alt] = (counts[alt] || 0) + 1;
       });
     });
     return counts;
@@ -610,7 +610,7 @@ export default function CaseStudy() {
                       }}
                     />
                     <span className="text-xs font-medium" style={{ color: '#1B3A5F' }}>
-                      {name} — 被 {count} 种准则推荐
+                      {name} — 在 {count} 种准则中列为最优（含并列）
                     </span>
                   </div>
                 ))}

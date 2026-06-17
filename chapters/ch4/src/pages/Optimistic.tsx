@@ -497,14 +497,15 @@ export default function Optimistic() {
               className="text-2xl font-bold"
               style={{ color: '#1B3A5F', fontFamily: "'Noto Serif SC', serif" }}
             >
-              {optimalRows.map((i) => altLabels[i]).join('、')} {optimalRows.length > 1 ? '— 积极投资策略（并列最优）' : '— 积极投资策略'}
+              {optimalRows.map((i) => altLabels[i]).join('、')}
+              {optimalRows.length > 1 ? '（并列最优）' : ''}
             </span>
             <span className="text-base font-semibold" style={{ color: '#C8963E' }}>
               最大收益 = {overallMax}
             </span>
             <p className="text-sm mt-1 leading-relaxed" style={{ color: '#5d6d7e' }}>
-              在乐观准则下，决策者相信未来会出现最有利的状态（景气），
-              因此选择在高景气下收益最大的积极投资策略。
+              在乐观准则下，最优方案为：{optimalRows.map((i) => altLabels[i]).join('、')}。
+              该方案在其最有利自然状态下可获得最大收益，最大收益为 {overallMax}。
             </p>
           </div>
         </div>
@@ -642,6 +643,11 @@ export default function Optimistic() {
             <p className="mb-3 text-[13px]">
               其中 dᵢⱼ 为方案 Aᵢ 在状态 θⱼ 下的收益值。
               先求每行最大值，再从这些最大值中取最大。
+            </p>
+
+            <p className="mb-3 text-[13px]">
+              <span className="font-semibold" style={{ color: '#1B3A5F' }}>示例说明：</span>
+              当前收益矩阵下，{optimalRows.map((i) => altLabels[i]).join('、')} 在最有利状态下的收益最大（最大收益为 {overallMax}），因此乐观准则选择{optimalRows.length > 1 ? '这些方案' : '该方案'}。修改矩阵后，最优方案会随之动态变化。
             </p>
 
             <p className="font-semibold mb-1.5" style={{ color: '#1B3A5F' }}>特点：</p>

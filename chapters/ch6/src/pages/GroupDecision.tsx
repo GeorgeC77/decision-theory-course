@@ -271,8 +271,8 @@ function BordaCountSection() {
           </h3>
           <p className="text-sm text-slate-600 leading-relaxed">
             每位投票人投一票给最偏好的方案，得票最多（不必超过半数）的方案获胜。
-            这是简单多数的一种常见形式，简单直接，但可能存在<span className="font-semibold text-red-600">循环悖论</span>（Condorcet
-            Paradox）：即使每个投票人的偏好都是理性的，群体偏好也可能出现 A&gt;B&gt;C&gt;A 的循环。
+            这是简单多数的一种常见形式，简单直接，但可能忽略排序靠后方案的偏好信息，也可能选出非 Condorcet 胜者。
+            与之不同，<span className="font-semibold text-red-600">Condorcet 悖论</span>出现在成对多数比较中：即使每个投票人的偏好都是理性的，群体两两比较也可能出现 A&gt;B&gt;C&gt;A 的循环。
           </p>
         </div>
 
@@ -1092,7 +1092,7 @@ function SummarySection() {
                         简单直观，易于实施
                       </td>
                       <td className="border border-slate-200 px-3 py-2">
-                        可能产生循环悖论，忽略偏好强度
+                        仅关注第一名，忽略后续排序；可能选不出 Condorcet 胜者；平票时需额外规则
                       </td>
                     </tr>
                     <tr className="bg-slate-50">

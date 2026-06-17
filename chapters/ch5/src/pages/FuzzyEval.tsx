@@ -1114,7 +1114,7 @@ export default function FuzzyEvalPage() {
                 {r3(weightedScore)}
               </div>
               <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
-                对应等级偏向：{grades[Math.min(grades.length - 1, Math.max(0, Math.round(weightedScore)))]}
+                分数越低代表综合等级越优；当前偏向：{grades[Math.min(grades.length - 1, Math.max(0, Math.round(weightedScore)))]}
               </p>
             </motion.div>
           </div>

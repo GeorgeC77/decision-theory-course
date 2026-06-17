@@ -1073,9 +1073,9 @@ export default function AhpPage() {
                   ⚠️ 一致性未通过！建议按以下步骤修改判断矩阵：
                 </p>
                 <ol className="text-xs mt-1 ml-4" style={{ color: '#b91c1c', listStyleType: 'decimal' }}>
-                  <li>找出使一致性最差的因素对（CI最大的元素）</li>
-                  <li>重新审视该因素对的相对重要性判断</li>
-                  <li>优先调整逻辑矛盾最明显的比值（如 A&gt;B, B&gt;C, 但 A&lt;C）</li>
+                  <li>检查是否存在传递性矛盾最明显的三元比较，例如 a<sub>ij</sub> × a<sub>jk</sub> 与 a<sub>ik</sub> 明显不一致。</li>
+                  <li>重点排查是否存在 A&gt;B、B&gt;C，但 A&lt;C 这类局部判断矛盾。</li>
+                  <li>重新审视逻辑矛盾最突出的因素对相对重要性判断。</li>
                   <li>调整后重新计算 CR，直至 CR &lt; 0.10</li>
                 </ol>
               </div>

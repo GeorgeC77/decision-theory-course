@@ -150,9 +150,37 @@ export default function MultiStageDecision() {
   const maxEv = Math.max(...expectedValues);
   const bestActionIndex = expectedValues.indexOf(maxEv);
 
+  // ── Probability validation ───────────────────────────────────
+  const priorSum = useMemo(
+    () => priorProbs.reduce((a, b) => a + b, 0),
+    [priorProbs]
+  );
+  const priorValid = useMemo(
+    () => Math.abs(priorSum - 1) < 1e-6 && priorProbs.every((p) => p >= 0),
+    [priorSum, priorProbs]
+  );
+  const likelihoodRowSums = useMemo(
+    () => likelihood.map((r) => r.h1 + r.h2 + r.h3),
+    [likelihood]
+  );
+  const likelihoodValid = useMemo(
+    () =>
+      likelihoodRowSums.every((s) => Math.abs(s - 1) < 1e-6) &&
+      likelihood.every((r) => r.h1 >= 0 && r.h2 >= 0 && r.h3 >= 0),
+    [likelihoodRowSums, likelihood]
+  );
+  const probabilitiesValid = priorValid && likelihoodValid;
+
   // ── Computed: Posterior probabilities ────────────────────────
   const posteriorResults = useMemo(() => {
     if (!showPosterior) return null;
+    if (!probabilitiesValid) {
+      return {
+        valid: false as const,
+        priorSum,
+        likelihoodRowSums,
+      };
+    }
 
     // P(H_k) = sum_j P(theta_j) * P(H_k | theta_j)
     const pH = [0, 0, 0];
@@ -194,11 +222,12 @@ export default function MultiStageDecision() {
     }
 
     // Posterior decision: can still choose not to buy the technology (8000 yuan)
+    const techCost = 4000;
+    const noBuyValue = 8000;
     const testCost = 600;
     const posteriorDecisions = evPosterior.map((evs) => {
       const maxBatchEv = Math.max(...evs);
-      const buyValue = maxBatchEv - 4000;
-      const noBuyValue = 8000;
+      const buyValue = maxBatchEv - techCost;
       const chooseBuy = buyValue >= noBuyValue;
       return {
         maxBatchEv,
@@ -213,24 +242,31 @@ export default function MultiStageDecision() {
       (sum, d, k) => sum + pH[k] * d.posteriorValueGross,
       0
     );
-    const priorBestValue = maxEv - 4000;
+
+    // Prior best value: choose between buying tech (best batch) and not buying tech
+    const priorBuyValue = maxEv - techCost;
+    const priorBestValue = Math.max(priorBuyValue, noBuyValue);
+    const priorChooseBuy = priorBuyValue >= noBuyValue;
+
     const evsiGross = expectedPosteriorValueGross - priorBestValue;
     const netEVSI = evsiGross - testCost;
     const expectedPosteriorValueNet = expectedPosteriorValueGross - testCost;
 
     return {
+      valid: true as const,
       pH,
       posterior,
       evPosterior,
       posteriorDecisions,
       priorBestValue,
+      priorChooseBuy,
       expectedPosteriorValueGross,
       expectedPosteriorValueNet,
       evsiGross,
       netEVSI,
       testCost,
     };
-  }, [showPosterior, likelihood, priorProbs, payoffData, maxEv]);
+  }, [showPosterior, likelihood, priorProbs, payoffData, maxEv, priorSum, likelihoodRowSums, probabilitiesValid]);
 
   // ── Handlers ─────────────────────────────────────────────────
   const updatePayoff = useCallback(
@@ -610,15 +646,22 @@ export default function MultiStageDecision() {
             <div className="mt-3 text-sm text-slate-600">
               不买技术的收益：
               <strong>8000 元</strong>
-              {maxEv - 4000 > 8000 ? (
-                <span className="text-emerald-600 ml-2">
-                  → 购买技术更优（净收益 {(maxEv - 4000).toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
-                </span>
-              ) : (
-                <span className="text-amber-600 ml-2">
-                  → 不购买技术更优
-                </span>
-              )}
+              {(() => {
+                const priorBuyValue = maxEv - 4000;
+                return priorBuyValue > 8000 ? (
+                  <span className="text-emerald-600 ml-2">
+                    → 购买技术更优（净收益 {priorBuyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
+                  </span>
+                ) : priorBuyValue < 8000 ? (
+                  <span className="text-amber-600 ml-2">
+                    → 不购买技术更优（8000 元）
+                  </span>
+                ) : (
+                  <span className="text-slate-600 ml-2">
+                    → 购买技术与不购买技术收益相同
+                  </span>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -735,171 +778,208 @@ export default function MultiStageDecision() {
           </div>
 
           {/* 后验概率结果 */}
-          {showPosterior && posteriorResults && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                后验概率计算结果
-              </h4>
-
-              <div className="overflow-x-auto rounded-lg border border-emerald-200">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-emerald-700 text-white">
-                      <th className="px-3 py-2.5 text-center font-semibold">
-                        <Katex tex="H_k" />
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold">
-                        <Katex tex="P(H_k)" />
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold">
-                        <Katex tex="P(\\theta_1|H_k)" />
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold">
-                        <Katex tex="P(\\theta_2|H_k)" />
-                      </th>
-                      <th className="px-3 py-2.5 text-center font-semibold">
-                        <Katex tex="P(\\theta_3|H_k)" />
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {posteriorResults.pH.map((ph, k) => (
-                      <tr
-                        key={k}
-                        className={k % 2 === 0 ? "bg-white" : "bg-emerald-50/50"}
-                      >
-                        <td className="px-3 py-2.5 text-center font-medium text-slate-700">
-                          <Katex tex={`H_${k + 1}`} />
-                        </td>
-                        <td className="px-3 py-2.5 text-center font-mono text-slate-700">
-                          {ph.toFixed(3)}
-                        </td>
-                        {posteriorResults.posterior[k].map((p, j) => (
-                          <td
-                            key={j}
-                            className="px-3 py-2.5 text-center font-mono text-slate-700"
-                          >
-                            {p.toFixed(3)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* 后验期望收益 */}
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-200">
-                <h4 className="text-sm font-semibold text-slate-700 mb-3">
-                  后验期望收益（考虑试销后）
+          {showPosterior && posteriorResults && (() => {
+            if (!posteriorResults.valid) {
+              return (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                    <h4 className="text-sm font-semibold text-red-700 flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      概率输入无效
+                    </h4>
+                    <p className="text-sm text-red-600">
+                      先验概率之和必须等于 1（当前 {posteriorResults.priorSum.toFixed(4)}），
+                      且每行似然概率 P(H₁|θⱼ)+P(H₂|θⱼ)+P(H₃|θⱼ) 必须等于 1。
+                      请检查输入后重新计算。
+                    </p>
+                    <p className="text-sm text-red-600 mt-1">
+                      当前似然行和：{posteriorResults.likelihoodRowSums.map((s, i) => `θ${i + 1}=${s.toFixed(4)}`).join('， ')}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  后验概率计算结果
                 </h4>
-                <div className="space-y-3">
-                  {posteriorResults.evPosterior.map((evs, k) => {
-                    const decision = posteriorResults.posteriorDecisions[k];
-                    const bestIdx = evs.indexOf(decision.maxBatchEv);
-                    return (
-                      <div
-                        key={k}
-                        className="bg-white rounded-lg p-4 border border-emerald-100"
-                      >
-                        <div className="text-sm font-medium text-emerald-800 mb-2">
-                          若试销结果为 <Katex tex={`H_${k + 1}`} />
-                          （P=<strong>{posteriorResults.pH[k].toFixed(3)}</strong>）：
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          {evs.map((ev, a) => (
-                            <div
-                              key={a}
-                              className={`text-center rounded-md py-2 px-2 text-sm font-medium ${
-                                a === bestIdx
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : "bg-slate-100 text-slate-600"
-                              }`}
+
+                <div className="overflow-x-auto rounded-lg border border-emerald-200">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-emerald-700 text-white">
+                        <th className="px-3 py-2.5 text-center font-semibold">
+                          <Katex tex="H_k" />
+                        </th>
+                        <th className="px-3 py-2.5 text-center font-semibold">
+                          <Katex tex="P(H_k)" />
+                        </th>
+                        <th className="px-3 py-2.5 text-center font-semibold">
+                          <Katex tex="P(\\theta_1|H_k)" />
+                        </th>
+                        <th className="px-3 py-2.5 text-center font-semibold">
+                          <Katex tex="P(\\theta_2|H_k)" />
+                        </th>
+                        <th className="px-3 py-2.5 text-center font-semibold">
+                          <Katex tex="P(\\theta_3|H_k)" />
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {posteriorResults.pH.map((ph, k) => (
+                        <tr
+                          key={k}
+                          className={k % 2 === 0 ? "bg-white" : "bg-emerald-50/50"}
+                        >
+                          <td className="px-3 py-2.5 text-center font-medium text-slate-700">
+                            <Katex tex={`H_${k + 1}`} />
+                          </td>
+                          <td className="px-3 py-2.5 text-center font-mono text-slate-700">
+                            {ph.toFixed(3)}
+                          </td>
+                          {posteriorResults.posterior[k].map((p, j) => (
+                            <td
+                              key={j}
+                              className="px-3 py-2.5 text-center font-mono text-slate-700"
                             >
-                              <Katex tex={`a_${a + 1}:`} />
-                              <br />
-                              {(ev - 4000).toLocaleString("zh-CN", {
-                                maximumFractionDigits: 0,
-                              })}{" "}
-                              元
-                              {a === bestIdx && (
-                                <span className="text-xs block mt-0.5 text-emerald-600">
-                                  最优批量
-                                </span>
-                              )}
-                            </div>
+                              {p.toFixed(3)}
+                            </td>
                           ))}
-                        </div>
-                        <div className="mt-2 text-sm text-slate-700">
-                          试销后决策：
-                          <strong className={decision.chooseBuy ? "text-emerald-700" : "text-amber-700"}>
-                            {decision.chooseBuy ? "购买技术" : "不购买技术"}
-                          </strong>
-                          <span className="text-slate-500 ml-1">
-                            （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {(decision.posteriorValueGross - 600).toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* 最终结论 */}
-                <div className="mt-4 bg-white rounded-lg p-4 border border-amber-200">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                    <div>
-                      <h5 className="font-semibold text-slate-800 text-sm">
-                        决策结论
-                      </h5>
-                      <p className="text-sm text-slate-600 mt-1">
-                        综合先验分析，最优决策为购买技术（4000元）并采用
-                        <strong className="text-emerald-700">
-                          {" "}
-                          {bestActionIndex === 0
-                            ? "大批生产"
-                            : bestActionIndex === 1
-                            ? "中批生产"
-                            : "小批生产"}
-                        </strong>
-                        ，期望净收益为{" "}
-                        <strong className="text-emerald-700">
-                          {(maxEv - 4000).toLocaleString("zh-CN", {
-                            maximumFractionDigits: 0,
-                          })}{" "}
-                          元
-                        </strong>
-                        。
-                        <br />
-                        不试销最优收益 ={" "}
-                        <strong>{posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
-                        试销后 gross 期望收益 ={" "}
-                        <strong>{posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
-                        <br />
-                        EVSI(gross) = {posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} ={" "}
-                        <strong>{posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
-                        试销成本 = {posteriorResults.testCost.toLocaleString("zh-CN")} 元；
-                        <br />
-                        EVSI(net) = {posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.testCost.toLocaleString("zh-CN")} ={" "}
-                        <strong className={posteriorResults.netEVSI > 0 ? "text-emerald-700" : "text-rose-600"}>
-                          {posteriorResults.netEVSI.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元
-                        </strong>。
-                        <br />
-                        决策规则：EVSI(net) {posteriorResults.netEVSI > 0 ? ">" : "≤"} 0，{posteriorResults.netEVSI > 0 ? "建议试销" : "不建议试销"}。
-                        因此最终最优策略为：
-                        <strong className="text-emerald-700">
-                          {posteriorResults.netEVSI > 0 ? "做试销" : "不做试销，直接购买技术并采用"}
-                          {posteriorResults.netEVSI <= 0 ? (bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产") : ""}
-                        </strong>
-                        。
-                      </p>
+                {/* 后验期望收益 */}
+                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-200">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3">
+                    后验期望收益（考虑试销后）
+                  </h4>
+                  <div className="space-y-3">
+                    {posteriorResults.evPosterior.map((evs, k) => {
+                      const decision = posteriorResults.posteriorDecisions[k];
+                      const bestIdx = evs.indexOf(decision.maxBatchEv);
+                      return (
+                        <div
+                          key={k}
+                          className="bg-white rounded-lg p-4 border border-emerald-100"
+                        >
+                          <div className="text-sm font-medium text-emerald-800 mb-2">
+                            若试销结果为 <Katex tex={`H_${k + 1}`} />
+                            （P=<strong>{posteriorResults.pH[k].toFixed(3)}</strong>）：
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            {evs.map((ev, a) => (
+                              <div
+                                key={a}
+                                className={`text-center rounded-md py-2 px-2 text-sm font-medium ${
+                                  a === bestIdx
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "bg-slate-100 text-slate-600"
+                                }`}
+                              >
+                                <Katex tex={`a_${a + 1}:`} />
+                                <br />
+                                {(ev - 4000).toLocaleString("zh-CN", {
+                                  maximumFractionDigits: 0,
+                                })}{" "}
+                                元
+                                {a === bestIdx && (
+                                  <span className="text-xs block mt-0.5 text-emerald-600">
+                                    最优批量
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-2 text-sm text-slate-700">
+                            试销后决策：
+                            <strong className={decision.chooseBuy ? "text-emerald-700" : "text-amber-700"}>
+                              {decision.chooseBuy ? "购买技术" : "不购买技术"}
+                            </strong>
+                            <span className="text-slate-500 ml-1">
+                              （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {(decision.posteriorValueGross - 600).toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 最终结论 */}
+                  <div className="mt-4 bg-white rounded-lg p-4 border border-amber-200">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                      <div>
+                        <h5 className="font-semibold text-slate-800 text-sm">
+                          决策结论
+                        </h5>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {posteriorResults.priorChooseBuy ? (
+                            <>
+                              综合先验分析，最优决策为购买技术（4000元）并采用
+                              <strong className="text-emerald-700">
+                                {" "}
+                                {bestActionIndex === 0
+                                  ? "大批生产"
+                                  : bestActionIndex === 1
+                                  ? "中批生产"
+                                  : "小批生产"}
+                              </strong>
+                              ，期望净收益为{" "}
+                              <strong className="text-emerald-700">
+                                {(maxEv - 4000).toLocaleString("zh-CN", {
+                                  maximumFractionDigits: 0,
+                                })}{" "}
+                                元
+                              </strong>
+                              。
+                            </>
+                          ) : (
+                            <>
+                              综合先验分析，最优决策为
+                              <strong className="text-emerald-700">不购买技术</strong>
+                              ，固定收益为{" "}
+                              <strong className="text-emerald-700">8000 元</strong>
+                              。
+                            </>
+                          )}
+                          <br />
+                          不试销最优收益 ={" "}
+                          <strong>{posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                          试销后 gross 期望收益 ={" "}
+                          <strong>{posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                          <br />
+                          EVSI(gross) = {posteriorResults.expectedPosteriorValueGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.priorBestValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} ={" "}
+                          <strong>{posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元</strong>；
+                          试销成本 = {posteriorResults.testCost.toLocaleString("zh-CN")} 元；
+                          <br />
+                          EVSI(net) = {posteriorResults.evsiGross.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} − {posteriorResults.testCost.toLocaleString("zh-CN")} ={" "}
+                          <strong className={posteriorResults.netEVSI > 0 ? "text-emerald-700" : "text-rose-600"}>
+                            {posteriorResults.netEVSI.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元
+                          </strong>。
+                          <br />
+                          决策规则：EVSI(net) {posteriorResults.netEVSI > 0 ? ">" : "≤"} 0，{posteriorResults.netEVSI > 0 ? "建议试销" : "不建议试销"}。
+                          因此最终最优策略为：
+                          <strong className="text-emerald-700">
+                            {posteriorResults.netEVSI > 0
+                              ? "做试销，试销后根据结果选择购买技术+最优批量方案，或不购买技术"
+                              : posteriorResults.priorChooseBuy
+                              ? `不做试销，直接购买技术并采用${bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产"}`
+                              : "不做试销，也不购买技术"}
+                          </strong>
+                          。
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </CardContent>
     </Card>

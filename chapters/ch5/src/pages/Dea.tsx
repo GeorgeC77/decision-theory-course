@@ -438,13 +438,13 @@ export default function DeaPage() {
               },
               {
                 icon: Boxes,
-                title: '生产可能集',
-                desc: '所有投入产出组合构成的集合，DEA在此集合的前沿面上寻找最优参照',
+                title: '生产可能集（示意）',
+                desc: '所有投入产出组合构成的集合，严格DEA在此集合的前沿面上寻找最优参照',
               },
               {
                 icon: TrendingUp,
-                title: '有效前沿面',
-                desc: '投入最小化或产出最大化的最优组合构成的包络面，有效DMU位于此面上',
+                title: '相对效率前沿示意',
+                desc: '以最高投入产出比为基准，近似展示相对效率最高的DMU，非严格包络面',
               },
             ].map((card, i) => (
               <motion.div
@@ -483,6 +483,11 @@ export default function DeaPage() {
           <h2 className="text-lg font-semibold mb-3" style={{ color: '#2A4A73' }}>
             📐 简化效率比值模型
           </h2>
+          <div className="rounded-lg p-3 mb-4" style={{ background: '#fffbeb', border: '1px solid #fcd34d' }}>
+            <p className="text-xs font-medium" style={{ color: '#b45309' }}>
+              ⚠️ 本页面仅用于直观理解DEA的相对效率思想，当前计算是“产出综合/投入综合”的简化比值代理，不是CCR/BCC线性规划结果，不能用于正式DEA评价。
+            </p>
+          </div>
           <p className="text-sm leading-relaxed mb-4" style={{ color: '#6B6B6B' }}>
             本演示使用简化比值代理来近似DEA的相对效率思想。先计算每个DMU的产出综合与投入综合之比，再以最高比值为基准归一化到[0,1]。严格DEA需对每个DMU求解线性规划。
           </p>
@@ -499,7 +504,7 @@ export default function DeaPage() {
 
           {/* DEA Validity Cards */}
           <h3 className="text-sm font-semibold mt-5 mb-3" style={{ color: '#2A4A73' }}>
-            DEA有效性判定
+            简化相对效率代理解释
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
@@ -507,25 +512,25 @@ export default function DeaPage() {
                 bg: '#E8F5E9',
                 border: '#bbf7d0',
                 color: '#4CAF50',
-                title: 'DEA有效',
-                condition: 'θ* = 1 且 s⁺ = s⁻ = 0',
-                meaning: '技术和规模均有效',
+                title: '相对效率代理值最高',
+                condition: 'θ ≈ 1',
+                meaning: '在简化比值代理下投入产出比最高',
               },
               {
                 bg: '#eff6ff',
                 border: '#bae6fd',
                 color: '#2563eb',
-                title: '弱DEA有效',
-                condition: 'θ* = 1 但 s⁺ ≠ 0 或 s⁻ ≠ 0',
-                meaning: '技术有效但规模非有效',
+                title: '相对效率代理值较高',
+                condition: 'θ 接近 1',
+                meaning: '投入产出比接近最高值',
               },
               {
                 bg: '#FDE8E8',
                 border: '#fecaca',
                 color: '#dc2626',
-                title: '非DEA有效',
-                condition: 'θ* < 1',
-                meaning: '技术和规模均需改进',
+                title: '相对效率代理值较低',
+                condition: 'θ 明显小于 1',
+                meaning: '投入产出比明显低于最高值',
               },
             ].map((card) => (
               <div
@@ -566,7 +571,7 @@ export default function DeaPage() {
                 📊 投入产出数据
               </h2>
               <p className="text-[13px] mt-1" style={{ color: '#6B6B6B' }}>
-                输入各决策单元的投入和产出数据，系统将自动计算DEA效率值
+                输入各决策单元的投入和产出数据，系统将自动计算简化效率代理值
               </p>
             </div>
             <span
@@ -740,7 +745,7 @@ export default function DeaPage() {
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div>
               <h2 className="text-lg font-semibold" style={{ color: '#2A4A73' }}>
-                ⚖️ DEA效率值计算
+                ⚖️ 简化效率代理值计算
               </h2>
               <p className="text-[13px] mt-1" style={{ color: '#6B6B6B' }}>
                 基于简化投入产出比值代理计算各决策单元的相对效率值
@@ -867,7 +872,7 @@ export default function DeaPage() {
                 💡 {selectedResult.name} 改进建议
               </h4>
               <p className="text-sm mb-2" style={{ color: '#78350f' }}>
-                投入冗余（可缩减量）:
+                示意性改进方向:
               </p>
               <ul className="flex flex-col gap-1 mb-2">
                 {selectedResult.inputRedundancy.map((red, i) =>
@@ -880,7 +885,7 @@ export default function DeaPage() {
                 )}
               </ul>
               <p className="text-sm" style={{ color: '#1B3A5F' }}>
-                要达到DEA有效，{selectedResult.name}需要在保持当前产出的基础上，将投入降低到前沿面上的投影点。
+                若以当前最高投入产出比为参照，{selectedResult.name}可考虑降低投入或提高产出，以提升相对效率代理值。
               </p>
             </motion.div>
           )}
@@ -896,10 +901,10 @@ export default function DeaPage() {
           style={{ border: '1px solid #E0DDD5' }}
         >
           <h2 className="text-lg font-semibold mb-1" style={{ color: '#2A4A73' }}>
-            📈 各决策单元DEA效率对比
+            📈 各决策单元简化效率代理值对比
           </h2>
           <p className="text-[13px] mb-5" style={{ color: '#6B6B6B' }}>
-            θ=1 的决策单元位于有效前沿面上
+            θ≈1 的决策单元在简化代理下相对效率最高
           </p>
 
           <div style={{ width: '100%', height: 350 }}>
@@ -926,7 +931,7 @@ export default function DeaPage() {
                   stroke="#4CAF50"
                   strokeDasharray="5 5"
                   label={{
-                    value: '有效前沿面 θ=1',
+                    value: '相对效率参考线 θ=1',
                     position: 'right',
                     fill: '#4CAF50',
                     fontSize: 12,

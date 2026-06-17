@@ -281,6 +281,7 @@ export default function MarkovDecision() {
     [0.4, 0.6],
   ]);
   const [exampleSteady, setExampleSteady] = useState<number[] | null>(null);
+  const [exampleRowError, setExampleRowError] = useState<string | null>(null);
 
   // Ad strategy matrices
   const noAdMatrix = [
@@ -296,8 +297,8 @@ export default function MarkovDecision() {
     (m: number[][]) => {
       for (let i = 0; i < m.length; i++) {
         const sum = m[i].reduce((a, b) => a + b, 0);
-        if (Math.abs(sum - 1) > 0.01) {
-          setRowError(`第 ${i + 1} 行概率之和为 ${sum.toFixed(3)}，应为 1`);
+        if (Math.abs(sum - 1) > 0.01 || m[i].some((v) => v < 0)) {
+          setRowError(`第 ${i + 1} 行概率之和为 ${sum.toFixed(3)} 或存在负数，应为 1 且各元素非负`);
           return false;
         }
       }
@@ -345,10 +346,23 @@ export default function MarkovDecision() {
     setSteadyResult(result);
   }, [transitionMatrix, validateRows]);
 
+  const validateExampleRows = useCallback((m: number[][]) => {
+    for (let i = 0; i < m.length; i++) {
+      const sum = m[i].reduce((a, b) => a + b, 0);
+      if (Math.abs(sum - 1) > 0.01 || m[i].some((v) => v < 0)) {
+        setExampleRowError(`第 ${i + 1} 行概率之和为 ${sum.toFixed(3)} 或存在负数，应为 1 且各元素非负`);
+        return false;
+      }
+    }
+    setExampleRowError(null);
+    return true;
+  }, []);
+
   const computeExampleSteady = useCallback(() => {
+    if (!validateExampleRows(exampleMatrix)) return;
     const result = solveSteadyState(exampleMatrix);
     setExampleSteady(result);
-  }, [exampleMatrix]);
+  }, [exampleMatrix, validateExampleRows]);
 
   const p2 = useMemo(() => matrixPower(transitionMatrix, 2), [transitionMatrix]);
   const p3 = useMemo(() => matrixPower(transitionMatrix, 3), [transitionMatrix]);
@@ -587,12 +601,20 @@ export default function MarkovDecision() {
                   onChange={(m) => {
                     setExampleMatrix(m);
                     setExampleSteady(null);
+                    validateExampleRows(m);
                   }}
                 />
               </div>
+              {exampleRowError && (
+                <p className="text-sm text-red-600 flex items-center gap-1">
+                  <AlertTriangle className="h-4 w-4" />
+                  {exampleRowError}
+                </p>
+              )}
               <Button
                 size="sm"
                 onClick={computeExampleSteady}
+                disabled={!!exampleRowError}
                 className="bg-violet-600 hover:bg-violet-700"
               >
                 <Calculator className="h-4 w-4 mr-2" />
@@ -751,9 +773,17 @@ export default function MarkovDecision() {
                 <strong>结论：</strong>不采取广告策略的三年总利润期望为 {noAdTotal.toFixed(2)} 万元，
                 采取广告策略为 {adTotal.toFixed(2)} 万元。
                 <span className="font-bold">
-                  因此不采取广告策略更优
+                  {(() => {
+                    if (noAdTotal > adTotal) {
+                      return `因此不采取广告策略更优，可多得 ${(noAdTotal - adTotal).toFixed(2)} 万元`;
+                    } else if (adTotal > noAdTotal) {
+                      return `因此采取广告策略更优，可多得 ${(adTotal - noAdTotal).toFixed(2)} 万元`;
+                    } else {
+                      return "因此两种策略三年总利润期望相同";
+                    }
+                  })()}
                 </span>
-                ，可多得利润 {(noAdTotal - adTotal).toFixed(2)} 万元。
+                。
               </AlertDescription>
             </Alert>
           </div>

@@ -201,16 +201,16 @@ export default function BayesianDecision() {
 
         {/* Formula */}
         <div className="mt-4 mb-6">
-          <div className="font-serif text-2xl text-[#1B3A5F] font-semibold leading-relaxed">
+          <div className="font-serif text-2xl text-[#1B3A5F] font-semibold leading-relaxed flex items-center justify-center flex-wrap gap-1">
             <span className="text-[#4CAF50]">P(Hᵢ|A)</span>
-            <span className="text-[#2B2B2B] mx-1">=</span>
-            <span className="inline-flex flex-col items-center align-middle mx-1">
-              <span className="border-b-2 border-[#2B2B2B] pb-1 px-1">
+            <span className="text-[#2B2B2B]">=</span>
+            <span className="inline-flex flex-col items-center align-middle">
+              <span className="border-b-2 border-[#2B2B2B] pb-1 px-2 text-center">
                 <span className="text-[#C8963E]">P(A|Hᵢ)</span>
                 <span className="text-[#2B2B2B] mx-1">×</span>
                 <span className="text-[#1B3A5F]">P(Hᵢ)</span>
               </span>
-              <span className="text-[#9E9E9E] pt-1">P(A)</span>
+              <span className="text-[#9E9E9E] pt-1 text-center">P(A)</span>
             </span>
           </div>
         </div>
@@ -613,12 +613,12 @@ export default function BayesianDecision() {
             </div>
             <div className="font-mono text-sm text-[#6B6B6B] tabular-nums space-y-1">
               <div>
-                EVSI = 验后期望 - 验前期望 = {evsi.postValue.toFixed(2)} - {preTestEMV.value.toFixed(2)} ={' '}
+                EVSI(gross) = 验后期望收益 − 验前期望收益 = {evsi.postValue.toFixed(2)} − {preTestEMV.value.toFixed(2)} ={' '}
                 <span className="font-bold">{evsi.evsiValue.toFixed(2)}</span> 万元
               </div>
-              <div>试验费用：{payoffs.testCost.toFixed(2)} 万元</div>
+              <div>信息成本（试验费用）：{payoffs.testCost.toFixed(2)} 万元</div>
               <div>
-                净信息价值 ={' '}
+                净EVSI = EVSI(gross) − 信息成本 = {evsi.evsiValue.toFixed(2)} − {payoffs.testCost.toFixed(2)} ={' '}
                 <span
                   className={`text-lg font-bold ${recommendTest ? 'text-[#4CAF50]' : 'text-[#F44336]'}`}
                 >
@@ -637,20 +637,25 @@ export default function BayesianDecision() {
                 : 'bg-[#FDE8E8] border border-[#F44336]/30'
             }`}
           >
-            <div className="flex items-center justify-center gap-2">
-              {recommendTest ? (
-                <Award className="w-5 h-5 text-[#4CAF50]" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-[#F44336]" />
-              )}
-              <span
-                className={`font-bold text-lg ${
-                  recommendTest ? 'text-[#4CAF50]' : 'text-[#F44336]'
-                }`}
-              >
-                净EVSI {recommendTest ? '＞' : '≤'} 0，
-                {recommendTest ? '建议' : '不建议'}进行试验抽样
-              </span>
+            <div className="flex flex-col items-center justify-center gap-2">
+              <div className="flex items-center gap-2">
+                {recommendTest ? (
+                  <Award className="w-5 h-5 text-[#4CAF50]" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-[#F44336]" />
+                )}
+                <span
+                  className={`font-bold text-lg ${
+                    recommendTest ? 'text-[#4CAF50]' : 'text-[#F44336]'
+                  }`}
+                >
+                  净EVSI {recommendTest ? '＞' : '≤'} 0，
+                  {recommendTest ? '建议' : '不建议'}进行试验抽样
+                </span>
+              </div>
+              <p className="text-xs text-[#6B6B6B]">
+                等价于：EVSI(gross) {recommendTest ? '＞' : '≤'} 信息成本（{payoffs.testCost.toFixed(2)} 万元）
+              </p>
             </div>
           </div>
         </div>

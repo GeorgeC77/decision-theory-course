@@ -328,7 +328,8 @@ export default function Pessimistic() {
             最小收益 = {maxOfMins}
           </p>
           <p className="mt-3 text-sm" style={{ color: '#5d6d7e', lineHeight: 1.7 }}>
-            在悲观准则下，决策者假设未来会出现最不利的状态（不景气），因此选择在最低谷也能保证最大保底收益的保守策略。
+            在悲观准则下，最优方案为：{optimalIdxs.map((i) => ALT_LABELS[i]).join('、')}。
+            该方案在其最不利自然状态下仍能获得最高保底收益，保底收益为 {maxOfMins}。
           </p>
         </div>
       </motion.div>
@@ -433,7 +434,7 @@ export default function Pessimistic() {
                   ['决策态度', '极度乐观', '极度悲观'],
                   ['考虑范围', '只考虑最好状态', '只考虑最坏状态'],
                   ['风险偏好', '高风险高回报', '低风险求稳定'],
-                  ['本例最优方案', '见乐观准则页', `保守(${optimalIdxs.map((i) => ALT_LABELS[i]).join('、')}), 收益${maxOfMins.toFixed(0)}`],
+                  ['当前最优方案', '见乐观准则页', `${optimalIdxs.map((i) => ALT_LABELS[i]).join('、')}, 保底收益 ${maxOfMins.toFixed(0)}`],
                   ['适用决策者', '实力雄厚、敢于冒险', '实力有限、风险厌恶'],
                 ].map((row, i) => (
                   <tr

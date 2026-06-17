@@ -286,6 +286,49 @@ export default function Laplace() {
             等概率准则假设各状态概率相等(1/n)，修改收益值将自动重新计算期望收益。也可自定义概率探索不同场景。
           </p>
 
+          {/* Mode indication */}
+          <div className="mb-4">
+            {result.probValid ? (
+              allEqualThird ? (
+                <div
+                  className="flex items-center gap-2 px-3 py-2 text-sm"
+                  style={{
+                    backgroundColor: '#f0faf3',
+                    borderRadius: '6px',
+                    color: '#4CAF50',
+                  }}
+                >
+                  <CheckCircle size={16} />
+                  当前为 Laplace 等概率准则（各状态概率均为 1/n）。
+                </div>
+              ) : (
+                <div
+                  className="flex items-center gap-2 px-3 py-2 text-sm"
+                  style={{
+                    backgroundColor: '#fffbeb',
+                    borderRadius: '6px',
+                    color: '#b45309',
+                  }}
+                >
+                  <AlertTriangle size={16} />
+                  当前概率不相等，因此本计算属于风险型期望值准则，不再是严格的 Laplace 等概率准则。
+                </div>
+              )
+            ) : (
+              <div
+                className="flex items-center gap-2 px-3 py-2 text-sm"
+                style={{
+                  backgroundColor: '#fdf2f2',
+                  borderRadius: '6px',
+                  color: '#F44336',
+                }}
+              >
+                <AlertTriangle size={16} />
+                概率之和必须等于 1，才能进行期望收益计算。
+              </div>
+            )}
+          </div>
+
           {/* Probability validation warning */}
           {!result.probValid && (
             <div
@@ -561,6 +604,7 @@ export default function Laplace() {
       </div>
 
       {/* ── Optimal Result ── */}
+      {result.probValid && (
       <div className="max-w-[1200px] mx-auto px-4 pb-6">
         <motion.div
           className="p-6"
@@ -600,15 +644,16 @@ export default function Laplace() {
           </div>
 
           <p className="mt-4 text-sm leading-relaxed" style={{ color: '#5d6d7e' }}>
-            在等概率准则下，假设三种经济状态出现的可能性相同。
+            {allEqualThird
+              ? '在等概率准则下，假设各自然状态出现的可能性相同。'
+              : '当前概率不相等，计算结果为风险型期望值准则下的最优方案。'}
             {result.optimalIndices.map((i) => alternatives[i]).join('和')}
             策略的期望收益均为{fmt(result.maxExpectedValue)}，
-            {result.optimalIndices.length > 1
-              ? '并列最优。保守策略虽然稳定但期望收益略低。'
-              : '为最优。'}
+            {result.optimalIndices.length > 1 ? '并列最优。' : '为最优。'}
           </p>
         </motion.div>
       </div>
+      )}
 
       {/* ── Bar Chart ── */}
       <div className="max-w-[1200px] mx-auto px-4 pb-6">
@@ -620,6 +665,8 @@ export default function Laplace() {
             </h2>
           </div>
 
+          {result.probValid ? (
+          <>
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-1.5">
               <span
@@ -690,6 +737,20 @@ export default function Laplace() {
               />
             </BarChart>
           </ResponsiveContainer>
+          </>
+          ) : (
+            <div
+              className="flex items-center gap-2 px-3 py-4 text-sm"
+              style={{
+                backgroundColor: '#fdf2f2',
+                borderRadius: '6px',
+                color: '#F44336',
+              }}
+            >
+              <AlertTriangle size={16} />
+              概率之和必须等于 1，才能显示期望收益对比图。
+            </div>
+          )}
         </Card>
       </div>
 
