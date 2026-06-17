@@ -154,9 +154,10 @@ function calculateEfficiency(
     return Math.min(d.rawEfficiency / maxRaw, 1);
   });
 
-  // Build results with ranking
+  // Build results with ranking (only valid DMUs participate)
   const indexed = thetas
-    .map((theta, idx) => ({ theta, idx }))
+    .map((theta, idx) => ({ theta, idx, valid: withMeta[idx].validInput }))
+    .filter((item) => item.valid && Number.isFinite(item.theta))
     .sort((a, b) => b.theta - a.theta);
 
   const rankMap = new Map<number, number>();
@@ -166,8 +167,9 @@ function calculateEfficiency(
 
   const results = dmus.map((dmu, idx) => {
     const theta = thetas[idx];
-    const effective = theta >= 0.98;
-    const rank = rankMap.get(idx) ?? 0;
+    const validInput = withMeta[idx].validInput;
+    const effective = validInput && theta >= 0.98;
+    const rank = validInput ? (rankMap.get(idx) ?? 0) : 0;
 
     // Illustrative input improvement room for non-top-proxy DMUs
     const inputRedundancy = dmu.inputs.map((inp) =>
@@ -223,16 +225,20 @@ export default function DeaPage() {
     [dmuData, inputLabels, inputCount, outputLabels, outputCount]
   );
 
+  // Only valid DMUs participate in ranking, stats and chart
+  const validResults = useMemo(() => results.filter((r) => r.validInput), [results]);
+  const hasInvalidInput = results.some((r) => !r.validInput);
+
   // Chart data
   const chartData = useMemo(
     () =>
-      results.map((r) => ({
+      validResults.map((r) => ({
         name: r.name,
         theta: r.theta,
         effective: r.effective,
         rank: r.rank,
       })),
-    [results]
+    [validResults]
   );
 
   /* ---- Input handlers ---- */
@@ -304,13 +310,13 @@ export default function DeaPage() {
     setSelectedDMU(0);
   };
 
-  // Stats
-  const effectiveCount = results.filter((r) => r.effective).length;
+  // Stats (based only on valid DMUs)
+  const effectiveCount = validResults.filter((r) => r.effective).length;
   const avgEfficiency =
-    results.length > 0
-      ? Math.round((results.reduce((s, r) => s + r.theta, 0) / results.length) * 1000) / 1000
+    validResults.length > 0
+      ? Math.round((validResults.reduce((s, r) => s + r.theta, 0) / validResults.length) * 1000) / 1000
       : 0;
-  const minResult = results.length > 0 ? results.reduce((a, b) => (a.theta < b.theta ? a : b)) : null;
+  const minResult = validResults.length > 0 ? validResults.reduce((a, b) => (a.theta < b.theta ? a : b)) : null;
 
   // Rank icons
   const rankIcon = (rank: number) => {
@@ -889,10 +895,14 @@ export default function DeaPage() {
                           {r.validInput ? r.theta.toFixed(3) : '—'}
                         </td>
                         <td className="px-4 py-2.5 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            {rankIcon(r.rank)}
-                            <span style={{ color: '#2A4A73' }}>{r.rank}</span>
-                          </div>
+                          {r.validInput ? (
+                            <div className="flex items-center justify-center gap-1">
+                              {rankIcon(r.rank)}
+                              <span style={{ color: '#2A4A73' }}>{r.rank}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: '#9E9E9E' }}>—</span>
+                          )}
                         </td>
                         <td className="px-4 py-2.5 text-center">
                           {!r.validInput ? (
@@ -1006,6 +1016,15 @@ export default function DeaPage() {
           <p className="text-[13px] mb-5" style={{ color: '#6B6B6B' }}>
             θ≈1 的评价单元在简化代理下相对效率最高
           </p>
+
+          {hasInvalidInput && (
+            <div
+              className="mb-4 rounded-lg p-3 text-sm font-medium"
+              style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309' }}
+            >
+              当前存在投入无效的评价单元，排名和统计仅基于有效评价单元。
+            </div>
+          )}
 
           {efficiencyError ? (
             <div

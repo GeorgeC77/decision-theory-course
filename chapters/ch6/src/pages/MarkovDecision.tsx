@@ -539,30 +539,38 @@ export default function MarkovDecision() {
           {/* Multi-step Transfer Visualization */}
           <div className="space-y-3 pt-4 border-t border-slate-200">
             <h3 className="font-semibold text-slate-800">多步转移矩阵可视化</h3>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="p1">P（一步）</TabsTrigger>
-                <TabsTrigger value="p2">P²（二步）</TabsTrigger>
-                <TabsTrigger value="p3">P³（三步）</TabsTrigger>
-              </TabsList>
-              <TabsContent value="p1">
-                <MatrixLatex matrix={transitionMatrix} name="P" />
-              </TabsContent>
-              <TabsContent value="p2">
-                <MatrixLatex matrix={p2} name="P^2" />
-              </TabsContent>
-              <TabsContent value="p3">
-                <MatrixLatex matrix={p3} name="P^3" />
-              </TabsContent>
-            </Tabs>
+            {rowError ? (
+              <div className="rounded-lg p-4 text-sm font-medium" style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}>
+                请先修正转移矩阵，使每行概率非负且和为 1。
+              </div>
+            ) : (
+              <>
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="p1">P（一步）</TabsTrigger>
+                    <TabsTrigger value="p2">P²（二步）</TabsTrigger>
+                    <TabsTrigger value="p3">P³（三步）</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="p1">
+                    <MatrixLatex matrix={transitionMatrix} name="P" />
+                  </TabsContent>
+                  <TabsContent value="p2">
+                    <MatrixLatex matrix={p2} name="P^2" />
+                  </TabsContent>
+                  <TabsContent value="p3">
+                    <MatrixLatex matrix={p3} name="P^3" />
+                  </TabsContent>
+                </Tabs>
 
-            {/* Convergence chart */}
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <h4 className="text-sm font-semibold text-slate-700 mb-3">
-                矩阵幂收敛趋势（从各状态出发）
-              </h4>
-              <ConvergenceChart matrices={[transitionMatrix, p2, p3]} />
-            </div>
+                {/* Convergence chart */}
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-3">
+                    矩阵幂变化趋势（从各状态出发）
+                  </h4>
+                  <ConvergenceChart matrices={[transitionMatrix, p2, p3]} />
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -825,7 +833,7 @@ export default function MarkovDecision() {
             <AccordionItem value="item-2">
               <AccordionTrigger>稳态概率求解方法</AccordionTrigger>
               <AccordionContent className="space-y-2 text-slate-700">
-                <p>当系统运行足够长时间后，状态概率分布趋于稳定，称为<strong>稳态概率</strong>。</p>
+                <p>在满足一定条件的马尔可夫链中，例如有限、不可约且非周期时，状态概率分布会随时间趋于稳定分布。一般情形下，稳态分布的存在不一定等同于从任意初始状态出发都会收敛。</p>
                 <div className="bg-slate-50 p-3 rounded border border-slate-200 space-y-2">
                   <p className="text-sm font-medium">求解步骤：</p>
                   <ol className="list-decimal list-inside text-sm space-y-1">

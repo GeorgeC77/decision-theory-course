@@ -889,7 +889,7 @@ export default function MultiStageDecision() {
                                 元
                                 {a === bestIdx && (
                                   <span className="text-xs block mt-0.5 text-emerald-600">
-                                    最优批量
+                                    购买技术时的最优批量
                                   </span>
                                 )}
                               </div>
@@ -903,6 +903,11 @@ export default function MultiStageDecision() {
                             <span className="text-slate-500 ml-1">
                               （购买净收益 {decision.buyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元 vs 不购买 {decision.noBuyValue.toLocaleString("zh-CN")} 元；扣除试销费后期望净收益 {(decision.posteriorValueGross - 600).toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
                             </span>
+                            {!decision.chooseBuy && (
+                              <p className="mt-1 text-xs text-amber-700">
+                                虽然该批量在购买技术条件下收益最高，但与不购买技术相比仍不划算，因此该试销结果下最终决策为不购买技术。
+                              </p>
+                            )}
                           </div>
                         </div>
                       );
@@ -966,7 +971,7 @@ export default function MultiStageDecision() {
                           因此最终最优策略为：
                           <strong className="text-emerald-700">
                             {posteriorResults.netEVSI > 0
-                              ? "做试销，试销后根据结果选择购买技术+最优批量方案，或不购买技术"
+                              ? "做试销，试销后根据结果选择购买技术并采用对应批量方案，或不购买技术"
                               : posteriorResults.priorChooseBuy
                               ? `不做试销，直接购买技术并采用${bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产"}`
                               : "不做试销，也不购买技术"}

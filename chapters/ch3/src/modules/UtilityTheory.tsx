@@ -749,7 +749,7 @@ export default function UtilityTheory() {
                     <td className="px-3 py-2 font-medium">风险厌恶</td>
                     <td className="px-3 py-2">凹形</td>
                     <td className="px-3 py-2">效用增长慢于收益增长，偏好确定性收益</td>
-                    <td className="px-3 py-2 font-mono text-xs">U(x)=√x</td>
+                    <td className="px-3 py-2 font-mono text-xs">U(x)=√(x/100)</td>
                   </tr>
                   <tr className="border-b border-[#EFEBE5]">
                     <td className="px-3 py-2 font-medium">风险中性</td>
@@ -761,14 +761,14 @@ export default function UtilityTheory() {
                     <td className="px-3 py-2 font-medium">风险偏好</td>
                     <td className="px-3 py-2">凸形</td>
                     <td className="px-3 py-2">效用增长快于收益增长，愿意承担风险</td>
-                    <td className="px-3 py-2 font-mono text-xs">U(x)=x²/10000</td>
+                    <td className="px-3 py-2 font-mono text-xs">U(x)=(x/100)²</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             <p className="text-sm text-[#6B6B6B] italic">
-              同一决策问题，不同风险偏好类型的决策者可能做出不同选择。当 EMV 排序与 EU 排序不一致时，说明决策者的风险偏好影响了最终决策。
+              本页假设收益 x 已限制在 0–100 区间，因此三类效用函数均映射到 0–1。同一决策问题，不同风险偏好类型的决策者可能做出不同选择。当 EMV 排序与 EU 排序不一致时，说明决策者的风险偏好影响了最终决策。
             </p>
           </div>
         </motion.div>
