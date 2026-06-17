@@ -47,6 +47,13 @@ interface EfficiencyResult {
   inputScores: number[];
   outputScores: number[];
   inputRedundancy: number[];
+  validInput: boolean;
+}
+
+interface EfficiencyOutput {
+  results: EfficiencyResult[];
+  error: string | null;
+  invalidInputNames: string[];
 }
 
 /* ================================================================
@@ -101,26 +108,53 @@ function calculateEfficiency(
   dmus: DMUData[],
   _inputLabels: string[],
   _outputLabels: string[]
-): EfficiencyResult[] {
-  if (dmus.length === 0) return [];
+): EfficiencyOutput {
+  if (dmus.length === 0) return { results: [], error: null, invalidInputNames: [] };
 
   // Compute raw efficiency = output sum / input sum (productivity ratio)
-  const rawEfficiencies = dmus.map((d) => {
+  const withMeta = dmus.map((d) => {
     const outSum = d.outputs.reduce((a, b) => a + b, 0);
     const inSum = d.inputs.reduce((a, b) => a + b, 0);
-    // Productivity ratio: output sum / input sum
-    return outSum / inSum;
+    const validInput = Number.isFinite(inSum) && Number.isFinite(outSum) && inSum > 0;
+    const rawEfficiency = validInput ? outSum / inSum : NaN;
+    return { ...d, outSum, inSum, validInput, rawEfficiency };
   });
 
-  const maxRaw = Math.max(...rawEfficiencies);
+  const invalidInputNames = withMeta
+    .filter((d) => !d.validInput)
+    .map((d) => d.name);
 
-  // Step 6: Normalize to [0, 1] by dividing by max
-  const thetas = rawEfficiencies.map((r) => {
-    const theta = r / maxRaw;
-    return Math.min(theta, 1);
+  const validRaws = withMeta
+    .filter((d) => d.validInput && Number.isFinite(d.rawEfficiency))
+    .map((d) => d.rawEfficiency);
+  const maxRaw = validRaws.length > 0 ? Math.max(...validRaws) : NaN;
+  const canNormalize = Number.isFinite(maxRaw) && maxRaw > 0;
+
+  if (!canNormalize) {
+    return {
+      results: dmus.map((dmu, idx) => ({
+        dmuIndex: idx,
+        name: dmu.name,
+        theta: 0,
+        rank: 0,
+        effective: false,
+        inputScores: dmu.inputs,
+        outputScores: dmu.outputs,
+        inputRedundancy: dmu.inputs.map(() => 0),
+        validInput: withMeta[idx].validInput,
+      })),
+      error: '当前数据无法归一化：所有有效 DMU 的投入产出比非正或不存在。请检查投入数据是否大于 0。',
+      invalidInputNames,
+    };
+  }
+
+  // Normalize to [0, 1] by dividing by max
+  const thetas = withMeta.map((d) => {
+    if (!d.validInput || !Number.isFinite(d.rawEfficiency)) return 0;
+    return Math.min(d.rawEfficiency / maxRaw, 1);
   });
 
-  // Step 7: Build results with ranking and reference DMUs
+  // Build results with ranking
   const indexed = thetas
     .map((theta, idx) => ({ theta, idx }))
     .sort((a, b) => b.theta - a.theta);
@@ -130,12 +164,12 @@ function calculateEfficiency(
     rankMap.set(item.idx, rank + 1);
   });
 
-  return dmus.map((dmu, idx) => {
+  const results = dmus.map((dmu, idx) => {
     const theta = thetas[idx];
     const effective = theta >= 0.98;
     const rank = rankMap.get(idx) ?? 0;
 
-    // Illustrative input improvement room for non-effective DMUs
+    // Illustrative input improvement room for non-top-proxy DMUs
     const inputRedundancy = dmu.inputs.map((inp) =>
       effective ? 0 : Math.round((1 - theta) * inp * 10) / 10
     );
@@ -149,8 +183,11 @@ function calculateEfficiency(
       inputScores: dmu.inputs,
       outputScores: dmu.outputs,
       inputRedundancy,
+      validInput: withMeta[idx].validInput,
     };
   });
+
+  return { results, error: null, invalidInputNames };
 }
 
 /* ================================================================
@@ -181,7 +218,7 @@ export default function DeaPage() {
   }, [dmuNames, dmuCount, inputs, inputCount, outputs, outputCount]);
 
   // Calculate efficiency results
-  const results = useMemo(
+  const { results, error: efficiencyError, invalidInputNames } = useMemo(
     () => calculateEfficiency(dmuData, inputLabels.slice(0, inputCount), outputLabels.slice(0, outputCount)),
     [dmuData, inputLabels, inputCount, outputLabels, outputCount]
   );
@@ -285,33 +322,59 @@ export default function DeaPage() {
 
   // Build calculation steps for selected DMU
   const selectedResult = results[selectedDMU];
+  const selectedMeta = selectedResult
+    ? dmuData[selectedDMU]
+    : null;
+  const selectedOutSum = selectedMeta?.outputs.reduce((a, b) => a + b, 0) ?? 0;
+  const selectedInSum = selectedMeta?.inputs.reduce((a, b) => a + b, 0) ?? 0;
+  const selectedRawEfficiency = selectedInSum > 0 ? selectedOutSum / selectedInSum : NaN;
+  const selectedMaxRaw = Math.max(
+    ...dmuData
+      .map((d) => ({
+        inSum: d.inputs.reduce((a, b) => a + b, 0),
+        outSum: d.outputs.reduce((a, b) => a + b, 0),
+      }))
+      .filter((d) => d.inSum > 0)
+      .map((d) => d.outSum / d.inSum)
+  );
+
   const calcSteps = selectedResult
     ? [
         {
-          title: `Step 1: 计算 ${selectedResult.name} 的产出综合得分`,
-          formula: `产出综合 = ${dmuData[selectedDMU]?.outputs.map((v, i) => `${v}/${Math.max(...dmuData.map((d) => d.outputs[i]))}`).join(' + ') ?? ''}`,
-          result: `产出综合得分 = ${selectedResult.outputScores.reduce((a, b) => a + b, 0).toFixed(3)}`,
+          title: `Step 1: 计算 ${selectedResult.name} 的产出总和`,
+          formula: `产出总和 = Σ outputs = ${dmuData[selectedDMU]?.outputs.map((v) => String(v)).join(' + ') ?? ''}`,
+          result: `产出总和 = ${selectedOutSum.toFixed(3)}`,
           highlight: false,
         },
         {
-          title: `Step 2: 计算 ${selectedResult.name} 的投入综合得分`,
-          formula: `投入综合 = ${dmuData[selectedDMU]?.inputs.map((v) => String(v)).join(' + ') ?? ''}`,
-          result: `投入综合 = ${selectedResult.inputScores.reduce((a, b) => a + b, 0)}`,
+          title: `Step 2: 计算 ${selectedResult.name} 的投入总和`,
+          formula: `投入总和 = Σ inputs = ${dmuData[selectedDMU]?.inputs.map((v) => String(v)).join(' + ') ?? ''}`,
+          result: `投入总和 = ${selectedInSum.toFixed(3)}`,
           highlight: false,
         },
         {
-          title: `Step 3: 计算效率值 θ`,
-          formula: 'θ = (产出综合 / 投入综合) / 最大值',
-          result: `θ* = ${selectedResult.theta.toFixed(3)}`,
+          title: `Step 3: 计算 ${selectedResult.name} 的效率代理值`,
+          formula: `效率代理值 = 产出总和 / 投入总和`,
+          result: Number.isFinite(selectedRawEfficiency)
+            ? `效率代理值 = ${selectedOutSum.toFixed(3)} / ${selectedInSum.toFixed(3)} = ${selectedRawEfficiency.toFixed(3)}`
+            : '投入总和须大于 0 才能计算效率代理值',
+          highlight: true,
+        },
+        {
+          title: `Step 4: 计算相对效率代理值 θ`,
+          formula: `θ = 当前效率代理值 / 最高效率代理值`,
+          result: Number.isFinite(selectedMaxRaw) && selectedMaxRaw > 0
+            ? `θ = ${selectedRawEfficiency.toFixed(3)} / ${selectedMaxRaw.toFixed(3)} = ${selectedResult.theta.toFixed(3)}`
+            : '当前数据无法归一化',
           highlight: true,
           optimal: selectedResult.effective,
         },
         {
-          title: `Step 4: 判定相对有效性`,
-          formula: `θ* = ${selectedResult.theta.toFixed(3)} ${selectedResult.effective ? '≈ 1' : '< 1'}`,
+          title: `Step 5: 判定代理值层级`,
+          formula: `θ* = ${selectedResult.theta.toFixed(3)}`,
           result: selectedResult.effective
-            ? `${selectedResult.name} 在简化比值代理下相对有效（比值接近最高）`
-            : `${selectedResult.name} 在简化比值代理下相对非有效，可参照有效单元改进`,
+            ? `${selectedResult.name} 的代理值接近最高`
+            : `${selectedResult.name} 的代理值较低，可参照代理值最高单元改进`,
           highlight: true,
           optimal: selectedResult.effective,
         },
@@ -337,10 +400,10 @@ export default function DeaPage() {
       ],
     },
     {
-      subtitle: '相对有效性判定',
+      subtitle: '代理值层级判定',
       content: [
-        'θ ≈ 1 → 相对有效（本演示中 θ ≥ 0.98 视为有效）',
-        'θ < 1 → 相对非有效，可参照有效单元改进',
+        'θ ≈ 1 → 代理值最高/接近最高（本演示中 θ ≥ 0.98 视为接近最高）',
+        'θ < 1 → 代理值较低，可参照代理值最高单元改进',
       ],
     },
     {
@@ -349,7 +412,7 @@ export default function DeaPage() {
         '无需预先设定权重，避免主观性',
         '无需指定生产函数的具体形式',
         '本演示仅给出简化的相对效率代理值，不涉及严格DEA的效率分解',
-        '可示意非有效DMU的投入改进空间（非严格DEA投影结果）',
+        '可示意代理值较低DMU的投入改进空间（非严格DEA投影结果）',
         '评价的是相对效率而非绝对效率',
         'DEA对异常值敏感，结果对指标选择较为敏感',
       ],
@@ -764,6 +827,20 @@ export default function DeaPage() {
             采用简化效率比值代理：θ = (某DMU产出综合/投入综合) ÷ (所有DMU中最大产出投入比)。θ越接近1表示相对效率越高。
           </p>
 
+          {(efficiencyError || invalidInputNames.length > 0) && (
+            <div
+              className="mb-4 rounded-lg p-3 text-sm font-medium"
+              style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}
+            >
+              {efficiencyError && <div>{efficiencyError}</div>}
+              {invalidInputNames.length > 0 && (
+                <div>
+                  以下 DMU 的投入总和必须大于 0：{invalidInputNames.join('、')}。
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Efficiency Results Table */}
           <div className="overflow-x-auto mb-5">
             <table className="w-full text-sm">
@@ -772,7 +849,7 @@ export default function DeaPage() {
                   <th className="px-4 py-3 text-left text-white font-medium whitespace-nowrap">DMU</th>
                   <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">效率值 θ</th>
                   <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">排名</th>
-                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">有效性</th>
+                  <th className="px-4 py-3 text-center text-white font-medium whitespace-nowrap">代理值层级</th>
 
                 </tr>
               </thead>
@@ -805,13 +882,21 @@ export default function DeaPage() {
                       </div>
                     </td>
                     <td className="px-4 py-2.5 text-center">
-                      {r.effective ? (
+                      {!r.validInput ? (
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{ background: '#FDE8E8', color: '#dc2626' }}
+                        >
+                          <AlertTriangle size={12} />
+                          投入无效
+                        </span>
+                      ) : r.effective ? (
                         <span
                           className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
                           style={{ background: '#E8F5E9', color: '#4CAF50' }}
                         >
                           <CheckCircle size={12} />
-                          相对有效
+                          代理值最高/接近最高
                         </span>
                       ) : (
                         <span
@@ -819,7 +904,7 @@ export default function DeaPage() {
                           style={{ background: '#f1f5f9', color: '#6B6B6B' }}
                         >
                           <AlertTriangle size={12} />
-                          相对非有效
+                          代理值较低
                         </span>
                       )}
                     </td>
@@ -857,8 +942,8 @@ export default function DeaPage() {
             steps={calcSteps}
           />
 
-          {/* Improvement suggestions for non-effective DMUs */}
-          {selectedResult && !selectedResult.effective && (
+          {/* Improvement suggestions for lower-proxy DMUs */}
+          {selectedResult && selectedResult.validInput && !selectedResult.effective && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -885,7 +970,7 @@ export default function DeaPage() {
                 )}
               </ul>
               <p className="text-sm" style={{ color: '#1B3A5F' }}>
-                若以当前最高投入产出比为参照，{selectedResult.name}可考虑降低投入或提高产出，以提升相对效率代理值。
+                若以当前最高投入产出比为参照，{selectedResult.name}可考虑降低投入或提高产出，以提升简化效率代理值。
               </p>
             </motion.div>
           )}
@@ -957,7 +1042,7 @@ export default function DeaPage() {
             className="flex flex-wrap justify-center gap-4 mt-5"
           >
             {[
-              { label: '有效DMU', value: `${effectiveCount}/${results.length}`, color: '#4CAF50' },
+              { label: '代理值最高/接近最高DMU', value: `${effectiveCount}/${results.length}`, color: '#4CAF50' },
               { label: '平均效率', value: avgEfficiency.toFixed(3), color: '#3b82f6' },
               {
                 label: '最低效率',

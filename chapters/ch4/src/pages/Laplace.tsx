@@ -578,27 +578,41 @@ export default function Laplace() {
             })}
 
             {/* Conclusion */}
-            <motion.div
-              variants={staggerStep}
-              className="p-3 text-sm font-semibold"
-              style={{
-                backgroundColor: '#f0faf3',
-                borderRadius: '6px',
-                color: '#4CAF50',
-              }}
-            >
-              <div style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                max E(A<sub>i</sub>) = max
-                {'{'}
-                {result.expectedValues.map((v) => fmt(v)).join(', ')} ={' '}
-                {result.maxExpectedValue.toFixed(2)}
-              </div>
-              <div className="mt-1">
-                → 最优方案：
-                {result.optimalIndices.map((i) => alternatives[i]).join(' 和 ')}
-                {result.optimalIndices.length > 1 ? ' 并列' : ''}
-              </div>
-            </motion.div>
+            {result.probValid ? (
+              <motion.div
+                variants={staggerStep}
+                className="p-3 text-sm font-semibold"
+                style={{
+                  backgroundColor: '#f0faf3',
+                  borderRadius: '6px',
+                  color: '#4CAF50',
+                }}
+              >
+                <div style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  max E(A<sub>i</sub>) = max
+                  {'{'}
+                  {result.expectedValues.map((v) => fmt(v)).join(', ')} ={' '}
+                  {result.maxExpectedValue.toFixed(2)}
+                </div>
+                <div className="mt-1">
+                  → 最优方案：
+                  {result.optimalIndices.map((i) => alternatives[i]).join(' 和 ')}
+                  {result.optimalIndices.length > 1 ? ' 并列' : ''}
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                variants={staggerStep}
+                className="p-3 text-sm font-semibold"
+                style={{
+                  backgroundColor: '#fdf2f2',
+                  borderRadius: '6px',
+                  color: '#F44336',
+                }}
+              >
+                概率无效，无法给出最优方案。请先使各概率非负且和为1。
+              </motion.div>
+            )}
           </motion.div>
         </Card>
       </div>

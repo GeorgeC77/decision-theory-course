@@ -80,8 +80,11 @@ export default function DecisionTreeAnalysis() {
   }, [schemes]);
 
   const maxEV = useMemo(() => Math.max(...evs), [evs]);
-  const optimalIdx = useMemo(
-    () => evs.findIndex((ev) => ev === maxEV),
+  const optimalIdxs = useMemo(
+    () =>
+      evs
+        .map((ev, i) => (Math.abs(ev - maxEV) < 1e-9 ? i : -1))
+        .filter((i) => i !== -1),
     [evs, maxEV]
   );
 
@@ -163,8 +166,8 @@ export default function DecisionTreeAnalysis() {
   const scheme2 = schemes[1];
   const ev1 = evs[0];
   const ev2 = evs[1];
-  const isOptimal1 = optimalIdx === 0;
-  const isOptimal2 = optimalIdx === 1;
+  const isOptimal1 = optimalIdxs.includes(0);
+  const isOptimal2 = optimalIdxs.includes(1);
 
   return (
     <div className="space-y-6 mt-6">
@@ -363,9 +366,15 @@ export default function DecisionTreeAnalysis() {
 
         {/* Bottom conclusion */}
         <div className="text-center mt-3 pt-3 border-t border-[#EFEBE5]">
-          <span className="text-sm font-bold text-[#4CAF50]">
-            ★ 最优方案（EV = {maxEV.toFixed(0)}万）= {schemes[optimalIdx].name}
-          </span>
+          {optimalIdxs.length === 1 ? (
+            <span className="text-sm font-bold text-[#4CAF50]">
+              ★ 最优方案（EV = {maxEV.toFixed(0)}万）= {schemes[optimalIdxs[0]].name}
+            </span>
+          ) : (
+            <span className="text-sm font-bold text-[#4CAF50]">
+              ★ 并列最优方案为 {optimalIdxs.map((i) => schemes[i].name).join('、')}（EV = {maxEV.toFixed(0)}万）
+            </span>
+          )}
         </div>
       </motion.div>
 
@@ -451,9 +460,15 @@ export default function DecisionTreeAnalysis() {
                 </span>
               </div>
               <div className="border-t border-[#E0DDD5] pt-2 mt-2">
-                <span className="text-lg font-bold text-[#4CAF50]">
-                  最优决策：{schemes[optimalIdx].name}（EV = {maxEV.toFixed(0)}万）
-                </span>
+                {optimalIdxs.length === 1 ? (
+                  <span className="text-lg font-bold text-[#4CAF50]">
+                    最优决策：{schemes[optimalIdxs[0]].name}（EV = {maxEV.toFixed(0)}万）
+                  </span>
+                ) : (
+                  <span className="text-lg font-bold text-[#4CAF50]">
+                    并列最优决策：{optimalIdxs.map((i) => schemes[i].name).join('、')}（EV = {maxEV.toFixed(0)}万）
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -700,28 +715,16 @@ export default function DecisionTreeAnalysis() {
                   <h4 className="text-[15px] font-semibold text-[#2B2B2B] mb-2">
                     逆向归纳法步骤
                   </h4>
-                  <ol className="space-y-2 text-sm text-[#6B6B6B]">
-                    <li className="flex gap-2">
-                      <span className="text-[#C8963E] font-bold shrink-0">1.</span>
-                      <span>从树的最右端（结果点）开始向左计算</span>
+                  <ol className="space-y-2 text-sm text-[#6B6B6B] list-decimal ml-4">
+                    <li>从树的最右端（结果点）开始向左计算</li>
+                    <li>
+                      对每个<strong>机会节点</strong>计算期望值 EV = Σ(P × 收益)
                     </li>
-                    <li className="flex gap-2">
-                      <span className="text-[#C8963E] font-bold shrink-0">2.</span>
-                      <span>
-                        对每个<strong>机会节点</strong>计算期望值 EV = Σ(P × 收益)
-                      </span>
+                    <li>
+                      对每个<strong>决策节点</strong>选择 EV 最大的方案
                     </li>
-                    <li className="flex gap-2">
-                      <span className="text-[#C8963E] font-bold shrink-0">3.</span>
-                      <span>
-                        对每个<strong>决策节点</strong>选择 EV 最大的方案
-                      </span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-[#C8963E] font-bold shrink-0">4.</span>
-                      <span>
-                        在次优方案上标记"剪枝"（×），保留最优路径
-                      </span>
+                    <li>
+                      在次优方案上标记"剪枝"（×），保留最优路径
                     </li>
                   </ol>
                 </div>

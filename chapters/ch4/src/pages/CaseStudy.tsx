@@ -620,7 +620,7 @@ export default function CaseStudy() {
                 const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
                 if (sorted.length === 0) return '请编辑收益矩阵以查看推荐结果。';
                 const details = sorted.map(([name, c]) => `${name}(${c})`).join('、');
-                return `各准则推荐方案统计：${details}。不同准则反映不同决策偏好，最终选择应结合决策情境与风险偏好综合判断，不宜简单按准则数量“多数决”。`;
+                return `多数准则推荐结果仅作为稳健性参考，不代表严格意义上的综合最优。不同准则反映不同风险态度，最终选择仍需结合决策者偏好。统计：${details}。`;
               })()}
             </p>
           </div>

@@ -213,7 +213,7 @@ export default function UtilityMergingPage() {
   const optimalIndex = useMemo(() => {
     let best = 0;
     results.forEach((r, i) => {
-      if (r.clampedW > results[best].clampedW) best = i;
+      if (r.W > results[best].W) best = i;
     });
     return best;
   }, [results]);
@@ -962,7 +962,7 @@ export default function UtilityMergingPage() {
               📊 各方案综合效用对比
             </h3>
             <p className="text-sm mt-1" style={{ color: '#6B6B6B' }}>
-              不同并合规则下各方案综合效用的柱状图对比（绿色柱状为最优方案）
+              不同并合规则下各方案综合效用的柱状图对比（绿色柱状为最优方案）。图表值为截断显示值，排序和最优方案基于原始 W。
             </p>
           </div>
           <div style={{ width: '100%', height: 350 }}>

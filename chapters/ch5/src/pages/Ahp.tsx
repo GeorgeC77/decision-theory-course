@@ -577,6 +577,11 @@ export default function AhpPage() {
 
   const bestAltIndex = ranked[0]?.originalIndex ?? 0;
 
+  /* Global consistency check */
+  const allConsistencyPassed =
+    (!criteriaConsistency.crValid || criteriaConsistency.cr < 0.1) &&
+    altConsistencies.every((c) => !c.crValid || c.cr < 0.1);
+
   /* Tab colors */
   const tabColors = ['#3b82f6', '#4CAF50', '#a855f7'];
 
@@ -1220,6 +1225,16 @@ export default function AhpPage() {
             })()}
           </div>
 
+          {/* Global consistency warning */}
+          {!allConsistencyPassed && (
+            <div
+              className="mt-4 rounded-lg p-3 text-sm font-medium"
+              style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}
+            >
+              ⚠️ 存在判断矩阵未通过一致性检验，当前综合排序仅供演示，不宜作为可靠决策结果。
+            </div>
+          )}
+
           {/* Combined weights table */}
           <div className="mt-6 overflow-x-auto">
             <h4 className="text-sm font-semibold mb-3" style={{ color: '#2A4A73' }}>
@@ -1347,7 +1362,10 @@ export default function AhpPage() {
                   value: cw * altWeightsPerCriterion[i][bestAltIndex],
                 }));
                 const top = contributions.reduce((a, b) => (a.value > b.value ? a : b));
-                return `在层次分析法下，${ALT_LABELS[bestAltIndex]}综合权重为 ${r3(globalWeights[bestAltIndex])}，排序第一。其中${top.name.replace(/ C\d/, '')}贡献最大（${r3(top.value)}），是综合排序的主要决定因素。`;
+                const base = `在层次分析法下，${ALT_LABELS[bestAltIndex]}综合权重为 ${r3(globalWeights[bestAltIndex])}，排序第一。其中${top.name.replace(/ C\d/, '')}贡献最大（${r3(top.value)}），是综合排序的主要决定因素。`;
+                return allConsistencyPassed
+                  ? base
+                  : `${base} 由于存在一致性未通过的判断矩阵，该排序结果需谨慎解释。`;
               })()}
             />
           </div>

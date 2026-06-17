@@ -58,8 +58,11 @@ export default function ExpectedValueCriterion() {
   }, [payoffs, probs]);
 
   const maxEV = useMemo(() => Math.max(...expectedValues), [expectedValues]);
-  const optimalIndex = useMemo(
-    () => expectedValues.findIndex((ev) => ev === maxEV),
+  const optimalIndices = useMemo(
+    () =>
+      expectedValues
+        .map((ev, i) => (Math.abs(ev - maxEV) < 1e-9 ? i : -1))
+        .filter((i) => i !== -1),
     [expectedValues, maxEV]
   );
 
@@ -96,7 +99,7 @@ export default function ExpectedValueCriterion() {
     (idx: number, value: string) => {
       const num = parseFloat(value);
       const next = [...probs];
-      next[idx] = isNaN(num) ? 0 : num;
+      next[idx] = isNaN(num) ? 0 : Math.max(0, Math.min(1, num));
       setProbs(next);
       if (Math.abs(next.reduce((s, p) => s + p, 0) - 1) >= 0.001) {
         setShakeKey((k) => k + 1);
@@ -126,9 +129,9 @@ export default function ExpectedValueCriterion() {
       SCHEME_NAMES.map((name, i) => ({
         name: `方案 ${name}`,
         value: expectedValues[i],
-        isOptimal: i === optimalIndex,
+        isOptimal: optimalIndices.includes(i),
       })),
-    [expectedValues, optimalIndex]
+    [expectedValues, optimalIndices]
   );
 
   const chartMax = useMemo(() => {
@@ -225,7 +228,7 @@ export default function ExpectedValueCriterion() {
 
               {/* Scheme rows */}
               {SCHEME_NAMES.map((name, i) => {
-                const isOptimal = i === optimalIndex;
+                const isOptimal = probValid && optimalIndices.includes(i);
                 return (
                   <tr
                     key={name}
@@ -305,31 +308,43 @@ export default function ExpectedValueCriterion() {
           </div>
           <p className="text-xs text-[#9E9E9E] mb-3">Expected Value of Perfect Information</p>
 
-          <div className="space-y-2 font-mono text-sm text-[#6B6B6B] tabular-nums">
-            <div className="flex justify-between">
-              <span>完整情报期望收益 Eₚ：</span>
-              <span className="font-semibold">
-                Eₚ = Σ P(θⱼ) × maxᵢ(dᵢⱼ) = {ep.toFixed(2)}
-              </span>
+          {probValid ? (
+            <div className="space-y-2 font-mono text-sm text-[#6B6B6B] tabular-nums">
+              <div className="flex justify-between">
+                <span>完整情报期望收益 Eₚ：</span>
+                <span className="font-semibold">
+                  Eₚ = Σ P(θⱼ) × maxᵢ(dᵢⱼ) = {ep.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>最优方案期望值：</span>
+                <span className="font-semibold">max(E(dᵢ)) = {maxEV.toFixed(2)}</span>
+              </div>
+              <div className="border-t border-[#E0DDD5] pt-2 flex justify-between items-center">
+                <span className="font-semibold">EVPI = Eₚ − max(E(dᵢ)) =</span>
+                <span className="text-2xl font-bold text-[#C8963E] tabular-nums">
+                  {evpi.toFixed(2)}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>最优方案期望值：</span>
-              <span className="font-semibold">max(E(dᵢ)) = {maxEV.toFixed(2)}</span>
+          ) : (
+            <div className="rounded-lg p-4 text-sm text-[#dc2626] bg-[#FDE8E8]">
+              当前概率不满足合法性要求（须非负且和为 1），EVPI 数值仅供中间预览，不能作为决策结论。
             </div>
-            <div className="border-t border-[#E0DDD5] pt-2 flex justify-between items-center">
-              <span className="font-semibold">EVPI = Eₚ − max(E(dᵢ)) =</span>
-              <span className="text-2xl font-bold text-[#C8963E] tabular-nums">
-                {evpi.toFixed(2)}
-              </span>
-            </div>
-          </div>
+          )}
 
           {/* Economic meaning */}
-          <div className="mt-4 bg-[#C8963E]/5 rounded-lg p-4 text-sm leading-relaxed">
-            获得完整情报后，期望收益最多可增加{' '}
-            <span className="font-bold text-[#C8963E]">{evpi.toFixed(2)}</span>{' '}
-            个单位。若情报成本低于此值，则获取情报是值得的。
-          </div>
+          {probValid ? (
+            <div className="mt-4 bg-[#C8963E]/5 rounded-lg p-4 text-sm leading-relaxed">
+              获得完整情报后，期望收益最多可增加{' '}
+              <span className="font-bold text-[#C8963E]">{evpi.toFixed(2)}</span>{' '}
+              个单位。若情报成本低于此值，则获取情报是值得的。
+            </div>
+          ) : (
+            <div className="mt-4 bg-[#FDE8E8] rounded-lg p-4 text-sm leading-relaxed text-[#dc2626]">
+              概率输入无效，无法给出 EVPI 决策结论。请先修正概率，使各概率非负且和为 1。
+            </div>
+          )}
         </motion.div>
 
         {/* Perfect Info Optimal Schemes Table */}
@@ -350,51 +365,57 @@ export default function ExpectedValueCriterion() {
             若已知未来状态，则每期选择对应最优方案
           </p>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#1B3A5F] text-white h-11">
-                  <th className="px-4 py-2 text-left font-semibold rounded-tl-xl">
-                    自然状态 θⱼ
-                  </th>
-                  <th className="px-4 py-2 text-center font-semibold">概率 P(θⱼ)</th>
-                  <th className="px-4 py-2 text-center font-semibold">最优方案</th>
-                  <th className="px-4 py-2 text-center font-semibold rounded-tr-xl">
-                    最大收益 maxᵢ(dᵢⱼ)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {stateOptimals.map((row, idx) => (
-                  <tr
-                    key={idx}
-                    className="h-12 bg-white border-b border-[#EFEBE5] hover:bg-[#F0EDE8]/50"
-                  >
-                    <td className="px-4 py-2 font-medium">{row.state}</td>
-                    <td className="px-4 py-2 text-center tabular-nums">{row.prob}</td>
-                    <td className="px-4 py-2 text-center">
-                      <span className="text-[#4CAF50] font-semibold">{row.scheme}</span>
-                      <span className="ml-2 inline-flex items-center bg-[#E8F5E9] text-[#4CAF50] border border-[#4CAF50]/30 rounded-full px-2 py-0.5 text-xs font-semibold">
-                        最优
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 text-center font-semibold tabular-nums">
-                      {row.maxPayoff}
+          {probValid ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#1B3A5F] text-white h-11">
+                    <th className="px-4 py-2 text-left font-semibold rounded-tl-xl">
+                      自然状态 θⱼ
+                    </th>
+                    <th className="px-4 py-2 text-center font-semibold">概率 P(θⱼ)</th>
+                    <th className="px-4 py-2 text-center font-semibold">最优方案</th>
+                    <th className="px-4 py-2 text-center font-semibold rounded-tr-xl">
+                      最大收益 maxᵢ(dᵢⱼ)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stateOptimals.map((row, idx) => (
+                    <tr
+                      key={idx}
+                      className="h-12 bg-white border-b border-[#EFEBE5] hover:bg-[#F0EDE8]/50"
+                    >
+                      <td className="px-4 py-2 font-medium">{row.state}</td>
+                      <td className="px-4 py-2 text-center tabular-nums">{row.prob}</td>
+                      <td className="px-4 py-2 text-center">
+                        <span className="text-[#4CAF50] font-semibold">{row.scheme}</span>
+                        <span className="ml-2 inline-flex items-center bg-[#E8F5E9] text-[#4CAF50] border border-[#4CAF50]/30 rounded-full px-2 py-0.5 text-xs font-semibold">
+                          最优
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-center font-semibold tabular-nums">
+                        {row.maxPayoff}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Ep row */}
+                  <tr className="h-12 bg-[#F0EDE8] font-bold">
+                    <td className="px-4 py-2">加权合计 Eₚ</td>
+                    <td className="px-4 py-2 text-center">—</td>
+                    <td className="px-4 py-2 text-center">—</td>
+                    <td className="px-4 py-2 text-center tabular-nums text-[#2B2B2B]">
+                      {ep.toFixed(2)}
                     </td>
                   </tr>
-                ))}
-                {/* Ep row */}
-                <tr className="h-12 bg-[#F0EDE8] font-bold">
-                  <td className="px-4 py-2">加权合计 Eₚ</td>
-                  <td className="px-4 py-2 text-center">—</td>
-                  <td className="px-4 py-2 text-center">—</td>
-                  <td className="px-4 py-2 text-center tabular-nums text-[#2B2B2B]">
-                    {ep.toFixed(2)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="rounded-lg p-4 text-sm text-[#dc2626] bg-[#FDE8E8]">
+              概率输入无效，无法显示完整情报下的状态最优方案。请先修正概率。
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -411,10 +432,11 @@ export default function ExpectedValueCriterion() {
           <h3 className="text-[17px] font-semibold text-[#2B2B2B]">各方案期望值对比</h3>
         </div>
         <p className="text-[13px] text-[#6B6B6B] mb-4">
-          绿色柱子为最优方案，蓝色为其他方案
+          {probValid ? '绿色柱子为最优方案，蓝色为其他方案' : '概率无效时仅显示预览，不出具正式结论'}
         </p>
 
         {/* SVG Bar Chart */}
+        {probValid ? (
         <div className="w-full" style={{ height: 240, position: 'relative' }}>
           <svg
             viewBox="0 0 400 200"
@@ -533,6 +555,14 @@ export default function ExpectedValueCriterion() {
             </div>
           </div>
         </div>
+      ) : (
+        <div
+          className="w-full flex items-center justify-center rounded-lg text-sm font-medium"
+          style={{ height: 240, background: '#FDE8E8', color: '#dc2626' }}
+        >
+          请先修正概率输入（须非负且和为 1），再查看图表结论
+        </div>
+      )}
       </motion.div>
 
       {/* ── Card 5: Knowledge ── */}
