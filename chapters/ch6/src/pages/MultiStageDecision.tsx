@@ -1041,7 +1041,7 @@ export default function MultiStageDecision() {
                           因此最终最优策略为：
                           <strong className="text-emerald-700">
                             {posteriorResults.netEVSI > 0
-                              ? "做试销，试销后根据结果选择购买技术并采用对应批量方案，或不购买技术"
+                              ? "做试销；对边际概率大于0的试销结果，根据后验分析选择购买技术并采用相应批量，或不购买技术"
                               : posteriorResults.priorChooseBuy
                               ? `不做试销，直接购买技术并采用${bestBatchNames}`
                               : "不做试销，也不购买技术"}
