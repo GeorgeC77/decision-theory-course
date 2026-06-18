@@ -9,6 +9,7 @@ import {
   GitBranch,
   Info,
   CheckCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   BarChart,
@@ -306,19 +307,21 @@ export default function FuzzyEvalPage() {
   /* Computed: normalized weights */
   const normalizedWeights = useMemo(() => normalizeWeights(weights), [weights]);
 
+  /* Computed: raw weight sum for zero-weight warning */
+  const rawWeightSum = useMemo(() => weights.reduce((a, b) => a + b, 0), [weights]);
+  const isWeightZero = rawWeightSum === 0;
+
   /* Computed: B = A ∘ R */
   const B = useMemo(
     () => computeB(normalizedWeights, R, operator),
     [normalizedWeights, R, operator]
   );
 
-  /* Computed: max membership grade */
-  const maxBIndex = useMemo(() => {
-    let maxIdx = 0;
-    for (let i = 1; i < B.length; i++) {
-      if (B[i] > B[maxIdx]) maxIdx = i;
-    }
-    return maxIdx;
+  /* Computed: max membership grade(s) */
+  const { maxB, maxBIdxs } = useMemo(() => {
+    const m = Math.max(...B);
+    const idxs = B.map((v, i) => (Math.abs(v - m) < 1e-9 ? i : -1)).filter((i) => i !== -1);
+    return { maxB: m, maxBIdxs: idxs };
   }, [B]);
 
   /* Computed: weighted average grade score */
@@ -339,9 +342,9 @@ export default function FuzzyEvalPage() {
       grades.map((g, i) => ({
         name: g,
         value: r3(B[i]),
-        fill: i === maxBIndex ? '#4CAF50' : '#3b82f6',
+        fill: maxBIdxs.includes(i) ? '#4CAF50' : '#3b82f6',
       })),
-    [grades, B, maxBIndex]
+    [grades, B, maxBIdxs]
   );
 
   /* Handlers */
@@ -432,12 +435,15 @@ export default function FuzzyEvalPage() {
       {
         title: 'Step 3: 综合评判结果',
         formula: `B = (${bStr})`,
-        result: `最大隶属度: ${grades[maxBIndex]} (b_${maxBIndex + 1} = ${r3(B[maxBIndex])})`,
+        result:
+          maxBIdxs.length === 1
+            ? `最大隶属度: ${grades[maxBIdxs[0]]} (b_${maxBIdxs[0] + 1} = ${r3(B[maxBIdxs[0]])})`
+            : `最大隶属度并列: ${maxBIdxs.map((i) => grades[i]).join('、')}（b=${r3(maxB)}）`,
         highlight: true,
         optimal: true,
       },
     ];
-  }, [operator, B, normalizedWeights, R, grades, maxBIndex]);
+  }, [operator, B, normalizedWeights, R, grades, maxBIdxs, maxB]);
 
   /* Knowledge sections */
   const knowledgeSections = [
@@ -805,6 +811,17 @@ export default function FuzzyEvalPage() {
               归一化后权重和 = {r3(normalizedWeights.reduce((a, b) => a + b, 0))}
             </span>
           </div>
+          {isWeightZero && (
+            <div
+              className="mt-3 flex items-center gap-2 px-3 py-2 rounded-md"
+              style={{ background: '#FDE8E8', border: '1px solid #fecaca' }}
+            >
+              <AlertTriangle size={14} style={{ color: '#dc2626', flexShrink: 0 }} />
+              <span className="text-xs" style={{ color: '#dc2626' }}>
+                当前输入权重和为0，系统暂按等权处理。请至少给一个因素设置正权重。
+              </span>
+            </div>
+          )}
         </SectionCard>
 
         {/* Section 7: Evaluation Grade Set */}
@@ -1051,8 +1068,8 @@ export default function FuzzyEvalPage() {
                       key={j}
                       className="px-3 py-2.5 text-sm text-center font-mono font-semibold"
                       style={{
-                        background: j === maxBIndex ? '#E8F5E9' : '#fff',
-                        color: j === maxBIndex ? '#4CAF50' : '#2A4A73',
+                        background: maxBIdxs.includes(j) ? '#E8F5E9' : '#fff',
+                        color: maxBIdxs.includes(j) ? '#4CAF50' : '#2A4A73',
                       }}
                     >
                       {r3(bj)}
@@ -1080,20 +1097,33 @@ export default function FuzzyEvalPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
               className="rounded-lg p-4"
-              style={{ background: '#E8F5E9', borderLeft: '4px solid #4CAF50' }}
+              style={{ background: maxBIdxs.length === 1 ? '#E8F5E9' : '#fffbeb', borderLeft: `4px solid ${maxBIdxs.length === 1 ? '#4CAF50' : '#f59e0b'}` }}
             >
-              <h4 className="text-sm font-semibold mb-2" style={{ color: '#4CAF50' }}>
+              <h4 className="text-sm font-semibold mb-2" style={{ color: maxBIdxs.length === 1 ? '#4CAF50' : '#b45309' }}>
                 最大隶属度原则
               </h4>
               <p className="text-sm mb-2" style={{ color: '#6B6B6B' }}>
                 Grade = argmaxⱼ(bⱼ)
               </p>
-              <div className="text-lg font-bold" style={{ color: '#1B3A5F' }}>
-                {grades[maxBIndex]}
-              </div>
-              <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
-                b_{maxBIndex + 1} = {r3(B[maxBIndex])} 为最大值
-              </p>
+              {maxBIdxs.length === 1 ? (
+                <>
+                  <div className="text-lg font-bold" style={{ color: '#1B3A5F' }}>
+                    {grades[maxBIdxs[0]]}
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
+                    b_{maxBIdxs[0] + 1} = {r3(B[maxBIdxs[0]])} 为最大值
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm font-medium" style={{ color: '#b45309' }}>
+                    最大隶属度并列：{maxBIdxs.map((i) => grades[i]).join('、')}
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#6B6B6B' }}>
+                    根据最大隶属度原则无法唯一确定等级，建议结合加权平均原则或进一步细化评价。
+                  </p>
+                </>
+              )}
             </motion.div>
 
             {/* Weighted average principle */}
@@ -1122,9 +1152,13 @@ export default function FuzzyEvalPage() {
           {/* Optimal Card */}
           <OptimalCard
             title="综合评价结果"
-            name={grades[maxBIndex]}
+            name={maxBIdxs.length === 1 ? grades[maxBIdxs[0]] : maxBIdxs.map((i) => grades[i]).join('、')}
             value={`B = (${B.map((v) => r3(v)).join(', ')})`}
-            description={`根据最大隶属度原则，该评价对象的综合评定等级为「${grades[maxBIndex]}」，其隶属度为 ${r3(B[maxBIndex])}，在所有评语等级中最高。使用${OPERATORS.find((o) => o.key === operator)?.label}算子进行计算。`}
+            description={
+              maxBIdxs.length === 1
+                ? `根据最大隶属度原则，该评价对象的综合评定等级为「${grades[maxBIdxs[0]]}」，其隶属度为 ${r3(B[maxBIdxs[0]])}，在所有评语等级中最高。使用${OPERATORS.find((o) => o.key === operator)?.label}算子进行计算。`
+                : `最大隶属度并列：${maxBIdxs.map((i) => grades[i]).join('、')}。根据最大隶属度原则无法唯一确定等级，建议结合加权平均原则或进一步细化评价。使用${OPERATORS.find((o) => o.key === operator)?.label}算子进行计算。`
+            }
           />
         </SectionCard>
 

@@ -354,49 +354,58 @@ export default function DeaPage() {
   }, [dmuData]);
 
   const calcSteps = selectedResult
-    ? [
-        {
-          title: `Step 1: 计算 ${selectedResult.name} 的产出总和`,
-          formula: `产出总和 = Σ outputs = ${dmuData[selectedDMU]?.outputs.map((v) => String(v)).join(' + ') ?? ''}`,
-          result: `产出总和 = ${selectedOutSum.toFixed(3)}`,
-          highlight: false,
-        },
-        {
-          title: `Step 2: 计算 ${selectedResult.name} 的投入总和`,
-          formula: `投入总和 = Σ inputs = ${dmuData[selectedDMU]?.inputs.map((v) => String(v)).join(' + ') ?? ''}`,
-          result: `投入总和 = ${selectedInSum.toFixed(3)}`,
-          highlight: false,
-        },
-        {
-          title: `Step 3: 计算 ${selectedResult.name} 的效率代理值`,
-          formula: `效率代理值 = 产出总和 / 投入总和`,
-          result: Number.isFinite(selectedRawEfficiency)
-            ? `效率代理值 = ${selectedOutSum.toFixed(3)} / ${selectedInSum.toFixed(3)} = ${selectedRawEfficiency.toFixed(3)}`
-            : '投入总和须大于 0 才能计算效率代理值',
-          highlight: true,
-        },
-        {
-          title: `Step 4: 计算相对效率代理值 θ`,
-          formula: `θ = 当前效率代理值 / 最高效率代理值`,
-          result:
-            Number.isFinite(selectedRawEfficiency) &&
-            Number.isFinite(selectedMaxRaw) &&
-            selectedMaxRaw > 0
-              ? `θ = ${selectedRawEfficiency.toFixed(3)} / ${selectedMaxRaw.toFixed(3)} = ${selectedResult.theta.toFixed(3)}`
-              : '当前数据无法归一化',
-          highlight: true,
-          optimal: selectedResult.effective,
-        },
-        {
-          title: `Step 5: 判定代理值层级`,
-          formula: `θ* = ${selectedResult.theta.toFixed(3)}`,
-          result: selectedResult.effective
-            ? `${selectedResult.name} 的代理值接近最高`
-            : `${selectedResult.name} 的代理值较低，可参照代理值最高单元改进`,
-          highlight: true,
-          optimal: selectedResult.effective,
-        },
-      ]
+    ? selectedResult.validInput
+      ? [
+          {
+            title: `Step 1: 计算 ${selectedResult.name} 的产出总和`,
+            formula: `产出总和 = Σ outputs = ${dmuData[selectedDMU]?.outputs.map((v) => String(v)).join(' + ') ?? ''}`,
+            result: `产出总和 = ${selectedOutSum.toFixed(3)}`,
+            highlight: false,
+          },
+          {
+            title: `Step 2: 计算 ${selectedResult.name} 的投入总和`,
+            formula: `投入总和 = Σ inputs = ${dmuData[selectedDMU]?.inputs.map((v) => String(v)).join(' + ') ?? ''}`,
+            result: `投入总和 = ${selectedInSum.toFixed(3)}`,
+            highlight: false,
+          },
+          {
+            title: `Step 3: 计算 ${selectedResult.name} 的效率代理值`,
+            formula: `效率代理值 = 产出总和 / 投入总和`,
+            result: Number.isFinite(selectedRawEfficiency)
+              ? `效率代理值 = ${selectedOutSum.toFixed(3)} / ${selectedInSum.toFixed(3)} = ${selectedRawEfficiency.toFixed(3)}`
+              : '投入总和须大于 0 才能计算效率代理值',
+            highlight: true,
+          },
+          {
+            title: `Step 4: 计算相对效率代理值 θ`,
+            formula: `θ = 当前效率代理值 / 最高效率代理值`,
+            result:
+              Number.isFinite(selectedRawEfficiency) &&
+              Number.isFinite(selectedMaxRaw) &&
+              selectedMaxRaw > 0
+                ? `θ = ${selectedRawEfficiency.toFixed(3)} / ${selectedMaxRaw.toFixed(3)} = ${selectedResult.theta.toFixed(3)}`
+                : '当前数据无法归一化',
+            highlight: true,
+            optimal: selectedResult.effective,
+          },
+          {
+            title: `Step 5: 判定代理值层级`,
+            formula: `θ* = ${selectedResult.theta.toFixed(3)}`,
+            result: selectedResult.effective
+              ? `${selectedResult.name} 的代理值接近最高`
+              : `${selectedResult.name} 的代理值较低，可参照代理值最高单元改进`,
+            highlight: true,
+            optimal: selectedResult.effective,
+          },
+        ]
+      : [
+          {
+            title: `${selectedResult.name} 无法计算效率代理值`,
+            formula: `投入总和 = Σ inputs = ${dmuData[selectedDMU]?.inputs.map((v) => String(v)).join(' + ') ?? ''}`,
+            result: '该评价单元投入总和必须大于0，当前无法计算效率代理值，也不参与排名。',
+            highlight: true,
+          },
+        ]
     : [];
 
   // Knowledge card sections
@@ -1085,7 +1094,7 @@ export default function DeaPage() {
                 className="flex flex-wrap justify-center gap-4 mt-5"
               >
                 {[
-                  { label: '代理值最高/接近最高单元', value: `${effectiveCount}/${results.length}`, color: '#4CAF50' },
+                  { label: '有效评价单元中代理值最高/接近最高单元', value: `${effectiveCount}/${validResults.length}`, color: '#4CAF50' },
                   { label: '平均效率', value: avgEfficiency.toFixed(3), color: '#3b82f6' },
                   {
                     label: '最低效率',

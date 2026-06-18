@@ -109,7 +109,11 @@ export default function DecisionTreeAnalysis() {
           next[schemeIdx].name = String(value);
         } else if (field === 'investment' || field === 'serviceYears') {
           const num = parseFloat(String(value));
-          next[schemeIdx][field] = isNaN(num) ? 0 : Math.max(0, num);
+          if (field === 'serviceYears') {
+            next[schemeIdx][field] = isNaN(num) ? 1 : Math.max(1, num);
+          } else {
+            next[schemeIdx][field] = isNaN(num) ? 0 : Math.max(0, num);
+          }
         }
         return next;
       });
@@ -542,7 +546,7 @@ export default function DecisionTreeAnalysis() {
                   </label>
                   <input
                     type="number"
-                    min={0}
+                    min={1}
                     value={scheme.serviceYears}
                     onChange={(e) =>
                       updateSchemeField(sIdx, 'serviceYears', e.target.value)

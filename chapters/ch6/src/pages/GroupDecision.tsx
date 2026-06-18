@@ -197,10 +197,11 @@ function BordaCountSection() {
   }, [candidates, voters]);
 
   const scores = bordaScores();
+  const maxScore = Math.max(...Object.values(scores));
+  const winners = candidates.filter((c) => scores[c] === maxScore);
   const sortedCandidates = [...candidates].sort(
     (a, b) => scores[b] - scores[a]
   );
-  const winner = sortedCandidates[0];
 
   function moveCandidate(voterIdx: number, candIdx: number, dir: -1 | 1) {
     setVoters((prev) => {
@@ -286,6 +287,9 @@ function BordaCountSection() {
             每位投票人对所有方案进行排序。若有 <TeX math="n" />{" "}
             个方案，最优方案得 <TeX math="n" /> 分，次优得{" "}
             <TeX math="n-1" /> 分，以此类推。累计所有投票人的波德数，得分最高的方案获胜。
+          </p>
+          <p className="text-xs text-emerald-600 mt-2 leading-relaxed">
+            本页面采用 n,n−1,...,1 计分；部分教材采用 n−1,n−2,...,0 计分。若每位投票人都给出完整排序，两种计分方式只差一个常数，不影响最终排名。
           </p>
         </div>
 
@@ -448,8 +452,8 @@ function BordaCountSection() {
             </h4>
             <div className="space-y-2">
               {sortedCandidates.map((c, i) => {
-                const maxScore = Math.max(...Object.values(scores));
                 const pct = maxScore > 0 ? (scores[c] / maxScore) * 100 : 0;
+                const isTop = winners.includes(c);
                 return (
                   <div key={c} className="flex items-center gap-3">
                     <span className="text-xs font-mono text-slate-500 w-6">
@@ -457,7 +461,7 @@ function BordaCountSection() {
                     </span>
                     <span
                       className={`font-mono font-bold w-8 text-center ${
-                        c === winner
+                        isTop
                           ? "text-yellow-700 text-lg"
                           : "text-slate-700"
                       }`}
@@ -467,7 +471,7 @@ function BordaCountSection() {
                     <div className="flex-1 bg-white rounded-full h-6 overflow-hidden border border-slate-200">
                       <div
                         className={`h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2 ${
-                          c === winner
+                          isTop
                             ? "bg-gradient-to-r from-yellow-400 to-amber-500"
                             : "bg-gradient-to-r from-slate-300 to-slate-400"
                         }`}
@@ -478,10 +482,10 @@ function BordaCountSection() {
                         </span>
                       </div>
                     </div>
-                    {c === winner && (
+                    {isTop && (
                       <Badge className="bg-yellow-500 text-white">
                         <Trophy className="w-3 h-3 mr-1" />
-                        最优
+                        {winners.length > 1 ? "并列最优" : "最优"}
                       </Badge>
                     )}
                   </div>
@@ -489,13 +493,27 @@ function BordaCountSection() {
               })}
             </div>
             <div className="mt-3 pt-3 border-t border-yellow-200 text-sm text-slate-600">
-              <span className="font-semibold text-slate-800">最优方案：</span>
-              <span className="font-bold text-yellow-700 text-lg ml-1">
-                {winner}
-              </span>
-              <span className="ml-2 text-slate-500">
-                （波德数 = {scores[winner]}）
-              </span>
+              {winners.length === 1 ? (
+                <>
+                  <span className="font-semibold text-slate-800">最优方案：</span>
+                  <span className="font-bold text-yellow-700 text-lg ml-1">
+                    {winners[0]}
+                  </span>
+                  <span className="ml-2 text-slate-500">
+                    （波德数 = {scores[winners[0]]}）
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold text-slate-800">并列最优方案：</span>
+                  <span className="font-bold text-yellow-700 text-lg ml-1">
+                    {winners.join("、")}
+                  </span>
+                  <span className="ml-2 text-slate-500">
+                    （波德数 = {maxScore}）
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
