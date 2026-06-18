@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Construction, AlertTriangle } from 'lucide-react'
+import { ArrowRight, BookOpen, Construction, AlertTriangle, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Chapter {
@@ -218,6 +218,13 @@ function Footer() {
               本网站内容仅供教学与学习交流使用。未经授权，禁止用于商业用途或大规模转载。
             </span>
           </div>
+          <a
+            href="mailto:gengc25@hotmail.com"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors"
+          >
+            <Mail className="w-4 h-4" aria-hidden="true" />
+            如发现内容疏漏，或有合作意向，欢迎联系：gengc25@hotmail.com
+          </a>
           <p className="text-white/60 text-xs">
             All Rights Reserved. Licensed for educational use.
           </p>
