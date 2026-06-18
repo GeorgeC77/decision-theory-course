@@ -188,9 +188,9 @@ function MatrixEditor({
               <Input
                 key={j}
                 type="number"
-                step="0.1"
-                min="0"
-                max="1"
+                step={0.01}
+                min={0}
+                max={1}
                 value={val}
                 readOnly={readOnly}
                 onChange={(e) => handleChange(i, j, e.target.value)}
