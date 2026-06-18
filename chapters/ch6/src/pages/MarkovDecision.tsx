@@ -213,7 +213,7 @@ function MatrixLatex({ matrix, name }: { matrix: number[][]; name?: string }) {
   const tex =
     (name ? name + " = " : "") +
     "\\begin{bmatrix}" +
-    matrix.map((row) => row.map((v) => v.toFixed(3)).join(" & ")).join(" \\") +
+    matrix.map((row) => row.map((v) => v.toFixed(3)).join(" & ")).join(" \\\\") +
     "\\end{bmatrix}";
   return <KaTeX tex={tex} display />;
 }

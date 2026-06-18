@@ -469,7 +469,7 @@ export default function MultiStageDecision() {
           </h3>
           <div className="bg-slate-50 rounded-lg p-4 overflow-x-auto">
             <Katex
-              tex="V_n(s) = \max_{a \in A(s)} \left\{ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V_{n+1}(s') \right\}"
+              tex="V_n(s) = \\max_{a \\in A(s)} \\left\\{ R(s,a) + \\gamma \\sum_{s'} P(s'|s,a) V_{n+1}(s') \\right\\}"
               display
             />
             <p className="text-xs text-slate-500 mt-2">
@@ -481,7 +481,7 @@ export default function MultiStageDecision() {
               的最优值函数，{" "}
               <Katex tex="R(s,a)" />{" "}
               为即时收益，{" "}
-              <Katex tex="\gamma" />{" "}
+              <Katex tex="\\gamma" />{" "}
               为折扣因子。
             </p>
           </div>
@@ -524,10 +524,10 @@ export default function MultiStageDecision() {
               <thead>
                 <tr className="bg-slate-800 text-white">
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[100px]">
-                    <Katex tex="\theta" />
+                    <Katex tex="\\theta" />
                   </th>
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[80px]">
-                    <Katex tex="P(\theta)" />
+                    <Katex tex="P(\\theta)" />
                   </th>
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[100px]">
                     <Katex tex="a_1" />
