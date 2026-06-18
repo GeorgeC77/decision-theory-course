@@ -1040,7 +1040,7 @@ export default function DeaPage() {
               className="rounded-lg p-4 text-sm font-medium"
               style={{ background: '#FDE8E8', border: '1px solid #fecaca', color: '#dc2626' }}
             >
-              当前数据无法归一化，暂不显示效率代理值对比图。请检查投入数据是否大于 0，并确保至少存在一个有效评价单元。
+              当前数据无法归一化，暂不显示效率代理值对比图。所有有效评价单元的产出投入比均为 0，或不存在投入总和大于 0 的评价单元。请检查投入是否大于 0，并确保至少一个评价单元具有正产出。
             </div>
           ) : (
             <>
