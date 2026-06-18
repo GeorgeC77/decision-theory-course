@@ -89,7 +89,11 @@ function EditableCell({
       type="number"
       step={isProb ? 0.01 : 1000}
       value={value}
-      onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+      onChange={(e) => {
+        const v = parseFloat(e.target.value);
+        const parsed = Number.isNaN(v) ? 0 : v;
+        onChange(isProb ? Math.max(0, Math.min(1, parsed)) : parsed);
+      }}
       className={`w-full text-center px-2 py-1.5 rounded border text-sm font-medium transition-all
         ${
           highlight
@@ -116,7 +120,11 @@ function ProbCell({
       min={0}
       max={1}
       value={value}
-      onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+      onChange={(e) => {
+        const v = parseFloat(e.target.value);
+        const clamped = Number.isNaN(v) ? 0 : Math.max(0, Math.min(1, v));
+        onChange(clamped);
+      }}
       className="w-full text-center px-2 py-1.5 rounded border border-slate-200 bg-white hover:border-slate-300 focus:border-slate-400 focus:ring-1 focus:ring-slate-300 focus:outline-none text-sm font-medium"
     />
   );
@@ -197,6 +205,10 @@ export default function MultiStageDecision() {
       }
     }
 
+    // Branches with zero marginal probability cannot yield valid posterior distributions
+    const pHEps = 1e-9;
+    const branchImpossible = pH.map((p) => p <= pHEps);
+
     // P(theta_j | H_k) = P(theta_j) * P(H_k | theta_j) / P(H_k)
     const posterior: number[][] = [[], [], []];
     for (let k = 0; k < 3; k++) {
@@ -260,6 +272,7 @@ export default function MultiStageDecision() {
     return {
       valid: true as const,
       pH,
+      branchImpossible,
       posterior,
       evPosterior,
       posteriorDecisions,
@@ -582,95 +595,111 @@ export default function MultiStageDecision() {
             <TrendingUp className="w-4 h-4 text-emerald-500" />
             各方案期望收益值（先验分析）
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { label: "a_1（大批生产）", ev: expectedValues[0], idx: 0 },
-              { label: "a_2（中批生产）", ev: expectedValues[1], idx: 1 },
-              { label: "a_3（小批生产）", ev: expectedValues[2], idx: 2 },
-            ].map((item) => (
-              <div
-                key={item.idx}
-                className={`rounded-lg p-4 border-2 transition-all ${
-                  bestActionIndexes.includes(item.idx)
-                    ? "border-emerald-400 bg-emerald-50 shadow-sm"
-                    : "border-slate-200 bg-white"
-                }`}
-              >
-                <div className="text-sm font-medium text-slate-600 mb-1">
-                  <Katex tex={item.label} />
-                </div>
-                <div
-                  className={`text-lg font-bold ${
-                    bestActionIndexes.includes(item.idx)
-                      ? "text-emerald-700"
-                      : "text-slate-800"
-                  }`}
-                >
-                  {item.ev.toLocaleString("zh-CN", {
-                    maximumFractionDigits: 0,
-                  })}{" "}
-                  元
-                </div>
-                {bestActionIndexes.includes(item.idx) && (
-                  <div className="flex items-center gap-1 mt-1 text-xs text-emerald-600 font-medium">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    {bestActionIndexes.length > 1
-                      ? "购买技术时的先验并列最优批量"
-                      : "购买技术时的先验最优批量"}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 扣除技术费后的净收益 */}
-          <div className="mt-4 bg-white rounded-lg p-4 border border-slate-200">
-            <h4 className="text-sm font-semibold text-slate-700 mb-2">
-              购买技术后的净收益（扣除4000元技术费）
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {expectedValues.map((ev, i) => {
-                const net = ev - 4000;
-                const isBest = bestActionIndexes.includes(i);
-                return (
+          {priorValid ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { label: "a_1（大批生产）", ev: expectedValues[0], idx: 0 },
+                  { label: "a_2（中批生产）", ev: expectedValues[1], idx: 1 },
+                  { label: "a_3（小批生产）", ev: expectedValues[2], idx: 2 },
+                ].map((item) => (
                   <div
-                    key={i}
-                    className={`text-center rounded-md py-2 px-3 text-sm font-medium ${
-                      isBest
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-slate-100 text-slate-600"
+                    key={item.idx}
+                    className={`rounded-lg p-4 border-2 transition-all ${
+                      bestActionIndexes.includes(item.idx)
+                        ? "border-emerald-400 bg-emerald-50 shadow-sm"
+                        : "border-slate-200 bg-white"
                     }`}
                   >
-                    <Katex tex={`a_${i + 1}:`} />{" "}
-                    {net.toLocaleString("zh-CN", {
-                      maximumFractionDigits: 0,
-                    })}{" "}
-                    元
+                    <div className="text-sm font-medium text-slate-600 mb-1">
+                      <Katex tex={item.label} />
+                    </div>
+                    <div
+                      className={`text-lg font-bold ${
+                        bestActionIndexes.includes(item.idx)
+                          ? "text-emerald-700"
+                          : "text-slate-800"
+                      }`}
+                    >
+                      {item.ev.toLocaleString("zh-CN", {
+                        maximumFractionDigits: 0,
+                      })}{" "}
+                      元
+                    </div>
+                    {bestActionIndexes.includes(item.idx) && (
+                      <div className="flex items-center gap-1 mt-1 text-xs text-emerald-600 font-medium">
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        {bestActionIndexes.length > 1
+                          ? "购买技术时的先验并列最优批量"
+                          : "购买技术时的先验最优批量"}
+                      </div>
+                    )}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+
+              {/* 扣除技术费后的净收益 */}
+              <div className="mt-4 bg-white rounded-lg p-4 border border-slate-200">
+                <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                  购买技术后的净收益（扣除4000元技术费）
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {expectedValues.map((ev, i) => {
+                    const net = ev - 4000;
+                    const isBest = bestActionIndexes.includes(i);
+                    return (
+                      <div
+                        key={i}
+                        className={`text-center rounded-md py-2 px-3 text-sm font-medium ${
+                          isBest
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        <Katex tex={`a_${i + 1}:`} />{" "}
+                        {net.toLocaleString("zh-CN", {
+                          maximumFractionDigits: 0,
+                        })}{" "}
+                        元
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 text-sm text-slate-600">
+                  不买技术的收益：
+                  <strong>8000 元</strong>
+                  {(() => {
+                    const priorBuyValue = maxEv - 4000;
+                    return priorBuyValue > 8000 ? (
+                      <span className="text-emerald-600 ml-2">
+                        → 购买技术更优（净收益 {priorBuyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
+                      </span>
+                    ) : priorBuyValue < 8000 ? (
+                      <span className="text-amber-600 ml-2">
+                        → 不购买技术更优（8000 元）
+                      </span>
+                    ) : (
+                      <span className="text-slate-600 ml-2">
+                        → 购买技术与不购买技术收益相同
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">先验概率无效，无法输出先验决策结论</p>
+                  <p className="mt-1">
+                    当前先验概率之和为 <strong>{priorSum.toFixed(4)}</strong>，且每个概率必须非负。请先验概率之和为 1 后再查看期望收益与购买技术的比较结论。
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="mt-3 text-sm text-slate-600">
-              不买技术的收益：
-              <strong>8000 元</strong>
-              {(() => {
-                const priorBuyValue = maxEv - 4000;
-                return priorBuyValue > 8000 ? (
-                  <span className="text-emerald-600 ml-2">
-                    → 购买技术更优（净收益 {priorBuyValue.toLocaleString("zh-CN", { maximumFractionDigits: 0 })} 元）
-                  </span>
-                ) : priorBuyValue < 8000 ? (
-                  <span className="text-amber-600 ml-2">
-                    → 不购买技术更优（8000 元）
-                  </span>
-                ) : (
-                  <span className="text-slate-600 ml-2">
-                    → 购买技术与不购买技术收益相同
-                  </span>
-                );
-              })()}
-            </div>
-          </div>
+          )}
         </div>
 
         {/* ── 贝叶斯计算交互区 ─────────────────────────────────── */}
@@ -838,7 +867,13 @@ export default function MultiStageDecision() {
                       {posteriorResults.pH.map((ph, k) => (
                         <tr
                           key={k}
-                          className={k % 2 === 0 ? "bg-white" : "bg-emerald-50/50"}
+                          className={
+                            posteriorResults.branchImpossible[k]
+                              ? "bg-red-50"
+                              : k % 2 === 0
+                              ? "bg-white"
+                              : "bg-emerald-50/50"
+                          }
                         >
                           <td className="px-3 py-2.5 text-center font-medium text-slate-700">
                             <Katex tex={`H_${k + 1}`} />
@@ -846,14 +881,26 @@ export default function MultiStageDecision() {
                           <td className="px-3 py-2.5 text-center font-mono text-slate-700">
                             {ph.toFixed(3)}
                           </td>
-                          {posteriorResults.posterior[k].map((p, j) => (
+                          {posteriorResults.branchImpossible[k] ? (
                             <td
-                              key={j}
-                              className="px-3 py-2.5 text-center font-mono text-slate-700"
+                              colSpan={3}
+                              className="px-3 py-2.5 text-center text-sm text-red-600 font-medium"
                             >
-                              {p.toFixed(3)}
+                              <span className="inline-flex items-center gap-1">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                后验概率未定义
+                              </span>
                             </td>
-                          ))}
+                          ) : (
+                            posteriorResults.posterior[k].map((p, j) => (
+                              <td
+                                key={j}
+                                className="px-3 py-2.5 text-center font-mono text-slate-700"
+                              >
+                                {p.toFixed(3)}
+                              </td>
+                            ))
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -867,6 +914,22 @@ export default function MultiStageDecision() {
                   </h4>
                   <div className="space-y-3">
                     {posteriorResults.evPosterior.map((evs, k) => {
+                      if (posteriorResults.branchImpossible[k]) {
+                        return (
+                          <div
+                            key={k}
+                            className="bg-red-50 rounded-lg p-4 border border-red-200"
+                          >
+                            <div className="text-sm font-medium text-red-800 mb-1">
+                              若试销结果为 <Katex tex={`H_${k + 1}`} />：
+                            </div>
+                            <p className="text-sm text-red-700 flex items-center gap-1">
+                              <AlertTriangle className="w-4 h-4 shrink-0" />
+                              P(H_{k+1}) = 0，该分支不可能出现，后验概率未定义。
+                            </p>
+                          </div>
+                        );
+                      }
                       const decision = posteriorResults.posteriorDecisions[k];
                       const bestIdxs = evs
                         .map((ev, i) => (Math.abs(ev - decision.maxBatchEv) < 1e-9 ? i : -1))
