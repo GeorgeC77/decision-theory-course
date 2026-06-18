@@ -148,7 +148,12 @@ export default function MultiStageDecision() {
   }, [payoffData]);
 
   const maxEv = Math.max(...expectedValues);
-  const bestActionIndex = expectedValues.indexOf(maxEv);
+  const bestActionIndexes = expectedValues
+    .map((ev, i) => (Math.abs(ev - maxEv) < 1e-9 ? i : -1))
+    .filter((i) => i !== -1);
+  const batchName = (idx: number) =>
+    idx === 0 ? "大批生产" : idx === 1 ? "中批生产" : "小批生产";
+  const bestBatchNames = bestActionIndexes.map(batchName).join("、");
 
   // ── Probability validation ───────────────────────────────────
   const priorSum = useMemo(
@@ -547,21 +552,21 @@ export default function MultiStageDecision() {
                       <EditableCell
                         value={row.a1}
                         onChange={(v) => updatePayoff(i, "a1", v)}
-                        highlight={bestActionIndex === 0}
+                        highlight={bestActionIndexes.includes(0)}
                       />
                     </td>
                     <td className="px-3 py-2">
                       <EditableCell
                         value={row.a2}
                         onChange={(v) => updatePayoff(i, "a2", v)}
-                        highlight={bestActionIndex === 1}
+                        highlight={bestActionIndexes.includes(1)}
                       />
                     </td>
                     <td className="px-3 py-2">
                       <EditableCell
                         value={row.a3}
                         onChange={(v) => updatePayoff(i, "a3", v)}
-                        highlight={bestActionIndex === 2}
+                        highlight={bestActionIndexes.includes(2)}
                       />
                     </td>
                   </tr>
@@ -586,7 +591,7 @@ export default function MultiStageDecision() {
               <div
                 key={item.idx}
                 className={`rounded-lg p-4 border-2 transition-all ${
-                  item.idx === bestActionIndex
+                  bestActionIndexes.includes(item.idx)
                     ? "border-emerald-400 bg-emerald-50 shadow-sm"
                     : "border-slate-200 bg-white"
                 }`}
@@ -596,7 +601,7 @@ export default function MultiStageDecision() {
                 </div>
                 <div
                   className={`text-lg font-bold ${
-                    item.idx === bestActionIndex
+                    bestActionIndexes.includes(item.idx)
                       ? "text-emerald-700"
                       : "text-slate-800"
                   }`}
@@ -606,10 +611,12 @@ export default function MultiStageDecision() {
                   })}{" "}
                   元
                 </div>
-                {item.idx === bestActionIndex && (
+                {bestActionIndexes.includes(item.idx) && (
                   <div className="flex items-center gap-1 mt-1 text-xs text-emerald-600 font-medium">
                     <CheckCircle className="w-3.5 h-3.5" />
-                    最优方案
+                    {bestActionIndexes.length > 1
+                      ? "购买技术时的先验并列最优批量"
+                      : "购买技术时的先验最优批量"}
                   </div>
                 )}
               </div>
@@ -624,7 +631,7 @@ export default function MultiStageDecision() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {expectedValues.map((ev, i) => {
                 const net = ev - 4000;
-                const isBest = i === bestActionIndex;
+                const isBest = bestActionIndexes.includes(i);
                 return (
                   <div
                     key={i}
@@ -861,7 +868,9 @@ export default function MultiStageDecision() {
                   <div className="space-y-3">
                     {posteriorResults.evPosterior.map((evs, k) => {
                       const decision = posteriorResults.posteriorDecisions[k];
-                      const bestIdx = evs.indexOf(decision.maxBatchEv);
+                      const bestIdxs = evs
+                        .map((ev, i) => (Math.abs(ev - decision.maxBatchEv) < 1e-9 ? i : -1))
+                        .filter((i) => i !== -1);
                       return (
                         <div
                           key={k}
@@ -876,7 +885,7 @@ export default function MultiStageDecision() {
                               <div
                                 key={a}
                                 className={`text-center rounded-md py-2 px-2 text-sm font-medium ${
-                                  a === bestIdx
+                                  bestIdxs.includes(a)
                                     ? "bg-emerald-100 text-emerald-800"
                                     : "bg-slate-100 text-slate-600"
                                 }`}
@@ -887,9 +896,11 @@ export default function MultiStageDecision() {
                                   maximumFractionDigits: 0,
                                 })}{" "}
                                 元
-                                {a === bestIdx && (
+                                {bestIdxs.includes(a) && (
                                   <span className="text-xs block mt-0.5 text-emerald-600">
-                                    购买技术时的最优批量
+                                    {bestIdxs.length > 1
+                                      ? "购买技术时的并列最优批量"
+                                      : "购买技术时的最优批量"}
                                   </span>
                                 )}
                               </div>
@@ -928,11 +939,7 @@ export default function MultiStageDecision() {
                               综合先验分析，最优决策为购买技术（4000元）并采用
                               <strong className="text-emerald-700">
                                 {" "}
-                                {bestActionIndex === 0
-                                  ? "大批生产"
-                                  : bestActionIndex === 1
-                                  ? "中批生产"
-                                  : "小批生产"}
+                                {bestBatchNames}
                               </strong>
                               ，期望净收益为{" "}
                               <strong className="text-emerald-700">
@@ -973,7 +980,7 @@ export default function MultiStageDecision() {
                             {posteriorResults.netEVSI > 0
                               ? "做试销，试销后根据结果选择购买技术并采用对应批量方案，或不购买技术"
                               : posteriorResults.priorChooseBuy
-                              ? `不做试销，直接购买技术并采用${bestActionIndex === 0 ? "大批生产" : bestActionIndex === 1 ? "中批生产" : "小批生产"}`
+                              ? `不做试销，直接购买技术并采用${bestBatchNames}`
                               : "不做试销，也不购买技术"}
                           </strong>
                           。

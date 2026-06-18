@@ -628,6 +628,11 @@ export default function MarkovDecision() {
                 <Calculator className="h-4 w-4 mr-2" />
                 求解稳态概率
               </Button>
+              {exampleRowError && (
+                <p className="text-xs text-amber-700">
+                  请先修正转移矩阵，使每行概率非负且和为1。
+                </p>
+              )}
             </div>
           </div>
 

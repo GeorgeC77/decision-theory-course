@@ -143,7 +143,7 @@ function calculateEfficiency(
         inputRedundancy: dmu.inputs.map(() => 0),
         validInput: withMeta[idx].validInput,
       })),
-      error: '当前数据无法归一化：没有有效评价单元的投入产出比。请检查投入数据是否大于 0。',
+      error: '当前数据无法归一化：所有有效评价单元的产出投入比均为0，或不存在投入总和大于0的评价单元。请检查投入是否大于0，并确保至少一个评价单元具有正产出。',
       invalidInputNames,
     };
   }

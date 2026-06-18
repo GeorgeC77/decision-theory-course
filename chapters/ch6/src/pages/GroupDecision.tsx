@@ -616,39 +616,18 @@ function WeightedMethodSection() {
         {/* 步骤 */}
         <div>
           <h3 className="font-semibold text-slate-800 mb-3">方法步骤</h3>
-          <ol className="space-y-2 text-sm text-slate-700">
+          <ol className="list-decimal ml-5 space-y-2 text-sm text-slate-700">
             {[
-              "每个决策者单独对各方案进行多指标决策",
-              "计算各方案的算术加权平均分和几何加权平均分",
-              "计算混合平均分：",
-              "计算总体平均分：",
-              "计算评价系数并排序：",
-              "计算协调系数 W 检验一致性",
+              { text: "每个决策者单独对各方案进行多指标决策" },
+              { text: "计算各方案的算术加权平均分和几何加权平均分" },
+              { text: "计算混合平均分：", formula: "t_i = (p_i + q_i)/2" },
+              { text: "计算总体平均分：", formula: "v_i = \\sum_{k=1}^{m} \\lambda_k t_i^{(k)}" },
+              { text: "计算评价系数并排序：", formula: "e_i = v_i / \\sum v_i" },
+              { text: "计算协调系数 W 检验一致性" },
             ].map((step, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-bold">
-                  {i + 1}
-                </span>
-                <span className="pt-0.5">
-                  {i === 2 ? (
-                    <>
-                      {step}
-                      <TeX math="t_i = (p_i + q_i)/2" display />
-                    </>
-                  ) : i === 3 ? (
-                    <>
-                      {step}
-                      <TeX math="v_i = \sum_{k=1}^{m} \lambda_k t_i^{(k)}" display />
-                    </>
-                  ) : i === 4 ? (
-                    <>
-                      {step}
-                      <TeX math="e_i = v_i / \sum v_i" display />
-                    </>
-                  ) : (
-                    step
-                  )}
-                </span>
+              <li key={i}>
+                {step.text}
+                {step.formula && <TeX math={step.formula} display />}
               </li>
             ))}
           </ol>
@@ -783,9 +762,24 @@ function WeightedExample() {
     evalCoeff[s] = parseFloat((overallAvg[s] / sumV).toFixed(4));
   });
 
-  // Ranking
+  // Ranking (with tie handling)
   const sortedSchemes = [...schemes].sort(
     (a, b) => evalCoeff[b] - evalCoeff[a]
+  );
+  const maxCoeff = Math.max(...schemes.map((s) => evalCoeff[s]));
+  const topSchemes = schemes.filter(
+    (s) => Math.abs(evalCoeff[s] - maxCoeff) < 1e-9
+  );
+  const rankedSchemes = sortedSchemes.reduce<{ s: string; rank: number; isTop: boolean }[]>(
+    (acc, s, i) => {
+      let rank = i + 1;
+      if (i > 0 && Math.abs(evalCoeff[s] - evalCoeff[sortedSchemes[i - 1]]) < 1e-9) {
+        rank = acc[i - 1]?.rank ?? i + 1;
+      }
+      acc.push({ s, rank, isTop: topSchemes.includes(s) });
+      return acc;
+    },
+    []
   );
 
   return (
@@ -987,20 +981,20 @@ function WeightedExample() {
               ⑤ 评价系数 <TeX math="e_i = v_i / \sum v_i" />
             </h4>
             <div className="space-y-1">
-              {sortedSchemes.map((s, i) => {
+              {rankedSchemes.map(({ s, rank, isTop }) => {
                 const pct = (evalCoeff[s] * 100).toFixed(2);
                 return (
                   <div key={s} className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 w-6">
-                      #{i + 1}
+                      #{rank}
                     </span>
                     <span className="font-mono text-sm w-12">{s}</span>
                     <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${
-                          i === 0
+                          isTop
                             ? "bg-yellow-400"
-                            : i === 1
+                            : rank === 2
                             ? "bg-slate-300"
                             : "bg-slate-200"
                         }`}
@@ -1010,6 +1004,9 @@ function WeightedExample() {
                     <span className="text-xs font-mono text-slate-600 w-16 text-right">
                       {evalCoeff[s]}
                     </span>
+                    {isTop && topSchemes.length > 1 && (
+                      <span className="text-[10px] text-amber-600 font-medium">并列</span>
+                    )}
                   </div>
                 );
               })}
@@ -1019,25 +1016,24 @@ function WeightedExample() {
 
         {/* Final Result */}
         <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg p-4 text-center">
-          <p className="text-sm text-slate-600 mb-1">最终排名</p>
+          <p className="text-sm text-slate-600 mb-1">
+            {topSchemes.length === 1 ? "最终最优方案" : "并列最优方案"}
+          </p>
           <div className="flex items-center justify-center gap-2 flex-wrap">
-            {sortedSchemes.map((s, i) => (
-              <div key={s} className="flex items-center gap-1">
-                {i > 0 && <span className="text-slate-400 mx-1">&gt;</span>}
-                <Badge
-                  variant={i === 0 ? "default" : "outline"}
-                  className={
-                    i === 0
-                      ? "bg-yellow-500 text-white text-base px-3 py-1"
-                      : "text-sm px-2 py-0.5"
-                  }
-                >
-                  {i === 0 && <Trophy className="w-3 h-3 mr-1" />}
-                  {s} ({evalCoeff[s]})
-                </Badge>
-              </div>
+            {topSchemes.map((s) => (
+              <Badge
+                key={s}
+                variant="default"
+                className="bg-yellow-500 text-white text-base px-3 py-1"
+              >
+                <Trophy className="w-3 h-3 mr-1" />
+                {s} ({evalCoeff[s]})
+              </Badge>
             ))}
           </div>
+          <p className="text-xs text-slate-500 mt-2">
+            完整排名见上方评价系数图
+          </p>
         </div>
       </div>
     </div>

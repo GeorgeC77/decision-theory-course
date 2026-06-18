@@ -571,7 +571,7 @@ export default function DecisionTreeAnalysis() {
                     <span className="text-xs text-[#9E9E9E]">, P=</span>
                     <input
                       type="number"
-                      step={0.1}
+                      step={0.01}
                       min={0}
                       max={1}
                       value={scheme.states[0].prob}
@@ -612,7 +612,7 @@ export default function DecisionTreeAnalysis() {
                     <span className="text-xs text-[#9E9E9E]">, P=</span>
                     <input
                       type="number"
-                      step={0.1}
+                      step={0.01}
                       min={0}
                       max={1}
                       value={scheme.states[1].prob}
