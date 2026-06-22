@@ -1019,17 +1019,17 @@ function ContinuousDecisionModule() {
                 <TeX formula="x_1 + y_1 = 10" display />
               </div>
               <div>
-                <TeX formula="x_2 + y_2 = 0.5x_1 + 0.2y_1" display />
+                <TeX formula="x_2 + y_2 = 1.5x_1 + 1.2y_1" display />
               </div>
               <div>
                 <TeX
-                  formula="x_3 + y_3 = 0.5(x_1+x_2) + 0.2(y_1+y_2)"
+                  formula="x_3 + y_3 = 1.5x_2 + 1.2y_2"
                   display
                 />
               </div>
               <div>
                 <TeX
-                  formula="x_4 + y_4 = 0.5(x_1+x_2+x_3) + 0.2(y_1+y_2+y_3)"
+                  formula="x_4 + y_4 = 1.5x_3 + 1.2y_3"
                   display
                 />
               </div>

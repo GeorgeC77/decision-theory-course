@@ -925,7 +925,7 @@ export default function MultiStageDecision() {
                             </div>
                             <p className="text-sm text-red-700 flex items-center gap-1">
                               <AlertTriangle className="w-4 h-4 shrink-0" />
-                              P(H_{k+1}) = 0，该分支不可能出现，后验概率未定义。
+                              <Katex tex={`P(H_${k + 1}) = 0`} />，该分支不可能出现，后验概率未定义。
                             </p>
                           </div>
                         );
