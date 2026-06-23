@@ -469,7 +469,7 @@ export default function MultiStageDecision() {
           </h3>
           <div className="bg-slate-50 rounded-lg p-4 overflow-x-auto">
             <Katex
-              tex="V_n(s) = \\max_{a \\in A(s)} \\left\\{ R(s,a) + \\gamma \\sum_{s'} P(s'|s,a) V_{n+1}(s') \\right\\}"
+              tex="V_n(s) = \max_{a \in A(s)} \left\{ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V_{n+1}(s') \right\}"
               display
             />
             <p className="text-xs text-slate-500 mt-2">
@@ -481,7 +481,7 @@ export default function MultiStageDecision() {
               的最优值函数，{" "}
               <Katex tex="R(s,a)" />{" "}
               为即时收益，{" "}
-              <Katex tex="\\gamma" />{" "}
+              <Katex tex="\gamma" />{" "}
               为折扣因子。
             </p>
           </div>
@@ -524,10 +524,10 @@ export default function MultiStageDecision() {
               <thead>
                 <tr className="bg-slate-800 text-white">
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[100px]">
-                    <Katex tex="\\theta" />
+                    <Katex tex="\theta" />
                   </th>
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[80px]">
-                    <Katex tex="P(\\theta)" />
+                    <Katex tex="P(\theta)" />
                   </th>
                   <th className="px-3 py-2.5 text-center font-semibold min-w-[100px]">
                     <Katex tex="a_1" />
@@ -722,27 +722,27 @@ export default function MultiStageDecision() {
           <div className="mb-4">
             <h4 className="text-sm font-semibold text-slate-700 mb-2">
               似然分布{" "}
-              <Katex tex="P(H_k | \\theta_j)" />（可编辑）
+              <Katex tex="P(H_k | \theta_j)" />（可编辑）
             </h4>
             <div className="overflow-x-auto rounded-lg border border-slate-200">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-700 text-white">
                     <th className="px-3 py-2 text-center font-semibold">
-                      <Katex tex="\\theta" />
+                      <Katex tex="\theta" />
                     </th>
                     <th className="px-3 py-2 text-center font-semibold">
-                      <Katex tex="P(H_1|\\theta)" />
+                      <Katex tex="P(H_1|\theta)" />
                       <br />
                       受欢迎
                     </th>
                     <th className="px-3 py-2 text-center font-semibold">
-                      <Katex tex="P(H_2|\\theta)" />
+                      <Katex tex="P(H_2|\theta)" />
                       <br />
                       一般
                     </th>
                     <th className="px-3 py-2 text-center font-semibold">
-                      <Katex tex="P(H_3|\\theta)" />
+                      <Katex tex="P(H_3|\theta)" />
                       <br />
                       不受欢迎
                     </th>
@@ -794,7 +794,7 @@ export default function MultiStageDecision() {
               贝叶斯公式
             </h4>
             <Katex
-              tex="P(\\theta_j | H_k) = \\frac{P(\\theta_j) \\cdot P(H_k | \\theta_j)}{P(H_k)} = \\frac{P(\\theta_j) \\cdot P(H_k | \\theta_j)}{\\sum_{i} P(\\theta_i) \\cdot P(H_k | \\theta_i)}"
+              tex="P(\theta_j | H_k) = \frac{P(\theta_j) \cdot P(H_k | \theta_j)}{P(H_k)} = \frac{P(\theta_j) \cdot P(H_k | \theta_j)}{\sum_{i} P(\theta_i) \cdot P(H_k | \theta_i)}"
               display
             />
           </div>
@@ -853,13 +853,13 @@ export default function MultiStageDecision() {
                           <Katex tex="P(H_k)" />
                         </th>
                         <th className="px-3 py-2.5 text-center font-semibold">
-                          <Katex tex="P(\\theta_1|H_k)" />
+                          <Katex tex="P(\theta_1|H_k)" />
                         </th>
                         <th className="px-3 py-2.5 text-center font-semibold">
-                          <Katex tex="P(\\theta_2|H_k)" />
+                          <Katex tex="P(\theta_2|H_k)" />
                         </th>
                         <th className="px-3 py-2.5 text-center font-semibold">
-                          <Katex tex="P(\\theta_3|H_k)" />
+                          <Katex tex="P(\theta_3|H_k)" />
                         </th>
                       </tr>
                     </thead>

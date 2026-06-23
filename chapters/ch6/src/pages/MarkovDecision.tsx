@@ -450,10 +450,10 @@ export default function MarkovDecision() {
           {/* Formula section */}
           <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 space-y-2">
             <p className="text-sm text-slate-600">稳态概率满足以下方程组：</p>
-            <KaTeX tex="\\pi = \\pi P" display />
-            <KaTeX tex="\\sum_{i} \\pi_i = 1" display />
+            <KaTeX tex="\pi = \pi P" display />
+            <KaTeX tex="\sum_{i} \pi_i = 1" display />
             <p className="text-xs text-slate-500 mt-2">
-              其中 <KaTeX tex="\\pi = {[\\pi_1, \\pi_2, \\dots, \\pi_n]}" /> 为稳态概率向量，P 为状态转移矩阵。
+              其中 <KaTeX tex="\pi = {[\pi_1, \pi_2, \dots, \pi_n]}" /> 为稳态概率向量，P 为状态转移矩阵。
             </p>
           </div>
 
@@ -651,7 +651,7 @@ export default function MarkovDecision() {
                     tex={`\\pi_2 = ${exampleMatrix[0][1]}\\pi_1 + ${exampleMatrix[1][1]}\\pi_2`}
                     display
                   />
-                  <KaTeX tex="\\pi_1 + \\pi_2 = 1" display />
+                  <KaTeX tex="\pi_1 + \pi_2 = 1" display />
                 </div>
                 <div className="mt-3 pt-3 border-t border-violet-200">
                   <p className="text-sm text-violet-700 font-medium mb-1">解得：</p>
@@ -825,7 +825,7 @@ export default function MarkovDecision() {
                 </p>
                 <div className="bg-slate-50 p-3 rounded border border-slate-200">
                   <KaTeX
-                    tex="P(X_{n+1} = j \\mid X_n = i, X_{n-1}, \\dots, X_0) = P(X_{n+1} = j \\mid X_n = i)"
+                    tex="P(X_{n+1} = j \mid X_n = i, X_{n-1}, \dots, X_0) = P(X_{n+1} = j \mid X_n = i)"
                     display
                   />
                 </div>
@@ -843,10 +843,10 @@ export default function MarkovDecision() {
                   <p className="text-sm font-medium">求解步骤：</p>
                   <ol className="list-decimal list-inside text-sm space-y-1">
                     <li>
-                      建立方程组：<KaTeX tex="\\pi_j = \\sum_i \\pi_i P_{ij}" />（对所有状态 j）
+                      建立方程组：<KaTeX tex="\pi_j = \sum_i \pi_i P_{ij}" />（对所有状态 j）
                     </li>
                     <li>
-                      添加归一化条件：<KaTeX tex="\\sum_i \\pi_i = 1" />
+                      添加归一化条件：<KaTeX tex="\sum_i \pi_i = 1" />
                     </li>
                     <li>用任一方程替换为归一化条件（通常替换最后一个方程）</li>
                     <li>解线性方程组得到稳态概率</li>

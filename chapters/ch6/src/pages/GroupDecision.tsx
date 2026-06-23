@@ -639,32 +639,32 @@ function WeightedMethodSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormulaCard
               title="算术加权平均分"
-              formula="p_i^{(k)} = \\sum_{j=1}^{n} w_j u_{ij}^{(k)}"
+              formula="p_i^{(k)} = \sum_{j=1}^{n} w_j u_{ij}^{(k)}"
               desc="对专家k的方案i，按指标权重加权求和"
             />
             <FormulaCard
               title="几何加权平均分"
-              formula="q_i^{(k)} = \\prod_{j=1}^{n} \\left(u_{ij}^{(k)}\\right)^{w_j}"
+              formula="q_i^{(k)} = \prod_{j=1}^{n} \left(u_{ij}^{(k)}\right)^{w_j}"
               desc="对专家k的方案i，按指标权重加权连乘"
             />
             <FormulaCard
               title="混合平均分"
-              formula="t_i = \\frac{p_i + q_i}{2}"
+              formula="t_i = \frac{p_i + q_i}{2}"
               desc="算术与几何平均的折中"
             />
             <FormulaCard
               title="总体平均分"
-              formula="v_i = \\sum_{k=1}^{m} \\lambda_k t_i^{(k)}"
+              formula="v_i = \sum_{k=1}^{m} \lambda_k t_i^{(k)}"
               desc="综合各专家的加权结果"
             />
             <FormulaCard
               title="评价系数"
-              formula="e_i = \\frac{v_i}{\\sum_{j=1}^{n} v_j}"
+              formula="e_i = \frac{v_i}{\sum_{j=1}^{n} v_j}"
               desc="归一化后的综合评分"
             />
             <FormulaCard
               title="协调系数"
-              formula="W = \\frac{12}{m^2(n^3-n)} \\sum_{j=1}^{n} \\left(d_j - \\frac{m(n+1)}{2}\\right)^2"
+              formula="W = \frac{12}{m^2(n^3-n)} \sum_{j=1}^{n} \left(d_j - \frac{m(n+1)}{2}\right)^2"
               desc="m：专家人数；n：方案数；d_j：第 j 个方案的等级和。检验专家意见一致性程度"
             />
           </div>
@@ -790,7 +790,7 @@ function WeightedExample() {
           示例计算（5个方案，2个专家，2个目标）
         </h3>
         <p className="text-xs text-white/70 mt-1">
-          <TeX math="W=(0.5, 0.5)^T" />，<TeX math="\\lambda_1=\\lambda_2=0.5" />
+          <TeX math="W=(0.5, 0.5)^T" />，<TeX math="\lambda_1=\lambda_2=0.5" />
         </p>
       </div>
 
@@ -960,7 +960,7 @@ function WeightedExample() {
           <div>
             <h4 className="text-sm font-semibold text-slate-700 mb-2">
               ④ 总体平均分{" "}
-              <TeX math="v_i = \\sum_{k=1}^{m} \\lambda_k t_i^{(k)}" />
+              <TeX math="v_i = \sum_{k=1}^{m} \lambda_k t_i^{(k)}" />
             </h4>
             <div className="bg-emerald-50 rounded-lg p-3">
               {schemes.map((s) => (
@@ -978,7 +978,7 @@ function WeightedExample() {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-slate-700 mb-2">
-              ⑤ 评价系数 <TeX math="e_i = v_i / \\sum_{i=1}^{n} v_i" />
+              ⑤ 评价系数 <TeX math="e_i = v_i / \sum_{i=1}^{n} v_i" />
             </h4>
             <div className="space-y-1">
               {rankedSchemes.map(({ s, rank, isTop }) => {

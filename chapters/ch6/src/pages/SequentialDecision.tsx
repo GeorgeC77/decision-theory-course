@@ -1034,7 +1034,7 @@ function ContinuousDecisionModule() {
                 />
               </div>
               <div>
-                <TeX formula="x_i, y_i \\geq 0 \\quad (i=1,2,3,4)" display />
+                <TeX formula="x_i, y_i \geq 0 \quad (i=1,2,3,4)" display />
               </div>
             </div>
           </div>
@@ -1046,7 +1046,7 @@ function ContinuousDecisionModule() {
           <div className="bg-slate-50 rounded-lg p-4 overflow-x-auto">
             <div className="text-sm text-slate-700">
               <TeX
-                formula="\\max Q = \\sum_{i=1}^{4}(4-i+1)(2000x_i + 3000y_i)"
+                formula="\max Q = \sum_{i=1}^{4}(4-i+1)(2000x_i + 3000y_i)"
                 display
               />
             </div>
