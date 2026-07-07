@@ -210,12 +210,12 @@ export default function CaseStudy() {
               <p>
                 <DollarSign className="w-4 h-4 inline text-[#C8963E] mr-1" />
                 购车费占年收入比：
-                <TeX math="\\frac{\\text{车价} \\div \\text{使用年限}}{\\text{年收入}} \\times 100\\%" display={false} />
+                <TeX math="\frac{\text{车价} \div \text{使用年限}}{\text{年收入}} \times 100\%" display={false} />
               </p>
               <p>
                 <Fuel className="w-4 h-4 inline text-[#C8963E] mr-1" />
                 油费占年收入比：
-                <TeX math="\\frac{365 \\times \\text{日耗油} \\times \\text{油价}}{\\text{年收入}} \\times 100\\%" display={false} />
+                <TeX math="\frac{365 \times \text{日耗油} \times \text{油价}}{\text{年收入}} \times 100\%" display={false} />
               </p>
               <p>
                 若油耗降低 <strong>{fuelReduction}%</strong>，则目标油费负担为：
