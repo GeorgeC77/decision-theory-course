@@ -24,7 +24,7 @@ npm run build
 cp -r dist/* "$DIST/"
 
 # Build each chapter
-for ch in ch3 ch4 ch5 ch6; do
+for ch in ch1 ch3 ch4 ch5 ch6; do
   echo "=== Building $ch ==="
   cd "$ROOT/chapters/$ch"
   npm install
