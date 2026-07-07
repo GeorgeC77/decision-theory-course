@@ -28,6 +28,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: |
             index/package-lock.json
+            chapters/ch1/package-lock.json
             chapters/ch3/package-lock.json
             chapters/ch4/package-lock.json
             chapters/ch5/package-lock.json
