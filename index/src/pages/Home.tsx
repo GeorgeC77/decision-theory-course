@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, Construction, AlertTriangle, Mail } from 'lucide-react'
+import { ArrowRight, BookOpen, Construction, AlertTriangle, Mail, GraduationCap, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Chapter {
@@ -74,6 +74,13 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="pt-28 pb-12 md:pt-36 md:pb-16 px-4 text-center">
+      <div className="flex justify-center mb-6 animate-fade-in-up">
+        <img
+          src="./xbm.jpg"
+          alt="中国石油大学（华东）校徽"
+          className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white object-cover shadow-md border border-[#E0DDD5]"
+        />
+      </div>
       <h1 className="text-4xl md:text-5xl font-bold text-[#1B3A5F] tracking-tight mb-3 animate-fade-in-up">
         决策理论与方法
       </h1>
@@ -197,6 +204,38 @@ function ChapterCard({ chapter, index }: { chapter: Chapter; index: number }) {
   )
 }
 
+const instructors = ['崔耕', '渐令', '王信敏']
+
+function TeachingTeamSection() {
+  return (
+    <section className="px-4 sm:px-6 lg:px-8 pb-14">
+      <div
+        className="max-w-3xl mx-auto rounded-xl bg-white shadow-md border border-[#E0DDD5] px-6 py-8 text-center animate-fade-in-up"
+        style={{ animationDelay: '0.25s' }}
+      >
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <GraduationCap className="w-5 h-5 text-[#C8963E]" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-[#1B3A5F]">教学团队</h2>
+        </div>
+        <p className="text-sm text-[#6B6B6B] mb-6">
+          中国石油大学（华东）· 经济管理学院
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {instructors.map((name) => (
+            <span
+              key={name}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F8F6F2] border border-[#E0DDD5] text-sm text-[#1B3A5F] font-medium"
+            >
+              <User className="w-4 h-4 text-[#C8963E]" aria-hidden="true" />
+              {name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function ChaptersGrid() {
   return (
     <section className="px-4 sm:px-6 lg:px-8 pb-20">
@@ -247,6 +286,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
+        <TeachingTeamSection />
         <ChaptersGrid />
       </main>
       <Footer />
